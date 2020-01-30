@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "calndarAppPlayground/ViewController.swift"
+            timestampString = "564089594.497583"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "16"
+            endingLineNumber = "16"
+            landmarkName = "ViewController"
+            landmarkType = "3">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "calndarAppPlayground.ViewController.eventStore.getter : __C.EKEventStore"
+                  moduleName = "calndarAppPlayground"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/lanceowide/Desktop/Calendar%20App/Calendar%20App%20-%20Code/App1/calndarAppPlayground/calndarAppPlayground/ViewController.swift"
+                  timestampString = "564087079.1943409"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "16"
+                  endingLineNumber = "16"
+                  offsetFromSymbolStart = "114">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "calndarAppPlayground.ViewController.eventStore.setter : __C.EKEventStore"
+                  moduleName = "calndarAppPlayground"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/lanceowide/Desktop/Calendar%20App/Calendar%20App%20-%20Code/App1/calndarAppPlayground/calndarAppPlayground/ViewController.swift"
+                  timestampString = "564087079.198956"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "16"
+                  endingLineNumber = "16"
+                  offsetFromSymbolStart = "128">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "calndarAppPlayground.ViewController.init(nibName: Swift.Optional&lt;Swift.String&gt;, bundle: Swift.Optional&lt;__C.NSBundle&gt;) -&gt; calndarAppPlayground.ViewController"
+                  moduleName = "calndarAppPlayground"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/lanceowide/Desktop/Calendar%20App/Calendar%20App%20-%20Code/App1/calndarAppPlayground/calndarAppPlayground/ViewController.swift"
+                  timestampString = "564087079.2018189"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "16"
+                  endingLineNumber = "16"
+                  offsetFromSymbolStart = "49">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "calndarAppPlayground.ViewController.init(coder: __C.NSCoder) -&gt; Swift.Optional&lt;calndarAppPlayground.ViewController&gt;"
+                  moduleName = "calndarAppPlayground"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/lanceowide/Desktop/Calendar%20App/Calendar%20App%20-%20Code/App1/calndarAppPlayground/calndarAppPlayground/ViewController.swift"
+                  timestampString = "564087079.205128"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "16"
+                  endingLineNumber = "16"
+                  offsetFromSymbolStart = "41">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

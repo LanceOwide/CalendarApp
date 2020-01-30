@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Page View Controller-->
+        <scene sceneID="tzS-W5-pjf">
+            <objects>
+                <pageViewController storyboardIdentifier="pageViewTutorial" autoresizesArchivedViewToFullSize="NO" transitionStyle="scroll" navigationOrientation="horizontal" spineLocation="none" id="AQR-G8-kMb" customClass="PageViewController" customModule="Planr" customModuleProvider="target" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4Hi-UP-ipS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-412" y="607"/>
+        </scene>
+        <!--Tutorial2 View Controller-->
+        <scene sceneID="z9w-Si-jpb">
+            <objects>
+                <viewController storyboardIdentifier="tutorialPage2" id="T5e-qy-dhK" customClass="Tutorial2ViewController" customModule="Planr" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="eNe-h0-RJ0">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ts8-iH-M5n">
+                                <rect key="frame" x="50" y="94" width="314" height="718"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PlusCircleCloud" translatesAutoresizingMaskIntoConstraints="NO" id="wiY-cj-dAr">
+                                        <rect key="frame" x="57" y="59" width="200" height="200"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="200" id="fDC-V1-u4O"/>
+                                            <constraint firstAttribute="height" constant="200" id="r20-vm-FbP"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Create Events" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nj0-Ht-HRr">
+                                        <rect key="frame" x="73" y="309" width="168" height="34"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Choose the time and place for your event, letting Planr know the 'search period' (e.g. next 6 weeks) and who to invite. " textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S1Y-xI-b7R">
+                                        <rect key="frame" x="16" y="383" width="272" height="82.5"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstItem="S1Y-xI-b7R" firstAttribute="leading" secondItem="ts8-iH-M5n" secondAttribute="leading" constant="16" id="5SS-R0-Ljo"/>
+                                    <constraint firstItem="wiY-cj-dAr" firstAttribute="top" secondItem="ts8-iH-M5n" secondAttribute="top" constant="59" id="A3Z-Fl-l1K"/>
+                                    <constraint firstItem="nj0-Ht-HRr" firstAttribute="centerX" secondItem="ts8-iH-M5n" secondAttribute="centerX" id="GE2-Wt-GZ7"/>
+                                    <constraint firstAttribute="trailing" secondItem="S1Y-xI-b7R" secondAttribute="trailing" constant="26" id="Kaq-OR-nOD"/>
+                                    <constraint firstItem="nj0-Ht-HRr" firstAttribute="top" secondItem="wiY-cj-dAr" secondAttribute="bottom" constant="50" id="aV5-eJ-8pK"/>
+                                    <constraint firstItem="S1Y-xI-b7R" firstAttribute="top" secondItem="nj0-Ht-HRr" secondAttribute="bottom" constant="40" id="oSE-XT-v3l"/>
+                                    <constraint firstItem="wiY-cj-dAr" firstAttribute="centerX" secondItem="ts8-iH-M5n" secondAttribute="centerX" id="suE-cS-k2F"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="FDZ-pL-amk" firstAttribute="trailing" secondItem="ts8-iH-M5n" secondAttribute="trailing" constant="50" id="91Y-1O-nBd"/>
+                            <constraint firstItem="ts8-iH-M5n" firstAttribute="leading" secondItem="FDZ-pL-amk" secondAttribute="leading" constant="50" id="CGo-pI-TPx"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="FDZ-pL-amk"/>
+                    </view>
+                    <connections>
+                        <outlet property="uiView" destination="ts8-iH-M5n" id="XC7-VY-0CI"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yzX-DJ-IcL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="749" y="304"/>
+        </scene>
+        <!--Tutorial3 View Controller-->
+        <scene sceneID="HrL-Fe-fD0">
+            <objects>
+                <viewController storyboardIdentifier="tutorialPage3" id="Vfc-KY-BnB" customClass="Tutorial3ViewController" customModule="Planr" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="wKr-aA-8hC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3kh-VG-E8W">
+                                <rect key="frame" x="50" y="94" width="314" height="718"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Availability Screenshot" translatesAutoresizingMaskIntoConstraints="NO" id="gN9-a1-YSs">
+                                        <rect key="frame" x="0.0" y="5" width="314" height="250"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="250" id="62T-DV-DNU"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Instant availability" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AZV-Ua-qNP">
+                                        <rect key="frame" x="50" y="280" width="214" height="34"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="9" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v8x-gN-Yii">
+                                        <rect key="frame" x="16" y="339" width="282" height="103.5"/>
+                                        <string key="text">Plugging directly into your calendars to gather availability, we determine the best dates for your event. You choose the date, and Planr adds the event to all your invitees calendars.</string>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5rJ-Id-Y2a">
+                                        <rect key="frame" x="136" y="638" width="0.0" height="0.0"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="v8x-gN-Yii" secondAttribute="trailing" constant="16" id="3DQ-P7-5ID"/>
+                                    <constraint firstItem="gN9-a1-YSs" firstAttribute="leading" secondItem="3kh-VG-E8W" secondAttribute="leading" id="3mR-Sb-nBC"/>
+                                    <constraint firstItem="v8x-gN-Yii" firstAttribute="top" secondItem="AZV-Ua-qNP" secondAttribute="bottom" constant="25" id="3vT-Wq-mqH"/>
+                                    <constraint firstItem="gN9-a1-YSs" firstAttribute="top" secondItem="3kh-VG-E8W" secondAttribute="top" constant="5" id="DVO-DD-h70"/>
+                                    <constraint firstItem="AZV-Ua-qNP" firstAttribute="top" secondItem="gN9-a1-YSs" secondAttribute="bottom" constant="25" id="dXC-wj-3UA"/>
+                                    <constraint firstItem="v8x-gN-Yii" firstAttribute="leading" secondItem="3kh-VG-E8W" secondAttribute="leading" constant="16" id="sBC-o6-U5v"/>
+                                    <constraint firstAttribute="trailing" secondItem="gN9-a1-YSs" secondAttribute="trailing" id="wyd-uX-tYx"/>
+                                    <constraint firstItem="AZV-Ua-qNP" firstAttribute="centerX" secondItem="3kh-VG-E8W" secondAttribute="centerX" id="zuS-y9-4f9"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="3kh-VG-E8W" firstAttribute="leading" secondItem="bag-cf-Sma" secondAttribute="leading" constant="50" id="cHW-R2-C5C"/>
+                            <constraint firstItem="bag-cf-Sma" firstAttribute="trailing" secondItem="3kh-VG-E8W" secondAttribute="trailing" constant="50" id="vKH-xc-XRn"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="bag-cf-Sma"/>
+                    </view>
+                    <connections>
+                        <outlet property="uiView" destination="3kh-VG-E8W" id="sWz-v7-zji"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ONJ-vd-wzc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="750.72463768115949" y="955.58035714285711"/>
+        </scene>
+        <!--Tutorial4 View Controller-->
+        <scene sceneID="1Ob-Ab-mNb">
+            <objects>
+                <viewController storyboardIdentifier="tutorialPage4" id="gke-km-Iuy" customClass="Tutorial4ViewController" customModule="Planr" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Vb8-44-3tm">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0BK-2Z-Ve7">
+                                <rect key="frame" x="50" y="94" width="314" height="718"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icons8-like-message-200" translatesAutoresizingMaskIntoConstraints="NO" id="5RQ-Av-UBs">
+                                        <rect key="frame" x="57" y="59" width="200" height="200"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="200" id="g8l-lA-m91"/>
+                                            <constraint firstAttribute="height" constant="200" id="hLy-gP-mPd"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dedicated event chat" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zva-yE-UIS">
+                                        <rect key="frame" x="29" y="309" width="256" height="34"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="A dedicated event chat means no more clogging up up your group messages deciding where to go." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eGE-Vu-Kue">
+                                        <rect key="frame" x="16" y="393" width="282" height="61.5"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstItem="eGE-Vu-Kue" firstAttribute="top" secondItem="zva-yE-UIS" secondAttribute="bottom" constant="50" id="0hl-3Q-htQ"/>
+                                    <constraint firstItem="zva-yE-UIS" firstAttribute="top" secondItem="5RQ-Av-UBs" secondAttribute="bottom" constant="50" id="0oO-wQ-vhr"/>
+                                    <constraint firstItem="eGE-Vu-Kue" firstAttribute="leading" secondItem="0BK-2Z-Ve7" secondAttribute="leading" constant="16" id="C7y-T8-8Ka"/>
+                                    <constraint firstAttribute="trailing" secondItem="eGE-Vu-Kue" secondAttribute="trailing" constant="16" id="USb-Rg-VJ0"/>
+                                    <constraint firstItem="5RQ-Av-UBs" firstAttribute="centerX" secondItem="0BK-2Z-Ve7" secondAttribute="centerX" id="YLm-hH-EbX"/>
+                                    <constraint firstItem="5RQ-Av-UBs" firstAttribute="top" secondItem="0BK-2Z-Ve7" secondAttribute="top" constant="59" id="ZkQ-aE-5aU"/>
+                                    <constraint firstItem="zva-yE-UIS" firstAttribute="centerX" secondItem="0BK-2Z-Ve7" secondAttribute="centerX" id="tfg-mh-NW9"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="EeR-4a-we5" firstAttribute="trailing" secondItem="0BK-2Z-Ve7" secondAttribute="trailing" constant="50" id="I58-4H-4Pg"/>
+                            <constraint firstItem="0BK-2Z-Ve7" firstAttribute="leading" secondItem="EeR-4a-we5" secondAttribute="leading" constant="50" id="cHt-IO-dLo"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="EeR-4a-we5"/>
+                    </view>
+                    <connections>
+                        <outlet property="uiView" destination="0BK-2Z-Ve7" id="vAk-Sj-eoh"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gL3-q1-N6s" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="751" y="1631"/>
+        </scene>
+        <!--Tutorial1 View Controller-->
+        <scene sceneID="YcR-ks-x09">
+            <objects>
+                <viewController storyboardIdentifier="tutorialPage1" id="A1j-Se-b6a" customClass="Tutorial1ViewController" customModule="Planr" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="CWU-21-Slq">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5bR-bm-GSw">
+                                <rect key="frame" x="50" y="94" width="314" height="718"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome to Planr!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f8r-8f-qgW">
+                                        <rect key="frame" x="48.5" y="280" width="217.5" height="33.5"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tired of sending 100s of messages just to meet up with friends? Welcome to the app that makes it happen instantly." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oFu-CD-Rwu">
+                                        <rect key="frame" x="16" y="353.5" width="282" height="82.5"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PlanrLogoCentreRounded" translatesAutoresizingMaskIntoConstraints="NO" id="d0z-8a-058">
+                                        <rect key="frame" x="82" y="80" width="150" height="150"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="150" id="M7Q-8H-foG"/>
+                                            <constraint firstAttribute="height" constant="150" id="UD2-T4-Fdz"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="oFu-CD-Rwu" firstAttribute="leading" secondItem="5bR-bm-GSw" secondAttribute="leading" constant="16" id="6QD-71-uhv"/>
+                                    <constraint firstAttribute="trailing" secondItem="oFu-CD-Rwu" secondAttribute="trailing" constant="16" id="ALy-NN-MeC"/>
+                                    <constraint firstItem="d0z-8a-058" firstAttribute="top" secondItem="5bR-bm-GSw" secondAttribute="top" constant="80" id="QTs-IP-FBR"/>
+                                    <constraint firstItem="f8r-8f-qgW" firstAttribute="top" secondItem="d0z-8a-058" secondAttribute="bottom" constant="50" id="Vzf-kg-eID"/>
+                                    <constraint firstItem="oFu-CD-Rwu" firstAttribute="top" secondItem="f8r-8f-qgW" secondAttribute="bottom" constant="40" id="eew-j8-73e"/>
+                                    <constraint firstItem="d0z-8a-058" firstAttribute="centerX" secondItem="5bR-bm-GSw" secondAttribute="centerX" id="fsh-U2-RAK"/>
+                                    <constraint firstItem="f8r-8f-qgW" firstAttribute="centerX" secondItem="5bR-bm-GSw" secondAttribute="centerX" id="gbw-nr-78Y"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="Sec-oI-XF8" firstAttribute="trailing" secondItem="5bR-bm-GSw" secondAttribute="trailing" constant="50" id="Lgo-na-xP0"/>
+                            <constraint firstItem="5bR-bm-GSw" firstAttribute="leading" secondItem="Sec-oI-XF8" secondAttribute="leading" constant="50" id="VCP-0Z-s9L"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Sec-oI-XF8"/>
+                    </view>
+                    <connections>
+                        <outlet property="uiView" destination="5bR-bm-GSw" id="DWS-8Z-ibt"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QST-ow-Nbe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="740.57971014492762" y="-368.30357142857139"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Availability Screenshot" width="367" height="377"/>
+        <image name="PlanrLogoCentreRounded" width="4096" height="4096"/>
+        <image name="PlusCircleCloud" width="500" height="500"/>
+        <image name="icons8-like-message-200" width="200" height="200"/>
+    </resources>
+</document>
