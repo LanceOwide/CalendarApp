@@ -1966,7 +1966,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         let firstActivityItem = "Hey, I've invited you to an event on the Planr App, download the App to join https://testflight.apple.com/join/LUCwcAoC"
         
         
-        let subject = "Plar App - Event Invite"
+        let subject = "Planr App - Event Invite"
 //                let secondActivityItem : NSURL = NSURL(string: "http//www.circleitapp.com")!
                 // If you want to put an image
         //        let image : UIImage = UIImage(named: "image.jpg")!
