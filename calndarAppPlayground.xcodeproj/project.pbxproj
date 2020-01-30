@@ -37,6 +37,8 @@
 		244F12AF23A3D8FF0082D9F2 /* PlanrTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244F12AE23A3D8FF0082D9F2 /* PlanrTableViewCell.swift */; };
 		2452F0C9235F472F002B3B63 /* AppSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2452F0C8235F472E002B3B63 /* AppSettingsViewController.swift */; };
 		2458E94222EF8E0800F38716 /* AccountSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2458E94122EF8E0800F38716 /* AccountSettings.swift */; };
+		24593FF423E32070003B57D9 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 24593FF223E32070003B57D9 /* Model.xcdatamodeld */; };
+		24593FF623E328E9003B57D9 /* CoreDataCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24593FF523E328E9003B57D9 /* CoreDataCode.swift */; };
 		2461961723C59C3600276DB8 /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2461961623C59C3600276DB8 /* ChatLogController.swift */; };
 		2461961923C59C4B00276DB8 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2461961823C59C4B00276DB8 /* Message.swift */; };
 		2461961B23C59C6100276DB8 /* ChatMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2461961A23C59C6100276DB8 /* ChatMessageCell.swift */; };
@@ -93,7 +95,7 @@
 		24061DAF21BD9D8700602BE1 /* CalendarEventModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventModel.swift; sourceTree = "<group>"; };
 		24109DBD22DE2FEA009068A7 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
 		2415AF9621AF4E2600437EF8 /* ContactList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactList.swift; sourceTree = "<group>"; };
-		2419501B22D78ED4000DA71F /* Twilio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Twilio.swift; sourceTree = "<group>"; };
+		2419501B22D78ED4000DA71F /* Twilio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Twilio.swift; path = ../Twilio.swift; sourceTree = "<group>"; };
 		2419ACE922219D0F00BE2273 /* CalendarListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarListView.swift; sourceTree = "<group>"; };
 		241B1DD5226E32AB004BEB66 /* calndarAppPlayground.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = calndarAppPlayground.entitlements; sourceTree = "<group>"; };
 		241B1DD6226E45C8004BEB66 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../../Desktop/GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -121,6 +123,8 @@
 		244F12AE23A3D8FF0082D9F2 /* PlanrTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanrTableViewCell.swift; sourceTree = "<group>"; };
 		2452F0C8235F472E002B3B63 /* AppSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsViewController.swift; sourceTree = "<group>"; };
 		2458E94122EF8E0800F38716 /* AccountSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettings.swift; sourceTree = "<group>"; };
+		24593FF323E32070003B57D9 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		24593FF523E328E9003B57D9 /* CoreDataCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCode.swift; sourceTree = "<group>"; };
 		2461961623C59C3600276DB8 /* ChatLogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
 		2461961823C59C4B00276DB8 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		2461961A23C59C6100276DB8 /* ChatMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageCell.swift; sourceTree = "<group>"; };
@@ -192,15 +196,8 @@
 		24061DB121BD9D8F00602BE1 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				24061DAF21BD9D8700602BE1 /* CalendarEventModel.swift */,
-				24BE31AD21BF148400981307 /* CalendarEventModelRealm.swift */,
-				2415AF9621AF4E2600437EF8 /* ContactList.swift */,
-				241BBCCA21CEBD7B00B67617 /* eventSearch.swift */,
-				241F6A18222DCF6F005ED48B /* SelectedCalendars.swift */,
-				2419501B22D78ED4000DA71F /* Twilio.swift */,
-				2492D89222F48CDE001B4570 /* PrefixCodes.swift */,
-				2445E71D230461C1002278EF /* InviteeStruct.swift */,
-				24D6EE9F23D4E88600C00FC4 /* notificationModel.swift */,
+				24593FF123E32056003B57D9 /* Core Data */,
+				24593FF023E32022003B57D9 /* Classes */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -259,6 +256,30 @@
 			path = "Login & Register";
 			sourceTree = "<group>";
 		};
+		24593FF023E32022003B57D9 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				24061DAF21BD9D8700602BE1 /* CalendarEventModel.swift */,
+				24BE31AD21BF148400981307 /* CalendarEventModelRealm.swift */,
+				2415AF9621AF4E2600437EF8 /* ContactList.swift */,
+				241BBCCA21CEBD7B00B67617 /* eventSearch.swift */,
+				241F6A18222DCF6F005ED48B /* SelectedCalendars.swift */,
+				2419501B22D78ED4000DA71F /* Twilio.swift */,
+				2492D89222F48CDE001B4570 /* PrefixCodes.swift */,
+				2445E71D230461C1002278EF /* InviteeStruct.swift */,
+				24D6EE9F23D4E88600C00FC4 /* notificationModel.swift */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		24593FF123E32056003B57D9 /* Core Data */ = {
+			isa = PBXGroup;
+			children = (
+				24593FF223E32070003B57D9 /* Model.xcdatamodeld */,
+			);
+			path = "Core Data";
+			sourceTree = "<group>";
+		};
 		2461961523C59C1E00276DB8 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
@@ -300,6 +321,7 @@
 			children = (
 				24B82F9E2379F9E100302072 /* GlobalFunctions.swift */,
 				2421C7C5237A0E11008EBBCD /* FirebaseCode.swift */,
+				24593FF523E328E9003B57D9 /* CoreDataCode.swift */,
 			);
 			path = "Global Code";
 			sourceTree = "<group>";
@@ -586,6 +608,7 @@
 				2424F4CD2331936900F46ACE /* CollectionViewCellAddFriends.swift in Sources */,
 				2492D89922F4F29D001B4570 /* UserCreatedEventsCell.swift in Sources */,
 				2445E71C2301CAFE002278EF /* EditSelectNewContactsViewController.swift in Sources */,
+				24593FF623E328E9003B57D9 /* CoreDataCode.swift in Sources */,
 				24EE4582235E3A1700AD72C3 /* AvailabilityCollectionViewCell.swift in Sources */,
 				241B700B22E60B9A00C3CCB6 /* EventCreation - Page 1.swift in Sources */,
 				241BE2C6232017EB003C221B /* CollectionViewCellCreateEvent.swift in Sources */,
@@ -622,6 +645,7 @@
 				244F12A523A3C6A90082D9F2 /* CollectionViewCellDates.swift in Sources */,
 				24C142612362679700410CC5 /* LogInViewController2.swift in Sources */,
 				2458E94222EF8E0800F38716 /* AccountSettings.swift in Sources */,
+				24593FF423E32070003B57D9 /* Model.xcdatamodeld in Sources */,
 				24F1CE372369D4D30088EADC /* saveCalendarViewController.swift in Sources */,
 				241FDF4F2398226700CB62CE /* LocationSearchTable.swift in Sources */,
 				2452F0C9235F472F002B3B63 /* AppSettingsViewController.swift in Sources */,
@@ -857,6 +881,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		24593FF223E32070003B57D9 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				24593FF323E32070003B57D9 /* Model.xcdatamodel */,
+			);
+			currentVersion = 24593FF323E32070003B57D9 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 24D07D2A219E2B3C004C102E /* Project object */;
 }

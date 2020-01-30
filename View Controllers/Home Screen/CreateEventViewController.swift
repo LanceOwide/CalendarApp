@@ -16,6 +16,10 @@ import Alamofire
 import Fabric
 import Crashlytics
 import Instructions
+import CoreData
+
+
+
 
 //Gloabl variables available to any viewController
 var settings = dbStore.settings
@@ -118,11 +122,9 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     
     @IBAction func testTheCode(_ sender: UIButton) {
         
-        getUserName{ usersName in
-          
-          print("usersName \(usersName)")
-    
-        }
+//        CDRetrieveAllEventsFB()
+        
+        CDAppHasLoaded()
         
     }
     
@@ -139,8 +141,10 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         checkCalendarStatus2()
         navigationItem.titleView = setAppHeader(colour: UIColor.black)
 
-//        setup the navigation controller Cirleit text
+//        print the directory the SQL database is saved to
+        print("data save location: \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
         
+//        setup the navigation controller Cirleit text
         let welcomeText = NSMutableAttributedString(string: "Menu",
                                                     attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16),NSAttributedString.Key.foregroundColor: UIColor.black])
         
@@ -157,7 +161,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         navigationItem.hidesBackButton = true
         
 //        hide code test button
-        testTheCodeButton.isHidden = true
+        testTheCodeButton.isHidden = false
 
         
 
