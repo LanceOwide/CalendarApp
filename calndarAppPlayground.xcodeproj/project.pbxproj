@@ -65,7 +65,6 @@
 		24A4632F2321D0930026F780 /* CollectionViewCellTimePeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A4632E2321D0930026F780 /* CollectionViewCellTimePeriod.swift */; };
 		24AB6F8921D0D0D20024A19C /* CreateEventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AB6F8821D0D0D20024A19C /* CreateEventViewController.swift */; };
 		24B82F9F2379F9E200302072 /* GlobalFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B82F9E2379F9E100302072 /* GlobalFunctions.swift */; };
-		24BE31AE21BF148400981307 /* CalendarEventModelRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BE31AD21BF148400981307 /* CalendarEventModelRealm.swift */; };
 		24C142612362679700410CC5 /* LogInViewController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C142602362679700410CC5 /* LogInViewController2.swift */; };
 		24C1426323626B4600410CC5 /* ActivationExistingUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C1426223626B4600410CC5 /* ActivationExistingUserViewController.swift */; };
 		24D07D36219E2B3C004C102E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D07D35219E2B3C004C102E /* AppDelegate.swift */; };
@@ -151,7 +150,6 @@
 		24A4632E2321D0930026F780 /* CollectionViewCellTimePeriod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewCellTimePeriod.swift; sourceTree = "<group>"; };
 		24AB6F8821D0D0D20024A19C /* CreateEventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEventViewController.swift; sourceTree = "<group>"; };
 		24B82F9E2379F9E100302072 /* GlobalFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalFunctions.swift; sourceTree = "<group>"; };
-		24BE31AD21BF148400981307 /* CalendarEventModelRealm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventModelRealm.swift; sourceTree = "<group>"; };
 		24C142602362679700410CC5 /* LogInViewController2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewController2.swift; sourceTree = "<group>"; };
 		24C1426223626B4600410CC5 /* ActivationExistingUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivationExistingUserViewController.swift; sourceTree = "<group>"; };
 		24D07D32219E2B3C004C102E /* Planr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Planr.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -260,7 +258,6 @@
 			isa = PBXGroup;
 			children = (
 				24061DAF21BD9D8700602BE1 /* CalendarEventModel.swift */,
-				24BE31AD21BF148400981307 /* CalendarEventModelRealm.swift */,
 				2415AF9621AF4E2600437EF8 /* ContactList.swift */,
 				241BBCCA21CEBD7B00B67617 /* eventSearch.swift */,
 				241F6A18222DCF6F005ED48B /* SelectedCalendars.swift */,
@@ -640,7 +637,6 @@
 				24A4632F2321D0930026F780 /* CollectionViewCellTimePeriod.swift in Sources */,
 				24E7BBE923DF6652008512B1 /* Tutorial1ViewController.swift in Sources */,
 				241F6A19222DCF6F005ED48B /* SelectedCalendars.swift in Sources */,
-				24BE31AE21BF148400981307 /* CalendarEventModelRealm.swift in Sources */,
 				246BF96922DCF369003ADB1B /* PhoneNumberCode.swift in Sources */,
 				244F12A523A3C6A90082D9F2 /* CollectionViewCellDates.swift in Sources */,
 				24C142612362679700410CC5 /* LogInViewController2.swift in Sources */,

@@ -123,62 +123,41 @@ extension UIViewController{
     //    function to retrieve single event from Firebase
     func CDRetrieveSinglEventsFB(eventID: String){
             print("running func CDRetrieveSinglEventsFB input - eventID: \(eventID)")
-        dbStore.collection("eventRequests").document(eventID).getDocument{ (querySnapshot, error) in
+        dbStore.collection("eventRequests").document(eventID).getDocument{ (documentEventData, error) in
                 if error != nil {
                     print("Error getting documents: \(error!)")
                 }
                 else {
-                    if querySnapshot!.exists == false{
+                    if documentEventData!.exists == false{
                       
         //                the user doesn't have any  event data to retrieve
                         print("the event is no longer available")
                     }
                     else{
-                         let eventID = querySnapshot!.documentID
-                         let startTimeString = querySnapshot!.get("startTimeInput") as! String
-                         let startDateString = querySnapshot!.get("startDateInput") as! String
-                         let allStartDates = querySnapshot!.get("startDates") as! [String]
-                         let endTimeString = querySnapshot!.get("endTimeInput") as! String
-                         let allEndDates = querySnapshot!.get("endDates") as! [String]
-                         let endDateString = querySnapshot!.get("endDateInput") as! String
-                         let daysOfTheWeek = querySnapshot!.get("daysOfTheWeek") as! [Int]
-                         let chosenDatePosition = querySnapshot!.get("chosenDatePosition") as? Int ?? 999
-                         let chosenDateCD = querySnapshot!.get("chosenDate") as? String ?? ""
-                         let chosenDateDay = querySnapshot!.get("chosenDateDay") as? Int ?? 999
-                         let secondsFromGMT = querySnapshot!.get("secondsFromGMT") as? Int ?? 999
-                         let chosenDateMonth = querySnapshot!.get("chosenDateMonth") as? Int ?? 999
-                         let chosenDateYear = querySnapshot!.get("chosenDateYear") as? Int ?? 999
-                         let eventCreatorName = querySnapshot!.get("eventOwnerName") as? String ?? ""
-                         let eventCreatorID = querySnapshot!.get("eventOwner") as? String ?? ""
-                         let eventLocation = querySnapshot!.get("location") as? String ?? ""
-                         let isAllDay = querySnapshot!.get("isAllDay") as? String ?? ""
-                         let eventDescription = querySnapshot!.get("eventDescription") as? String ?? ""
-                         let locationLongitude = querySnapshot!.get("locationLongitude") as? Double ?? 0.0
-                         let locationLatitude = querySnapshot!.get("locationLatitude") as? Double ?? 0.0
                          
                          let CDNewEvent = CoreDataEvent(context: context)
                          
-                         CDNewEvent.chosenDate = chosenDateCD
-                         CDNewEvent.chosenDateDay = Int32(chosenDateDay)
-                         CDNewEvent.chosenDateMonth = Int32(chosenDateMonth)
-                         CDNewEvent.chosenDatePosition = Int32(chosenDatePosition)
-                         CDNewEvent.chosenDateYear = Int32(chosenDateYear)
-                         CDNewEvent.daysOfTheWeek = daysOfTheWeek
-                         CDNewEvent.endDateInput = endDateString
-                         CDNewEvent.endDates = allEndDates
-                         CDNewEvent.endTimeInput = endTimeString
-                         CDNewEvent.eventDescription = eventDescription
-                         CDNewEvent.eventID = eventID
-                         CDNewEvent.eventOwner = eventCreatorID
-                         CDNewEvent.eventOwnerName = eventCreatorName
-                         CDNewEvent.isAllDay = isAllDay
-                         CDNewEvent.location = eventLocation
-                         CDNewEvent.locationLatitue = locationLatitude
-                         CDNewEvent.locationLongitude = locationLongitude
-                         CDNewEvent.secondsFromGMT = Int32(secondsFromGMT)
-                         CDNewEvent.startDates = allStartDates
-                         CDNewEvent.startDateInput = startDateString
-                         CDNewEvent.startTimeInput = startTimeString
+                        CDNewEvent.chosenDate = documentEventData!.get("chosenDate") as? String ?? ""
+                         CDNewEvent.chosenDateDay = Int64(documentEventData!.get("chosenDateDay") as? Int ?? 999)
+                         CDNewEvent.chosenDateMonth = Int64(documentEventData!.get("chosenDateMonth") as? Int ?? 999)
+                         CDNewEvent.chosenDatePosition = Int64(documentEventData!.get("chosenDatePosition") as? Int ?? 999)
+                         CDNewEvent.chosenDateYear = Int64(documentEventData!.get("chosenDateYear") as? Int ?? 999)
+                         CDNewEvent.daysOfTheWeek = documentEventData!.get("daysOfTheWeek") as? [Int]
+                         CDNewEvent.endDateInput = documentEventData!.get("endDateInput") as? String
+                         CDNewEvent.endDates = documentEventData!.get("endDates") as? [String]
+                         CDNewEvent.endTimeInput = documentEventData!.get("endTimeInput") as? String
+                         CDNewEvent.eventDescription = documentEventData!.get("eventDescription") as? String ?? ""
+                         CDNewEvent.eventID = documentEventData!.documentID
+                         CDNewEvent.eventOwner = documentEventData!.get("eventOwner") as? String ?? ""
+                         CDNewEvent.eventOwnerName = documentEventData!.get("eventOwnerName") as? String ?? ""
+                         CDNewEvent.isAllDay = documentEventData!.get("isAllDay") as? String ?? ""
+                         CDNewEvent.location = documentEventData!.get("location") as? String ?? ""
+                         CDNewEvent.locationLatitue = documentEventData!.get("locationLatitude") as? Double ?? 0.0
+                         CDNewEvent.locationLongitude = documentEventData!.get("locationLongitude") as? Double ?? 0.0
+                         CDNewEvent.secondsFromGMT = Int64(documentEventData!.get("secondsFromGMT") as? Int ?? 999)
+                         CDNewEvent.startDates = documentEventData!.get("startDates") as? [String]
+                         CDNewEvent.startDateInput = documentEventData!.get("startDateInput") as? String
+                         CDNewEvent.startTimeInput = documentEventData!.get("startTimeInput") as? String
                          
  //                        append the new event onto CDNewEvent
                          CDEevents.append(CDNewEvent)
@@ -210,57 +189,33 @@ extension UIViewController{
                    else{
                     
                     for documentEventData in querySnapshot!.documents{
-                     
-                        let eventID = documentEventData.documentID
-                        let startTimeString = documentEventData.get("startTimeInput") as! String
-                        let startDateString = documentEventData.get("startDateInput") as! String
-                        let allStartDates = documentEventData.get("startDates") as! [String]
-                        let endTimeString = documentEventData.get("endTimeInput") as! String
-                        let allEndDates = documentEventData.get("endDates") as! [String]
-                        let endDateString = documentEventData.get("endDateInput") as! String
-                        let daysOfTheWeek = documentEventData.get("daysOfTheWeek") as! [Int]
-                        let chosenDatePosition = documentEventData.get("chosenDatePosition") as? Int ?? 999
-                        let chosenDateCD = documentEventData.get("chosenDate") as? String ?? ""
-                        let chosenDateDay = documentEventData.get("chosenDateDay") as? Int ?? 999
-                        let secondsFromGMT = documentEventData.get("secondsFromGMT") as? Int ?? 999
-                        let chosenDateMonth = documentEventData.get("chosenDateMonth") as? Int ?? 999
-                        let chosenDateYear = documentEventData.get("chosenDateYear") as? Int ?? 999
-                        let eventCreatorName = documentEventData.get("eventOwnerName") as? String ?? ""
-                        let eventCreatorID = documentEventData.get("eventOwner") as? String ?? ""
-                        let eventLocation = documentEventData.get("location") as? String ?? ""
-                        let isAllDay = documentEventData.get("isAllDay") as? String ?? ""
-                        let eventDescription = documentEventData.get("eventDescription") as? String ?? ""
-                        let locationLongitude = documentEventData.get("locationLongitude") as? Double ?? 0.0
-                        let locationLatitude = documentEventData.get("locationLatitude") as? Double ?? 0.0
-                        
                         let CDNewEvent = CoreDataEvent(context: context)
                         
-                        CDNewEvent.chosenDate = chosenDateCD
-                        CDNewEvent.chosenDateDay = Int32(chosenDateDay)
-                        CDNewEvent.chosenDateMonth = Int32(chosenDateMonth)
-                        CDNewEvent.chosenDatePosition = Int32(chosenDatePosition)
-                        CDNewEvent.chosenDateYear = Int32(chosenDateYear)
-                        CDNewEvent.daysOfTheWeek = daysOfTheWeek
-                        CDNewEvent.endDateInput = endDateString
-                        CDNewEvent.endDates = allEndDates
-                        CDNewEvent.endTimeInput = endTimeString
-                        CDNewEvent.eventDescription = eventDescription
-                        CDNewEvent.eventID = eventID
-                        CDNewEvent.eventOwner = eventCreatorID
-                        CDNewEvent.eventOwnerName = eventCreatorName
-                        CDNewEvent.isAllDay = isAllDay
-                        CDNewEvent.location = eventLocation
-                        CDNewEvent.locationLatitue = locationLatitude
-                        CDNewEvent.locationLongitude = locationLongitude
-                        CDNewEvent.secondsFromGMT = Int32(secondsFromGMT)
-                        CDNewEvent.startDates = allStartDates
-                        CDNewEvent.startDateInput = startDateString
-                        CDNewEvent.startTimeInput = startTimeString
+                        CDNewEvent.chosenDate = documentEventData.get("chosenDate") as? String ?? ""
+                        CDNewEvent.chosenDateDay = Int64(documentEventData.get("chosenDateDay") as? Int ?? 999)
+                        CDNewEvent.chosenDateMonth = Int64(documentEventData.get("chosenDateMonth") as? Int ?? 999)
+                        CDNewEvent.chosenDatePosition = Int64(documentEventData.get("chosenDatePosition") as? Int ?? 999)
+                        CDNewEvent.chosenDateYear = Int64(documentEventData.get("chosenDateYear") as? Int ?? 999)
+                        CDNewEvent.daysOfTheWeek = documentEventData.get("daysOfTheWeek") as? [Int]
+                        CDNewEvent.endDateInput = documentEventData.get("endDateInput") as? String
+                        CDNewEvent.endDates = documentEventData.get("endDates") as? [String]
+                        CDNewEvent.endTimeInput = documentEventData.get("endTimeInput") as? String
+                        CDNewEvent.eventDescription = documentEventData.get("eventDescription") as? String ?? ""
+                        CDNewEvent.eventID = documentEventData.documentID
+                        CDNewEvent.eventOwner = documentEventData.get("eventOwner") as? String ?? ""
+                        CDNewEvent.eventOwnerName = documentEventData.get("eventOwnerName") as? String ?? ""
+                        CDNewEvent.isAllDay = documentEventData.get("isAllDay") as? String ?? ""
+                        CDNewEvent.location = documentEventData.get("location") as? String ?? ""
+                        CDNewEvent.locationLatitue = documentEventData.get("locationLatitude") as? Double ?? 0.0
+                        CDNewEvent.locationLongitude = documentEventData.get("locationLongitude") as? Double ?? 0.0
+                        CDNewEvent.secondsFromGMT = Int64(documentEventData.get("secondsFromGMT") as? Int ?? 999)
+                        CDNewEvent.startDates = documentEventData.get("startDates") as? [String]
+                        CDNewEvent.startDateInput = documentEventData.get("startDateInput") as? String
+                        CDNewEvent.startTimeInput = documentEventData.get("startTimeInput") as? String
                         
 //                        append the new event onto CDNewEvent
                         CDEevents.append(CDNewEvent)
-                        
-    
+
                     }
 //                    print("CDEevents \(CDEevents)")
                     self.CDSaveData()
@@ -269,7 +224,6 @@ extension UIViewController{
     
     
     func CDFetchEventDataFromDB() -> Bool{
-        
         let request : NSFetchRequest<CoreDataEvent> = CoreDataEvent.fetchRequest()
         
         do{
@@ -284,7 +238,6 @@ extension UIViewController{
             
             return false
         }
-        
     }
     
     
@@ -317,17 +270,149 @@ extension UIViewController{
         
     }
     
+//    function for retrieveing data from DB with any request
+    func CDFetchFilteredEventDataFromDB(with request: NSFetchRequest<CoreDataEvent> = CoreDataEvent.fetchRequest()) -> [CoreDataEvent]{
+        
+        var filteredEventResults = [CoreDataEvent]()
+        
+        do{
+            filteredEventResults = try context.fetch(request)
+                print("filteredEventResults - event count: \(filteredEventResults.count)")
+                
+                return filteredEventResults
+                
+            } catch{
+                print("error fetching the data from core data \(error)")
+                
+                return filteredEventResults
+            }
+        }
     
-//retrieve the user created events
-    
-    func getUserCreatedEventPending() -> [CoreDataEvent]{
+//    func to serialise data from CDStore to eventSearch class
+    func serialiseEvents() -> [eventSearch]{
+        
+        let dateFormatterSimple = DateFormatter()
+        dateFormatterSimple.dateFormat = "yyyy-MM-dd"
+        dateFormatterSimple.locale = Locale(identifier: "en_US_POSIX")
      
-        let userCreatedEventsPending = [CoreDataEvent]()
+      var serialisedEvents = [eventSearch]()
+      let retrievedResults = CDFetchFilteredEventDataFromDB()
+    
+        for CDNewEvent in retrievedResults{
+            
+            var n = eventSearch()
+            
+            n.chosenDate = CDNewEvent.chosenDate ?? ""
+            n.chosenDateDay = Int(CDNewEvent.chosenDateDay)
+            n.chosenDateMonth = Int(CDNewEvent.chosenDateMonth)
+            n.chosenDatePosition = Int(CDNewEvent.chosenDatePosition)
+            n.chosenDateYear = Int(CDNewEvent.chosenDateYear)
+            n.daysOfTheWeekArray = CDNewEvent.daysOfTheWeek!
+            n.eventEndDate = CDNewEvent.endDateInput!
+            n.endDateArray = CDNewEvent.endDates!
+            n.eventEndTime = CDNewEvent.endTimeInput!
+            n.eventDescription = CDNewEvent.eventDescription!
+            n.eventID = CDNewEvent.eventID!
+            n.eventOwnerID = CDNewEvent.eventOwner!
+            n.eventOwnerName = CDNewEvent.eventOwnerName!
+            n.isAllDay = CDNewEvent.isAllDay!
+            n.eventLocation = CDNewEvent.location!
+            n.locationLatitue = CDNewEvent.locationLatitue
+            n.locationLongitude = CDNewEvent.locationLongitude
+            n.secondsFromGMT = Int(CDNewEvent.secondsFromGMT)
+            n.startDateArray = CDNewEvent.startDates!
+            n.eventStartDate = CDNewEvent.startDateInput!
+            n.eventStartTime = CDNewEvent.startTimeInput!
+            
+//            adding the final date in the search array
+            let finalSearchDate = dateFormatterSimple.date(from: CDNewEvent.endDateInput!)
+            n.finalSearchDate = finalSearchDate!.addingTimeInterval(TimeInterval(secondsFromGMT))
+            
+            serialisedEvents.append(n)
+        }
+//        print("serialisedEvents: \(serialisedEvents)")
+        return serialisedEvents
+    }
+    
+   
+//   filter events for the
+    func filteringEventsForDisplay(pending: Bool, createdByUser: Bool, pastEvents: Bool, serialisedEvents: [eventSearch]){
+        
+        print("running func getEventsFromCD inputs - pending: \(pending) createdByUser \(createdByUser) pastEvents: \(pastEvents)")
+        
+//        date for comparison to determine whether the event is occuring today.
+        let calendar = Calendar(identifier: .gregorian)
+        let date = Date()
+        let newDate = date.addingTimeInterval(TimeInterval(secondsFromGMT))
+        let dateComponents = DateComponents(year: Calendar.current.component(.year, from: newDate), month: Calendar.current.component(.month, from: newDate), day: Calendar.current.component(.day, from: newDate), hour: 0, minute: 0, second: 0)
+        let dateFromComponents = calendar.date(from: dateComponents)!.addingTimeInterval(TimeInterval(secondsFromGMT))
+               
+        if createdByUser == true && pending == true && pastEvents == false{
+            let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate == "" && $0.finalSearchDate > dateFromComponents}
+                print("events \(events)")
+        }
+        else if createdByUser == false && pending == true && pastEvents == false{
+                let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate == "" && $0.finalSearchDate > dateFromComponents}
+            print("events \(events)")
+        }
+        else if createdByUser == false && pending == true && pastEvents == true{
+                    let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate == "" && $0.finalSearchDate < dateFromComponents}
+                print("events \(events)")
+            }
+        else if createdByUser == true && pending == false && pastEvents == false{
+                let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate != "" && $0.finalSearchDate > dateFromComponents}
+            print("events \(events)")
+        }
+        else if createdByUser == false && pending == false && pastEvents == false{
+                let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate != "" && $0.finalSearchDate > dateFromComponents}
+            print("events \(events)")
+        }
+        else if createdByUser == false && pending == false && pastEvents == true{
+                let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate != "" && $0.finalSearchDate < dateFromComponents}
+            print("events \(events)")
+        }
+    
+    
+    }
+    
+    
+    
+    
+    
+    
+    
+//MARK: not being used: retrieve specific sorted events from the CoreData
+    func getEventsFromCD(pending: Bool, createdByUser: Bool, pastEvents: Bool) -> [CoreDataEvent]{
+     
+        print("running func getEventsFromCD inputs - pending: \(pending) createdByUser \(createdByUser) pastEvents: \(pastEvents)")
+        
+        var filteredUserEvents = [CoreDataEvent]()
+        
+        if createdByUser == true && pending == true{
+//            get events where the current user created the event and they are pending
+            let request : NSFetchRequest<CoreDataEvent> = CoreDataEvent.fetchRequest()
+            request.predicate = NSPredicate(format: "eventOwner = %@ AND chosenDate = %@", user!,"")
+            request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+            filteredUserEvents = CDFetchFilteredEventDataFromDB(with: request)
+            
+            return filteredUserEvents
+        }
+                    if createdByUser == false && pending == true{
+            //            get events where the current user created the event and they are pending
+                        let request : NSFetchRequest<CoreDataEvent> = CoreDataEvent.fetchRequest()
+                        request.predicate = NSPredicate(format: "eventOwner == %@ AND chosenDate == %@", user!,"")
+                        request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+                        filteredUserEvents = CDFetchFilteredEventDataFromDB(with: request)
+                        
+                        return filteredUserEvents
+                    }
+        else{
+            return filteredUserEvents
+            
+        }
         
         
-        
-        
-     return userCreatedEventsPending
+     
     }
     
 

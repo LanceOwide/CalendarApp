@@ -121,11 +121,10 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     
     
     @IBAction func testTheCode(_ sender: UIButton) {
-        
 //        CDRetrieveAllEventsFB()
         
-        CDAppHasLoaded()
-        
+        filteringEventsForDisplay(pending: true, createdByUser: true, pastEvents: false, serialisedEvents: serialiseEvents())
+
     }
     
     
@@ -140,6 +139,8 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         checkUserInUserDatabase()
         checkCalendarStatus2()
         navigationItem.titleView = setAppHeader(colour: UIColor.black)
+        
+        CDAppHasLoaded()
 
 //        print the directory the SQL database is saved to
         print("data save location: \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
