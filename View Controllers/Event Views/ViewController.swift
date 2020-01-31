@@ -14,6 +14,7 @@ import SwiftyJSON
 import Alamofire
 import FirebaseMessaging
 import MBProgressHUD
+import CoreData
 
 var availabilitySummaryArray = [[Any]]()
 var fractionResults = [[Any]]()

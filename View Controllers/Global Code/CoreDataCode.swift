@@ -44,6 +44,7 @@ extension UIViewController{
         }}
     
     
+//    MARK: - this should be converted to a snaphot listener to detect any new event notifications and update accordingly
 //    check for events with updated flags in the userEventsUpdate table
     func CDRetrieveUpdatedEventCheck(completion: @escaping (_ eventIDString: [String:Any]) -> Void){
         
@@ -315,5 +316,20 @@ extension UIViewController{
         
         
     }
+    
+    
+//retrieve the user created events
+    
+    func getUserCreatedEventPending() -> [CoreDataEvent]{
+     
+        let userCreatedEventsPending = [CoreDataEvent]()
+        
+        
+        
+        
+     return userCreatedEventsPending
+    }
+    
+
     
 }
