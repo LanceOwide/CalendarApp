@@ -436,7 +436,7 @@ class GlobalFunctions: UIViewController {
     
 //    add user IDs to the eventRequests table
     
-    func addUserIDsToEventRequests(userIDs: [String], currentUserID: [String],existingUserIDs: [String], eventID: String, addCurrentUser: Bool) {
+        func addUserIDsToEventRequests(userIDs: [String], currentUserID: [String],existingUserIDs: [String], eventID: String, addCurrentUser: Bool, allNames: [String]) {
         
         var allUsers = [String]()
         
@@ -450,6 +450,7 @@ class GlobalFunctions: UIViewController {
             allUsers = userIDs + currentUserID + existingUserIDs
             
             dbStore.collection("eventRequests").document(eventID).setData(["users" : allUsers], merge: true)
+            dbStore.collection("eventRequests").document(eventID).setData(["usersNames" : allNames], merge: true)
             ref.child("invitedUsers").setValue(allUsers)
             
         }
@@ -457,6 +458,7 @@ class GlobalFunctions: UIViewController {
         
         allUsers = userIDs + existingUserIDs
             dbStore.collection("eventRequests").document(eventID).setData(["users" : allUsers], merge: true)
+            dbStore.collection("eventRequests").document(eventID).setData(["usersNames" : allNames], merge: true)
             ref.child("invitedUsers").setValue(allUsers)
             
         }

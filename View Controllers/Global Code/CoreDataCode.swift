@@ -158,7 +158,8 @@ extension UIViewController{
                          CDNewEvent.startDates = documentEventData!.get("startDates") as? [String]
                          CDNewEvent.startDateInput = documentEventData!.get("startDateInput") as? String
                          CDNewEvent.startTimeInput = documentEventData!.get("startTimeInput") as? String
-                         
+                        CDNewEvent.usersNames = documentEventData!.get("usersNames") as? [String]
+                        CDNewEvent.startDatesDisplay = self.dateArrayToDisplayDates(dates: documentEventData!.get("startDates") as! [String])
  //                        append the new event onto CDNewEvent
                          CDEevents.append(CDNewEvent)
                         self.CDSaveData()
@@ -212,6 +213,8 @@ extension UIViewController{
                         CDNewEvent.startDates = documentEventData.get("startDates") as? [String]
                         CDNewEvent.startDateInput = documentEventData.get("startDateInput") as? String
                         CDNewEvent.startTimeInput = documentEventData.get("startTimeInput") as? String
+                        CDNewEvent.usersNames = documentEventData.get("usersNames") as? [String]
+                        CDNewEvent.startDatesDisplay = self.dateArrayToDisplayDates(dates: documentEventData.get("startDates") as! [String])
                         
 //                        append the new event onto CDNewEvent
                         CDEevents.append(CDNewEvent)
@@ -314,7 +317,6 @@ extension UIViewController{
             n.eventDescription = CDNewEvent.eventDescription!
             n.eventID = CDNewEvent.eventID!
             n.eventOwnerID = CDNewEvent.eventOwner!
-            n.eventOwnerName = CDNewEvent.eventOwnerName!
             n.isAllDay = CDNewEvent.isAllDay!
             n.eventLocation = CDNewEvent.location!
             n.locationLatitue = CDNewEvent.locationLatitue
@@ -323,10 +325,22 @@ extension UIViewController{
             n.startDateArray = CDNewEvent.startDates!
             n.eventStartDate = CDNewEvent.startDateInput!
             n.eventStartTime = CDNewEvent.startTimeInput!
+            n.usersNames = CDNewEvent.usersNames ?? [""]
+            n.startDatesDisplay = CDNewEvent.startDatesDisplay!
             
 //            adding the final date in the search array
             let finalSearchDate = dateFormatterSimple.date(from: CDNewEvent.endDateInput!)
             n.finalSearchDate = finalSearchDate!.addingTimeInterval(TimeInterval(secondsFromGMT))
+            
+            
+//            changing the event owner name to be you for those events the user is hosting
+            
+            if CDNewEvent.eventOwnerName! == user!{
+                n.eventOwnerName = "You"
+            }
+            else{
+               n.eventOwnerName = CDNewEvent.eventOwnerName!
+            }
             
             serialisedEvents.append(n)
         }
@@ -335,8 +349,8 @@ extension UIViewController{
     }
     
    
-//   filter events for the
-    func filteringEventsForDisplay(pending: Bool, createdByUser: Bool, pastEvents: Bool, serialisedEvents: [eventSearch]){
+//   filter events for the required in each section of the tableView controller, set createdByUser false when filtering for past events
+    func filteringEventsForDisplay(pending: Bool, createdByUser: Bool, pastEvents: Bool, serialisedEvents: [eventSearch]) -> [eventSearch]{
         
         print("running func getEventsFromCD inputs - pending: \(pending) createdByUser \(createdByUser) pastEvents: \(pastEvents)")
         
@@ -350,71 +364,104 @@ extension UIViewController{
         if createdByUser == true && pending == true && pastEvents == false{
             let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate == "" && $0.finalSearchDate > dateFromComponents}
                 print("events \(events)")
+            return events
         }
         else if createdByUser == false && pending == true && pastEvents == false{
                 let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate == "" && $0.finalSearchDate > dateFromComponents}
             print("events \(events)")
+            return events
         }
         else if createdByUser == false && pending == true && pastEvents == true{
                     let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate == "" && $0.finalSearchDate < dateFromComponents}
                 print("events \(events)")
+            return events
             }
         else if createdByUser == true && pending == false && pastEvents == false{
                 let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate != "" && $0.finalSearchDate > dateFromComponents}
             print("events \(events)")
+            return events
         }
         else if createdByUser == false && pending == false && pastEvents == false{
                 let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate != "" && $0.finalSearchDate > dateFromComponents}
             print("events \(events)")
+            return events
         }
         else if createdByUser == false && pending == false && pastEvents == true{
                 let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate != "" && $0.finalSearchDate < dateFromComponents}
             print("events \(events)")
+            return events
+        }
+        else{
+            
+            let emptyEvents = [eventSearch]()
+            
+            return emptyEvents
         }
     
     
     }
     
     
-    
-    
-    
-    
-    
-//MARK: not being used: retrieve specific sorted events from the CoreData
-    func getEventsFromCD(pending: Bool, createdByUser: Bool, pastEvents: Bool) -> [CoreDataEvent]{
-     
-        print("running func getEventsFromCD inputs - pending: \(pending) createdByUser \(createdByUser) pastEvents: \(pastEvents)")
-        
-        var filteredUserEvents = [CoreDataEvent]()
-        
-        if createdByUser == true && pending == true{
-//            get events where the current user created the event and they are pending
-            let request : NSFetchRequest<CoreDataEvent> = CoreDataEvent.fetchRequest()
-            request.predicate = NSPredicate(format: "eventOwner = %@ AND chosenDate = %@", user!,"")
-            request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
-            filteredUserEvents = CDFetchFilteredEventDataFromDB(with: request)
-            
-            return filteredUserEvents
+//    convert date array into display format
+    func dateArrayToDisplayDates(dates: [String]) -> [String]{
+        let dateFormatterTz = DateFormatter()
+        dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
+        dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
+        let dateFormatterForResults = DateFormatter()
+        dateFormatterForResults.dateFormat = "E d MMM"
+        dateFormatterForResults.locale = Locale(identifier: "en_US_POSIX")
+        var formattedDates = [String]()
+        for date in dates{
+            let dateDate = dateFormatterTz.date(from: date)
+            let dateString = dateFormatterForResults.string(from: dateDate!)
+            formattedDates.append(dateString)
         }
-                    if createdByUser == false && pending == true{
-            //            get events where the current user created the event and they are pending
-                        let request : NSFetchRequest<CoreDataEvent> = CoreDataEvent.fetchRequest()
-                        request.predicate = NSPredicate(format: "eventOwner == %@ AND chosenDate == %@", user!,"")
-                        request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
-                        filteredUserEvents = CDFetchFilteredEventDataFromDB(with: request)
-                        
-                        return filteredUserEvents
-                    }
-        else{
-            return filteredUserEvents
-            
-        }
-        
-        
-     
+        return formattedDates
     }
     
 
-    
 }
+
+
+
+
+
+
+
+
+
+//Extra code not being used
+
+////MARK: not being used: retrieve specific sorted events from the CoreData
+//    func getEventsFromCD(pending: Bool, createdByUser: Bool, pastEvents: Bool) -> [CoreDataEvent]{
+//
+//        print("running func getEventsFromCD inputs - pending: \(pending) createdByUser \(createdByUser) pastEvents: \(pastEvents)")
+//
+//        var filteredUserEvents = [CoreDataEvent]()
+//
+//        if createdByUser == true && pending == true{
+////            get events where the current user created the event and they are pending
+//            let request : NSFetchRequest<CoreDataEvent> = CoreDataEvent.fetchRequest()
+//            request.predicate = NSPredicate(format: "eventOwner = %@ AND chosenDate = %@", user!,"")
+//            request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+//            filteredUserEvents = CDFetchFilteredEventDataFromDB(with: request)
+//
+//            return filteredUserEvents
+//        }
+//                    if createdByUser == false && pending == true{
+//            //            get events where the current user created the event and they are pending
+//                        let request : NSFetchRequest<CoreDataEvent> = CoreDataEvent.fetchRequest()
+//                        request.predicate = NSPredicate(format: "eventOwner == %@ AND chosenDate == %@", user!,"")
+//                        request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+//                        filteredUserEvents = CDFetchFilteredEventDataFromDB(with: request)
+//
+//                        return filteredUserEvents
+//                    }
+//        else{
+//            return filteredUserEvents
+//
+//        }
+//
+//
+//
+//    }

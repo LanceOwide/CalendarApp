@@ -722,7 +722,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
                  let pointOfInterest = UIView()
                  
                  
-                 let hintPositions = [CGRect(x: screenWidth/2 + 20, y: topDistance + 72, width: screenWidth/2 - 50, height: screenWidth/2 - 50)]
+                 let hintPositions = [CGRect(x: screenWidth/2 + 20, y: topDistance + 75, width: screenWidth/2 - 50, height: screenWidth/2 - 53)]
                  
                  pointOfInterest.frame = hintPositions[index]
                  

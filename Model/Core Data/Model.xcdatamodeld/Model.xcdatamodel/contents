@@ -21,11 +21,13 @@
         <attribute name="secondsFromGMT" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="startDateInput" optional="YES" attributeType="String"/>
         <attribute name="startDates" optional="YES" attributeType="Transformable" customClassName="[String]"/>
+        <attribute name="startDatesDisplay" optional="YES" attributeType="Transformable" customClassName="[String]"/>
         <attribute name="startTimeInput" optional="YES" attributeType="String"/>
         <attribute name="timestamp" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="users" optional="YES" attributeType="Transformable" customClassName="[String]"/>
+        <attribute name="usersNames" optional="YES" attributeType="Transformable" customClassName="[String]"/>
     </entity>
     <elements>
-        <element name="CoreDataEvent" positionX="-63" positionY="-18" width="128" height="388"/>
+        <element name="CoreDataEvent" positionX="-63" positionY="-18" width="128" height="418"/>
     </elements>
 </model>

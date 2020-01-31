@@ -459,7 +459,9 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         
          deleteUserEventLinkArray(userID: deletedUserIDs, eventID: eventIDChosen)
         deleteEventStoreAvailability(eventID: eventIDChosen)
-         addUserIDsToEventRequests(userIDs: inviteesUserIDs, currentUserID: [""], existingUserIDs: [""], eventID: eventIDChosen, addCurrentUser: false)
+            
+//            MARK: this needs to be corrected
+        addUserIDsToEventRequests(userIDs: inviteesUserIDs, currentUserID: [""], existingUserIDs: [""], eventID: eventIDChosen, addCurrentUser: false, allNames: [""])
    
         }
             
@@ -501,7 +503,8 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
                 
                 self.userEventLinkArray(userID: existentArray, userName: userNameArray, eventID: eventIDChosen)
 
-                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [""], existingUserIDs: inviteesUserIDs, eventID: eventIDChosen, addCurrentUser: false)
+//                MARK: this needs to be corected
+                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [""], existingUserIDs: inviteesUserIDs, eventID: eventIDChosen, addCurrentUser: false, allNames: [""])
                 
                 print("new users added")
                 

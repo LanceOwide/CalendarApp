@@ -224,7 +224,7 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
                 
                 self.userEventLinkArray(userID: existentArray + [currentUserID!], userName: userNameArray + [eventOwnerName ?? ""], eventID: eventID)
                 
-                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [currentUserID!], existingUserIDs: [], eventID: eventID, addCurrentUser: true)
+                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [currentUserID!], existingUserIDs: [], eventID: eventID, addCurrentUser: true, allNames: userNameArray + nonExistentNameArray)
                 
                 
                 if nonExistentArray.isEmpty == false{
