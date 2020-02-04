@@ -437,17 +437,11 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
         }
         else{
         if indexPath.section == 0{
-            let info = sectionUserHostedEvents[indexPath.row]
-            print("info: \(info)")
-        
-            
-//            reset the non user invitees to ensure we don't carry over any non saved changes from previous view of the edit page
-            nonUserInviteeNames.removeAll()
-            deletedInviteeNames.removeAll()
-            deletedNonUserInviteeNames.removeAll()
-            deletedUserIDs.removeAll()
-            
-            if info.newChatMessage == true{
+//            set shared property to pass the event selected to other page
+            currentUserSelectedEvent = sectionUserHostedEvents[indexPath.row]
+            let segue = "splitViewResultsController"
+
+            if currentUserSelectedEvent.newChatMessage == true{
                 newMessageNotification = true
             }
             else{
@@ -455,32 +449,14 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
             newMessageNotification = false
             
             }
-            
-            print(info)
-            eventIDChosen = info.eventID
-            chosenDateForEvent = info.chosenDate
-            let segue = "splitViewResultsController"
-            
-            //        gets all the event details needed to create the event detail arrays
-            prepareForEventDetailsPage(eventID: eventIDChosen, isEventOwnerID: user!, segueName: segue, isSummaryView: false, performSegue: true){
-                loadingNotification.hide(animated: true)
-                self.userCreatedEvents.deselectRow(at: indexPath, animated: false)
-                
-            }
-            
-            
+            self.performSegue(withIdentifier: segue, sender: self)
         }
           else if indexPath.section == 1{
-                        let info = sectionUpcomingEvents[indexPath.row]
-                        print("info: \(info)")
-
-                        print(info)
-                        eventIDChosen = info.eventID
-                        chosenDateForEvent = info.chosenDate
+                    currentUserSelectedEvent = sectionUpcomingEvents[indexPath.row]
                     let segue = "splitViewResultsController"
             
             
-            if info.newChatMessage == true{
+            if currentUserSelectedEvent.newChatMessage == true{
                 newMessageNotification = true
             }
             else{
@@ -488,42 +464,21 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
             newMessageNotification = false
             
             }
-            
-            
-            prepareForEventDetailsPage(eventID: eventIDChosen, isEventOwnerID: "", segueName: segue, isSummaryView: false, performSegue: true){
-                loadingNotification.hide(animated: true)
-                self.userCreatedEvents.deselectRow(at: indexPath, animated: false)
-                
-            }
+            self.performSegue(withIdentifier: segue, sender: self)
    
                     }
         else if indexPath.section == 2{
             
-            let info = sectionPastEvents[indexPath.row]
-            print(info)
-            let segue = "splitViewResultsController"
-            eventIDChosen = info.eventID
-            let eventOwnerID = info.eventOwnerID
-            chosenDateForEvent = info.chosenDate
-            
-            
-            if info.newChatMessage == true{
+            currentUserSelectedEvent = sectionPastEvents[indexPath.row]
+            if currentUserSelectedEvent.newChatMessage == true{
                 newMessageNotification = true
             }
             else{
-            
             newMessageNotification = false
-            
             }
+
+            self.performSegue(withIdentifier: "", sender: self)
             
-            prepareForEventDetailsPage(eventID: eventIDChosen, isEventOwnerID: eventOwnerID, segueName: segue, isSummaryView: false, performSegue: true){
-                
-                loadingNotification.hide(animated: true)
-                
-                self.userCreatedEvents.deselectRow(at: indexPath, animated: false)
-                
-            }
-  
         }
             else{
                 
@@ -615,14 +570,14 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
                 
                 print("data for invitee names - your events")
 
-                numberOfItemsForSection = sectionUserHostedEvents[(collectionView.tag - 1)/1000000].usersNames.count
+                numberOfItemsForSection = sectionUserHostedEvents[(collectionView.tag - 1)/1000000].currentUserNames.count + sectionUserHostedEvents[(collectionView.tag - 1)/1000000].nonUserNames.count
 
                     }
                     else if collectionView.tag < 10000000000 && sectionUpcomingEvents.count != 0{
                 
                 print("data for invitee names - upcoming events")
 
-                      numberOfItemsForSection = sectionUpcomingEvents[(collectionView.tag - 1)/100000000].usersNames.count
+                      numberOfItemsForSection = sectionUpcomingEvents[(collectionView.tag - 1)/100000000].currentUserNames.count + sectionUpcomingEvents[(collectionView.tag - 1)/100000000].nonUserNames.count
 
                     }
                     else if collectionView.tag < 1000000000000 && sectionPastEvents.count != 0{
@@ -630,7 +585,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
                 
                 print("data for invitee names - missed events")
                         
-                        numberOfItemsForSection = sectionPastEvents[(collectionView.tag - 1)/10000000000].usersNames.count
+                        numberOfItemsForSection = sectionPastEvents[(collectionView.tag - 1)/10000000000].currentUserNames.count + sectionPastEvents[(collectionView.tag - 1)/10000000000].nonUserNames.count
                         
                         
                     }
@@ -749,28 +704,22 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
                     }
                         
                     else if collectionView.tag < 100000000 && sectionUserHostedEvents.count != 0{
-                
-                print("user hosted invitee names - \(sectionUserHostedEvents[(collectionView.tag - 1)/1000000].usersNames[indexPath.row])")
+                let nameArray = sectionUserHostedEvents[(collectionView.tag - 1)/1000000].currentUserNames + sectionUserHostedEvents[(collectionView.tag - 1)/1000000].nonUserNames
 
 
-                cell.lblInviteeNames.text = sectionUserHostedEvents[(collectionView.tag - 1)/1000000].usersNames[indexPath.row]
+                cell.lblInviteeNames.text = nameArray[indexPath.row]
 
                     }
                     else if collectionView.tag < 10000000000 && sectionUpcomingEvents.count != 0{
-                
-                print("user hosted invitee names - \(sectionUpcomingEvents[(collectionView.tag - 1)/100000000].usersNames[indexPath.row])")
+                let nameArray = sectionUpcomingEvents[(collectionView.tag - 1)/10000000000].currentUserNames + sectionUpcomingEvents[(collectionView.tag - 1)/10000000000].nonUserNames
 
-                        cell.lblInviteeNames.text = sectionUpcomingEvents[(collectionView.tag - 1)/100000000].usersNames[indexPath.row]
-
+                        cell.lblInviteeNames.text = nameArray[indexPath.row]
 
                     }
                     else if collectionView.tag < 1000000000000 && sectionPastEvents.count != 0{
-                        
-            //            cell.lblUserCreatedDates.text = "loading"
-                         
-                print("user hosted invitee names - \(sectionPastEvents[(collectionView.tag - 1)/10000000000].usersNames[indexPath.row])")
+                     let nameArray = sectionPastEvents[(collectionView.tag - 1)/1000000000000].currentUserNames + sectionPastEvents[(collectionView.tag - 1)/1000000000000].nonUserNames
 
-                        cell.lblInviteeNames.text = sectionPastEvents[(collectionView.tag - 1)/10000000000].usersNames[indexPath.row]
+                        cell.lblInviteeNames.text = nameArray[indexPath.row]
                         
                         
                     }

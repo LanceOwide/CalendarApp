@@ -121,10 +121,9 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     
     
     @IBAction func testTheCode(_ sender: UIButton) {
-//        CDRetrieveAllEventsFB()
-        
-        filteringEventsForDisplay(pending: true, createdByUser: true, pastEvents: false, serialisedEvents: serialiseEvents())
 
+        
+        
     }
     
     
@@ -140,7 +139,12 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         checkCalendarStatus2()
         navigationItem.titleView = setAppHeader(colour: UIColor.black)
         
-        CDAppHasLoaded()
+//        check we have data in core data and update if required
+        CDAppHasLoaded{
+//            completed getting event data, now check for availability
+            self.CDAppHasLoadedAvailability()
+            self.eventChangeListener()
+        }
 
 //        print the directory the SQL database is saved to
         print("data save location: \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
@@ -565,6 +569,8 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     let storyBoard = UIStoryboard(name: "TutorialStoryboard", bundle: nil)
     
     let popOverVC = storyBoard.instantiateViewController(withIdentifier: "pageViewTutorial") as! PageViewController
+        
+        DispatchQueue.main.async{
 
     self.addChild(popOverVC)
        popOverVC.view.frame = self.view.frame
@@ -573,7 +579,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
             
             UserDefaults.standard.set("false", forKey: "firstTimeOpening")
         
-    }
+        }}
         else{
             
             print("wasn't the first time the user opened the app")

@@ -18,6 +18,8 @@
 		241B700F22E6105A00C3CCB6 /* EventCreation - Page 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241B700E22E6105A00C3CCB6 /* EventCreation - Page 2.swift */; };
 		241BBCCB21CEBD7B00B67617 /* eventSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241BBCCA21CEBD7B00B67617 /* eventSearch.swift */; };
 		241BE2C6232017EB003C221B /* CollectionViewCellCreateEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241BE2C5232017EB003C221B /* CollectionViewCellCreateEvent.swift */; };
+		241D821623E8DD3E000DB0CE /* AvailabilityStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241D821523E8DD3E000DB0CE /* AvailabilityStruct.swift */; };
+		241D821823E9B282000DB0CE /* eventResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241D821723E9B282000DB0CE /* eventResults.swift */; };
 		241F6A19222DCF6F005ED48B /* SelectedCalendars.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241F6A18222DCF6F005ED48B /* SelectedCalendars.swift */; };
 		241FDF4D239820CB00CB62CE /* LocationMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241FDF4C239820CA00CB62CE /* LocationMapViewController.swift */; };
 		241FDF4F2398226700CB62CE /* LocationSearchTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241FDF4E2398226700CB62CE /* LocationSearchTable.swift */; };
@@ -103,6 +105,8 @@
 		241B700E22E6105A00C3CCB6 /* EventCreation - Page 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EventCreation - Page 2.swift"; sourceTree = "<group>"; };
 		241BBCCA21CEBD7B00B67617 /* eventSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = eventSearch.swift; sourceTree = "<group>"; };
 		241BE2C5232017EB003C221B /* CollectionViewCellCreateEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewCellCreateEvent.swift; sourceTree = "<group>"; };
+		241D821523E8DD3E000DB0CE /* AvailabilityStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailabilityStruct.swift; sourceTree = "<group>"; };
+		241D821723E9B282000DB0CE /* eventResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = eventResults.swift; sourceTree = "<group>"; };
 		241F6A18222DCF6F005ED48B /* SelectedCalendars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedCalendars.swift; sourceTree = "<group>"; };
 		241FDF4C239820CA00CB62CE /* LocationMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMapViewController.swift; sourceTree = "<group>"; };
 		241FDF4E2398226700CB62CE /* LocationSearchTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchTable.swift; sourceTree = "<group>"; };
@@ -265,6 +269,8 @@
 				2492D89222F48CDE001B4570 /* PrefixCodes.swift */,
 				2445E71D230461C1002278EF /* InviteeStruct.swift */,
 				24D6EE9F23D4E88600C00FC4 /* notificationModel.swift */,
+				241D821523E8DD3E000DB0CE /* AvailabilityStruct.swift */,
+				241D821723E9B282000DB0CE /* eventResults.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -608,7 +614,9 @@
 				24593FF623E328E9003B57D9 /* CoreDataCode.swift in Sources */,
 				24EE4582235E3A1700AD72C3 /* AvailabilityCollectionViewCell.swift in Sources */,
 				241B700B22E60B9A00C3CCB6 /* EventCreation - Page 1.swift in Sources */,
+				241D821823E9B282000DB0CE /* eventResults.swift in Sources */,
 				241BE2C6232017EB003C221B /* CollectionViewCellCreateEvent.swift in Sources */,
+				241D821623E8DD3E000DB0CE /* AvailabilityStruct.swift in Sources */,
 				246A614C2384930C00CFC2C0 /* CircledEventsCollectionViewCell.swift in Sources */,
 				24957FC621AAA5B1008E0AB7 /* RegisterViewController.swift in Sources */,
 				24E69D9521D50F8100D2AF5F /* StickyGridCollectionViewLayout.swift in Sources */,

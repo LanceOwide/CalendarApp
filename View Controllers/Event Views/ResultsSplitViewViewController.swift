@@ -21,6 +21,7 @@ var inviteesNamesLocation = [String]()
 var arrayForEventResultsPageFinal = [[Any]]()
 var nonUserInviteeNames = Array<String>()
 var numberOfNonInviteeUsers = Int()
+var currentAvailability = [AvailabilityStruct]()
 
 class ResultsSplitViewViewController: UIViewController, CoachMarksControllerDataSource, CoachMarksControllerDelegate{
     
@@ -67,43 +68,12 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        //        set label details
-        let eventDescription = eventResultsArrayDetails[2][1] as? String
-        let startTime = convertToLocalTime(inputTime: eventResultsArrayDetails[6][0] as! String)
-        let endTime = convertToLocalTime(inputTime: eventResultsArrayDetails[7][0] as! String)
-        let eventLocation = eventResultsArrayDetails[1][1] as! String
-        
-        lblEventDescription.text = eventDescription!
-        lblEventLocation.text = eventLocation
-        
-        if chosenDateForEvent == "2019-01-01" || chosenDateForEvent == ""{
-            chosenDateForLabel = ""
-        }
-        else{
-            chosenDateForLabel = ("\(convertToDisplayDate(inputDate: chosenDateForEvent)): ")
-        }
-        
-        lblEventChosenDate.text = ("\(chosenDateForLabel)\(startTime) - \(endTime)")
-
+//        set delegate for the collectionView
         resultsCollectionView.dataSource = self
         resultsCollectionView.delegate = self
         
-        lblEventChosenDate.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.gray, thickness: 0.5)
-        
-        
-        let nonInviteeUsers = eventResultsArrayDetails[10] as? [String]
-        numberOfNonInviteeUsers = nonInviteeUsers!.count
-        
-        lblInviteNonUsers.text = "Invite non-users (\(numberOfNonInviteeUsers))"
-
-        
-//        defines visible buttons based on whether the user created the event
-        defineVisibleButtons()
-        
-//        setup the navigation bar chat icon
+        //        setup the navigation bar chat icon
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(chatSelected))
-        
         
         navigationItem.titleView = setAppHeader(colour: UIColor.black)
         
@@ -112,6 +82,24 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
         coachMarksController.delegate = self
         coachMarksController.overlay.allowTap = true
         
+        //        set label details
+        let startTime = convertToLocalTime(inputTime: currentUserSelectedEvent.eventStartTime)
+        let endTime = convertToLocalTime(inputTime: currentUserSelectedEvent.eventEndTime)
+        lblEventDescription.text = currentUserSelectedEvent.eventDescription
+        lblEventLocation.text = currentUserSelectedEvent.eventLocation
+        if currentUserSelectedEvent.chosenDate == "2019-01-01" || currentUserSelectedEvent.chosenDate == ""{
+            chosenDateForLabel = ("\(startTime) - \(endTime)")
+        }
+        else{
+            chosenDateForLabel = ("\(convertToDisplayDate(inputDate: currentUserSelectedEvent.chosenDate)): \(startTime) - \(endTime)")
+        }
+        lblEventChosenDate.text = chosenDateForLabel
+        lblEventChosenDate.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.gray, thickness: 0.5)
+        lblInviteNonUsers.text = "Invite non-users (\(currentUserSelectedEvent.nonUserNames.count))"
+
+//        defines visible buttons based on whether the user created the event
+        defineVisibleButtons()
+
         if summaryView == true{
             
             navigationItem.hidesBackButton = true
@@ -129,16 +117,16 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
         else{
            imgMessageNotification.isHidden = true
         }
-        
-        
-        //        listener to detect when the event availability has been udpated by the user
+                
+//        MARK: listener to detect when the event availability has been udpated by the user
         NotificationCenter.default.addObserver(self, selector: #selector(updateTables), name: .availabilityUpdated, object: nil)
      
+//        end of viewDidLoad
     }
     
 //    defines the visible buttons when the event owner or invitee select the event
     
-    //    Segue to edit the event page
+//    Segue to edit the event page
         @objc func doneSelected(){
             performSegue(withIdentifier: "issueWithArraySegue", sender: (Any).self)
   
@@ -178,10 +166,6 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(chatSelected))
             
             //        get user names for those events where we are owner
-            
-            getUsersNames2{
-                
-            }
             
             if numberOfNonInviteeUsers == 0{
                 

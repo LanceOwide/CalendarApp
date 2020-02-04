@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="2iY-Pe-9SJ">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="2iY-Pe-9SJ">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -3217,7 +3217,7 @@ we'll link the number to your account
                                     <inset key="sectionInset" minX="5" minY="5" maxX="0.0" maxY="5"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" misplaced="YES" reuseIdentifier="availabilityCell" translatesAutoresizingMaskIntoConstraints="NO" id="a56-Jx-RQZ" customClass="AvailabilityCollectionViewCell" customModule="Planr" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" fixedFrame="YES" reuseIdentifier="availabilityCell" translatesAutoresizingMaskIntoConstraints="NO" id="a56-Jx-RQZ" customClass="AvailabilityCollectionViewCell" customModule="Planr" customModuleProvider="target">
                                         <rect key="frame" x="5" y="55" width="0.0" height="0.0"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="HG8-gm-s9k">
@@ -3987,10 +3987,10 @@ we'll link the number to your account
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="3Ns-ZF-dR6"/>
-        <segue reference="2wf-ve-N4b"/>
+        <segue reference="Yv7-9d-Gt7"/>
         <segue reference="j5g-mX-T67"/>
         <segue reference="6XA-gQ-hLu"/>
-        <segue reference="79k-bs-lwz"/>
+        <segue reference="qo0-DN-67N"/>
         <segue reference="PIS-fn-f47"/>
         <segue reference="0B5-Yr-1G9"/>
     </inferredMetricsTieBreakers>

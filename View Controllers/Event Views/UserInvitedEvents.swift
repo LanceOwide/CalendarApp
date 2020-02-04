@@ -11,7 +11,7 @@ import Firebase
 import MBProgressHUD
 
 
-var chosenDateForEvent = String()
+var currentUserSelectedEvent = eventSearch()
 
 class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
@@ -94,154 +94,17 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
     //    MARK: code to pull down the events the user is invited to and display them
     @objc func getUsersInvtedEvents(){
         
-                sectionUpcomingEvents.removeAll()
-                sectionPastEvents.removeAll()
-                sectionUserHostedEvents.removeAll()
-                
-                let dateFormatterTz = DateFormatter()
-                let dateFormatterForResults = DateFormatter()
-                
-                dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
-                dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
-                
-                dateFormatterForResults.dateFormat = "E d MMM"
-                dateFormatterForResults.locale = Locale(identifier: "en_US_POSIX")
-                
-//            set the loading notification, whilst we download the event data
-                let loadingNotification = MBProgressHUD.showAdded(to: view, animated: false)
-                       loadingNotification.label.text = "Loading"
-                       loadingNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
-                       loadingNotification.mode = MBProgressHUDMode.customView
-                
-                
-//        pull down all events where the users userID is in the users array
-                dbStore.collection("eventRequests").whereField("users", arrayContains: user!).getDocuments { (querySnapshot, error) in
-                    if error != nil {
-                        print("Error getting documents: \(error!)")
-                    }
-                    else {
+        let serialisedEvents = serialiseEvents()
                         
-                        if querySnapshot!.isEmpty == true{
-                          
-                            loadingNotification.hide(animated: true)
-                            
-                        }
-                        else{
+//      filter the serilaised events for events hosted by the user and in the pending status
+        sectionUserHostedEvents = filteringEventsForDisplay(pending: false, createdByUser: true, pastEvents: false, serialisedEvents: serialisedEvents)
                         
-                        for document in querySnapshot!.documents {
-        //                    print("\(document.documentID) => \(document.data())")
-
-                            var nextUserEventToAdd = eventSearch()
-                            let startTimeString = document.get("startTimeInput") as! String
-                            let adjStartTimeDate = self.dateFormatterTime.date(from: startTimeString)!.addingTimeInterval(TimeInterval(secondsFromGMT))
-                            let adjStartTimeString = self.dateFormatterTime.string(from: adjStartTimeDate)
-                            let endTimeString = document.get("endTimeInput") as! String
-                            let adjEndTimeDate = self.dateFormatterTime.date(from: endTimeString)!.addingTimeInterval(TimeInterval(secondsFromGMT))
-                            let adjEndTimeString = self.dateFormatterTime.string(from: adjEndTimeDate)
-                            
-                            nextUserEventToAdd.eventDescription = document.get("eventDescription") as! String
-                            nextUserEventToAdd.eventStartTime = adjStartTimeString
-                            nextUserEventToAdd.eventEndTime = adjEndTimeString
-                            nextUserEventToAdd.eventLocation = document.get("location") as! String
-                            nextUserEventToAdd.eventEndDate = document.get("endDateInput") as! String
-                            nextUserEventToAdd.eventStartDate = document.get("startDateInput") as! String
-                            nextUserEventToAdd.timeStamp = document.get("timeStamp") as? Float ?? 0.0
-                            nextUserEventToAdd.eventID = document.documentID
-                            nextUserEventToAdd.eventOwnerID = document.get("eventOwner") as! String
-                            
-                            
-                            
-                            
-                            self.checkEventChatNotificationStatus(eventID: nextUserEventToAdd.eventID){ (notificationBool) in
-                            
-                                nextUserEventToAdd.newChatMessage = notificationBool
-                                
-                            }
-                            
-                            let eventOwner = document.get("eventOwner") as! String
-                            
-                            if eventOwner == user! {
-                                
-                                nextUserEventToAdd.eventOwnerName = "You"
-                            }
-                            else{
-                                nextUserEventToAdd.eventOwnerName = document.get("eventOwnerName") as! String
-                            }
-                            
-                            nextUserEventToAdd.chosenDate = document.get("chosenDate") as? String ?? "2019-01-01"
-                            
-                            
-                            
-//                            let monthAsNr = Calendar.current.component(.month, from: today)
-//                            DateComponents(year: year, month: month, day: day, hour: hr, minute: min, second: sec)
-                            
-                            let calendar = Calendar(identifier: .gregorian)
-                            let eventSearchEndDate = self.dateFormatterSimple.date(from: nextUserEventToAdd.eventEndDate)
-                            let eventChosenDate = self.dateFormatterSimple.date(from: nextUserEventToAdd.chosenDate)
-                            let date = Date()
-                            let newDate = date.addingTimeInterval(TimeInterval(secondsFromGMT))
-                            let eventChosenDateAdj = eventChosenDate!.addingTimeInterval(TimeInterval(secondsFromGMT))
-                            let dateComponents = DateComponents(year: Calendar.current.component(.year, from: newDate), month: Calendar.current.component(.month, from: newDate), day: Calendar.current.component(.day, from: newDate), hour: 0, minute: 0, second: 0)
-                            let dateFromComponents = calendar.date(from: dateComponents)!.addingTimeInterval(TimeInterval(secondsFromGMT))
-
-                            
-                            print("dates for events: eventSearchEndDate: \(eventSearchEndDate!) eventChosenDate:\(eventChosenDate!) date:\(date) newDate \(newDate) dateFromComponents \(dateFromComponents) eventChosenDateAdj \(eventChosenDateAdj)")
-                            
-                            
-                            self.getInviteeNames(eventID: nextUserEventToAdd.eventID) { (userArray) in
-                            self.getInviteeNamesNonUsers(eventID: nextUserEventToAdd.eventID) { (userArrayNonUsers) in
-                                
-                                nextUserEventToAdd.inviteeNamesArray = userArray + userArrayNonUsers
-                            
-                            self.getArrayOfChosenDates3(eventID: nextUserEventToAdd.eventID, completion: { (startDates, endDates) in
-                                
-                            
-                                for dates in startDates {
-                                 
-                                //                    converting the dates to test back to the string and format we want to display
-                                                    let newDate = dateFormatterTz.date(from: dates)
-                                                    
-                                    nextUserEventToAdd.startDateArray.append(dateFormatterForResults.string(from: newDate!))
-                                    
-                                    print("nextUserEventToAdd.startDateArray: \(nextUserEventToAdd.startDateArray)")
-                                    
-                                }
-
-                                //                    if the end date of our serach period for the event is after today or the
-                                
-                                if nextUserEventToAdd.chosenDate != "2019-01-01"{
-                                    
-                                    
-                                    if eventChosenDateAdj < dateFromComponents {
-                                        
-                                        print("past event: \(nextUserEventToAdd.eventDescription)")
-                                        self.sectionPastEvents.append(nextUserEventToAdd)
-                                    }
-                                    else if eventOwner == user!{
-                                                            
-                                                            print("user hosted event: \(nextUserEventToAdd.eventDescription)")
-                                                            
-                                                            sectionUserHostedEvents.append(nextUserEventToAdd)
-                                                        }
-                                    else {
-                                    
-                                    print("upcoming event: \(nextUserEventToAdd.eventDescription)")
-                                    
-                                        self.sectionUpcomingEvents.append(nextUserEventToAdd)
-                                    }
-                                }
-                                else{
-  
-                                }
-                    
-                                loadingNotification.hide(animated: true)
-                                self.userInvitedEvents.reloadData()
-                            })
-                        }
-         
-                    }}}
-                }
-            }
+//      filter the serilaised events for events not hosted by the user and in the pending status
+        sectionUpcomingEvents = filteringEventsForDisplay(pending: false, createdByUser: false, pastEvents: false, serialisedEvents: serialisedEvents)
+                        
+//      filter the serilaised events for events not hosted by the user and in the pending status, but in the past
+        sectionPastEvents = filteringEventsForDisplay(pending: false, createdByUser: false, pastEvents: true, serialisedEvents: serialisedEvents)
+        
     }
 
     
@@ -326,7 +189,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                                 
                             cell.userInvitedCellLabel1.attributedText = eventTitleDescription
                             cell.userInvitedCellLabel2.text =  item.eventLocation
-                            cell.userInvitedCellLabel4.text = ("\(item.eventStartTime) - \(item.eventEndTime)")
+                            cell.userInvitedCellLabel4.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
                             cell.userInvitedCellLabel3.text = convertToDisplayDate(inputDate: item.chosenDate)
                     
                     
@@ -357,7 +220,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                                 
                             cell.userInvitedCellLabel1.attributedText = eventTitleDescription
                             cell.userInvitedCellLabel2.text = ("\(item.eventLocation) \n\(item.eventStartTime) - \(item.eventEndTime)")
-                            cell.userInvitedCellLabel4.text = ("\(item.eventStartTime) - \(item.eventEndTime)")
+                            cell.userInvitedCellLabel4.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
                             cell.userInvitedCellLabel3.text = convertToDisplayDate(inputDate: item.chosenDate)
                     
                     
@@ -388,7 +251,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                                 
                             cell.userInvitedCellLabel1.attributedText = eventTitleDescription
                             cell.userInvitedCellLabel2.text = ("Location: \(item.eventLocation) \nTime: \(item.eventStartTime) - \(item.eventEndTime)")
-                            cell.userInvitedCellLabel4.text = ("Time: \(item.eventStartTime) - \(item.eventEndTime)")
+                            cell.userInvitedCellLabel4.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
                             cell.userInvitedCellLabel3.text = convertToDisplayDate(inputDate: item.chosenDate)
                     
                     //                        check if there is an outstanding chat message
@@ -517,23 +380,12 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
             }
             else{
             if indexPath.section == 0{
-                let info = sectionUserHostedEvents[indexPath.row]
-                print("info: \(info)")
-                
-                chosenDateForEvent = info.chosenDate
-                
-                
+//                set shared property to pass the event selected to other page
+                currentUserSelectedEvent = sectionUserHostedEvents[indexPath.row]
                 //            reset the non user invitees to ensure we don't carry over any non saved changes from previous view of the edit page
-                nonUserInviteeNames.removeAll()
-                deletedInviteeNames.removeAll()
-                deletedNonUserInviteeNames.removeAll()
-                deletedUserIDs.removeAll()
                 userInvitedEvents.deselectRow(at: indexPath, animated: false)
-//                print(info)
-                eventIDChosen = info.eventID
-                let currentEventOwner = info.eventOwnerID
-                
-                if info.newChatMessage == true{
+ 
+                if currentUserSelectedEvent.newChatMessage == true{
                     newMessageNotification = true
                 }
                 else{
@@ -541,51 +393,30 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                 newMessageNotification = false
                 
                 }
-
-                prepareForEventDetailsPage(eventID: eventIDChosen, isEventOwnerID: currentEventOwner, segueName: segue, isSummaryView: false, performSegue: true){
-                    
                     loadingNotification.hide(animated: true)
                     
-                }
+//                }
    
             }
                 
             else if indexPath.section == 1{
-                            let info = sectionUpcomingEvents[indexPath.row]
-                            print("info: \(info)")
-                            chosenDateForEvent = info.chosenDate
-                            print(info)
-                            eventIDChosen = info.eventID
-                            let currentEventOwner = info.eventOwnerID
+                            currentUserSelectedEvent = sectionUpcomingEvents[indexPath.row]
                             userInvitedEvents.deselectRow(at: indexPath, animated: false)
                 
-                if info.newChatMessage == true{
+                if currentUserSelectedEvent.newChatMessage == true{
                     newMessageNotification = true
                 }
                 else{
-                
                 newMessageNotification = false
-                
                 }
-                
-                prepareForEventDetailsPage(eventID: eventIDChosen, isEventOwnerID: currentEventOwner, segueName: segue, isSummaryView: false, performSegue: true){
                     loadingNotification.hide(animated: true)
-                    
-                }
-                
-                
-               
                         }
             else{
                 
-                let info = sectionPastEvents[indexPath.row]
-                print(info)
-                eventIDChosen = info.eventID
-                chosenDateForEvent = info.chosenDate
-                let currentEventOwner = info.eventOwnerID
+                currentUserSelectedEvent = sectionPastEvents[indexPath.row]
                 userInvitedEvents.deselectRow(at: indexPath, animated: false)
                 
-                if info.newChatMessage == true{
+                if currentUserSelectedEvent.newChatMessage == true{
                     newMessageNotification = true
                 }
                 else{
@@ -593,14 +424,9 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                 newMessageNotification = false
                 
                 }
-                
-                prepareForEventDetailsPage(eventID: eventIDChosen, isEventOwnerID: currentEventOwner, segueName: segue, isSummaryView: false, performSegue: true){
                     loadingNotification.hide(animated: true)
                     
-                }
-                
-                
-                    
+//                }
                 }}}}
 
 
@@ -628,18 +454,19 @@ extension UserInvitedEvents: UICollectionViewDataSource, UICollectionViewDelegat
     //        The number of cells in the collectionView is determined by the count of dates in the event. The section is determined by the tag. A check is perfomed to ensure the event has data
             else if collectionView.tag < 100 && sectionUserHostedEvents.count != 0{
 
-                numberOfItemsForSection = sectionUserHostedEvents[(collectionView.tag - 1)].inviteeNamesArray.count
+                numberOfItemsForSection = sectionUserHostedEvents[(collectionView.tag - 1)].currentUserNames.count + sectionUserHostedEvents[(collectionView.tag - 1)].nonUserNames.count
 
             }
             else if collectionView.tag < 10000 && sectionUpcomingEvents.count != 0{
 
-              numberOfItemsForSection = sectionUpcomingEvents[(collectionView.tag - 1)/100].inviteeNamesArray.count
+              numberOfItemsForSection = sectionUpcomingEvents[(collectionView.tag - 1)/100].currentUserNames.count + sectionUpcomingEvents[(collectionView.tag - 1)/100].nonUserNames.count
 
             }
             else if collectionView.tag < 1000000 && sectionPastEvents.count != 0{
                 
                 
-                numberOfItemsForSection = sectionPastEvents[(collectionView.tag - 1)/10000].inviteeNamesArray.count
+                numberOfItemsForSection = sectionPastEvents[(collectionView.tag - 1)/10000].currentUserNames.count + sectionPastEvents[(collectionView.tag - 1)/10000].nonUserNames.count
+
                 
                 
             }
@@ -697,25 +524,24 @@ extension UserInvitedEvents: UICollectionViewDataSource, UICollectionViewDelegat
             }
                 
             else if collectionView.tag < 100 && sectionUserHostedEvents.count != 0{
-
-
-                cell.lblCircledInvitees.text = sectionUserHostedEvents[(collectionView.tag - 1)].inviteeNamesArray[indexPath.row]
+                
+                let nameArray = sectionUserHostedEvents[(collectionView.tag - 1)].currentUserNames + sectionUserHostedEvents[(collectionView.tag - 1)].nonUserNames
+                cell.lblCircledInvitees.text = nameArray[indexPath.row]
 
             }
             else if collectionView.tag < 10000 && sectionUpcomingEvents.count != 0{
+                let nameArray = sectionUpcomingEvents[(collectionView.tag - 1)/100].currentUserNames + sectionUpcomingEvents[(collectionView.tag - 1)/100].nonUserNames
 
-
-
-                cell.lblCircledInvitees.text = sectionUpcomingEvents[(collectionView.tag - 1)/100].inviteeNamesArray[indexPath.row]
+               cell.lblCircledInvitees.text = nameArray[indexPath.row]
 
 
             }
             else if collectionView.tag < 1000000 && sectionPastEvents.count != 0{
                 
-    //            cell.lblUserCreatedDates.text = "loading"
+                let nameArray = sectionUpcomingEvents[(collectionView.tag - 1)/10000].currentUserNames + sectionUpcomingEvents[(collectionView.tag - 1)/10000].nonUserNames
                  
 
-                cell.lblCircledInvitees.text = sectionPastEvents[(collectionView.tag - 1)/10000].inviteeNamesArray[indexPath.row]
+                cell.lblCircledInvitees.text = nameArray[indexPath.row]
                 
                 
             }

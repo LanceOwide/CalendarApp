@@ -224,7 +224,10 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
                 
                 self.userEventLinkArray(userID: existentArray + [currentUserID!], userName: userNameArray + [eventOwnerName ?? ""], eventID: eventID)
                 
-                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [currentUserID!], existingUserIDs: [], eventID: eventID, addCurrentUser: true, allNames: userNameArray + nonExistentNameArray)
+                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [currentUserID!], existingUserIDs: [], eventID: eventID, addCurrentUser: true, currentUserNames: userNameArray, nonUserNames: nonExistentNameArray)
+                
+//                Add a notification to the notificaiton table for each user invited to the event
+                self.eventCreatedNotification(userIDs: existentArray + [user!], eventID: eventID)
                 
                 
                 if nonExistentArray.isEmpty == false{

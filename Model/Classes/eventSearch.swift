@@ -35,6 +35,7 @@ struct eventSearch {
     var isAllDay = String()
     var secondsFromGMT = Int()
     var finalSearchDate = Date()
-    var usersNames = [String]()
+    var currentUserNames = [String]()
+    var nonUserNames = [String]()
     var startDatesDisplay = [String]()
 }

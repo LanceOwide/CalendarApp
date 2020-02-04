@@ -436,7 +436,7 @@ class GlobalFunctions: UIViewController {
     
 //    add user IDs to the eventRequests table
     
-        func addUserIDsToEventRequests(userIDs: [String], currentUserID: [String],existingUserIDs: [String], eventID: String, addCurrentUser: Bool, allNames: [String]) {
+        func addUserIDsToEventRequests(userIDs: [String], currentUserID: [String],existingUserIDs: [String], eventID: String, addCurrentUser: Bool, currentUserNames: [String], nonUserNames: [String]) {
         
         var allUsers = [String]()
         
@@ -449,16 +449,14 @@ class GlobalFunctions: UIViewController {
             
             allUsers = userIDs + currentUserID + existingUserIDs
             
-            dbStore.collection("eventRequests").document(eventID).setData(["users" : allUsers], merge: true)
-            dbStore.collection("eventRequests").document(eventID).setData(["usersNames" : allNames], merge: true)
+            dbStore.collection("eventRequests").document(eventID).setData(["users" : allUsers, "currentUserNames" : currentUserNames, "nonUserNames": nonUserNames], merge: true)
             ref.child("invitedUsers").setValue(allUsers)
             
         }
         else{
         
         allUsers = userIDs + existingUserIDs
-            dbStore.collection("eventRequests").document(eventID).setData(["users" : allUsers], merge: true)
-            dbStore.collection("eventRequests").document(eventID).setData(["usersNames" : allNames], merge: true)
+            dbStore.collection("eventRequests").document(eventID).setData(["users" : allUsers, "currentUserNames" : currentUserNames, "nonUserNames": nonUserNames], merge: true)
             ref.child("invitedUsers").setValue(allUsers)
             
         }
@@ -663,7 +661,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                 let startTimeInputResult = self.convertToLocalTime(inputTime: startTimeString)
                 let endDateInputResult = document.get("endDateInput") as! String
                 let dateChosenInput = document.get("chosenDate") as? String ?? ""
-                chosenDateForEvent = dateChosenInput
+//                chosenDateForEvent = dateChosenInput
                 let endTimeInputResult = self.convertToLocalTime(inputTime: endTimeString)
                 let documentIDResult = document.documentID
                 let invitees = document.get("users")  as! Array<String>
@@ -739,7 +737,6 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                 print("arrayForEventResultsPageDetails: \(arrayForEventResultsPageDetails)")
                 numberOfDatesInArray = emptyArray.count
                 completion(arrayForEventResultsPage, arrayForEventResultsPageDetails, numberOfDatesInArray)
-                
                     })
             }
         }
@@ -1501,12 +1498,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         
         var n = 1
         var y = 1
-        
-        
-        //        0 = row
-//        print(resultsArray[0][2])
-        
-        
+
         while n <= numberOfColumns - 1  {
             
             while y <= numberOfRows - 1 {
@@ -1537,6 +1529,9 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         return (countedResults: [countedResultArray], fractionResults: [countedResultArrayFraction])
         
     }
+        
+        
+        
     
     func dateInXDays(increment: Int, additionType: Calendar.Component) -> Date{
         

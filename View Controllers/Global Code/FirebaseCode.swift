@@ -88,7 +88,7 @@ extension UIViewController{
             }}}
             
         }
-    
+
     
     
     func checkEventChatNotificationStatus(eventID: String, completion: @escaping (_ notifcationBool: Bool) -> ()){
