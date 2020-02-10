@@ -62,8 +62,9 @@ class ManualAvailabilityViewController: UIViewController,CoachMarksControllerDat
         navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
         
         
-        
-        temporaryCurrentUsersAvailability = currentUsersAvailability
+        let t = currentUserSelectedAvailability.filter(){$0.uid == user!}
+        print("t \(t)")
+        temporaryCurrentUsersAvailability = t[0].userAvailability
         print("temporaryCurrentUsersAvailability: \(temporaryCurrentUsersAvailability)")
         
         buttonSettings(uiButton: btnClose)
@@ -73,13 +74,11 @@ class ManualAvailabilityViewController: UIViewController,CoachMarksControllerDat
     
     
     @objc func saveAvailability() {
-        commitUserAvailbilityData(userEventStoreID: currentUserAvailabilityDocID, finalAvailabilityArray2: temporaryCurrentUsersAvailability)
         
-        let eventID = eventResultsArrayDetails[3][1] as! String
-        let users = eventResultsArrayDetails[8][0] as! [String]
-        let eventOwner = users[0]
-        
-        prepareForEventDetailsPage(eventID: eventID, isEventOwnerID: eventOwner, segueName: "", isSummaryView: false, performSegue: false){
+        let eventID = currentUserSelectedEvent.eventID
+        commitUserAvailbilityData(userEventStoreID: currentUserAvailabilityDocID, finalAvailabilityArray2: temporaryCurrentUsersAvailability, eventID: eventID)
+
+        prepareForEventDetailsPage(eventID: eventID, isEventOwnerID: currentUserSelectedEvent.eventOwnerID, segueName: "", isSummaryView: false, performSegue: false){
             
             self.view.removeFromSuperview()
             

@@ -28,41 +28,20 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     var dateFormatterDay = DateFormatter()
     var dateFormatterString = DateFormatter()
     
-//    var combinedInviteesNames = inviteesNames + nonUserInviteeNames + inviteesNamesNew
 
     @IBOutlet var eventTitle: UITextField!
-    
-    
     @IBOutlet var eventLoction: UITextField!
-    
     @IBOutlet var eventStartTime: UITextField!
-    
-    
     @IBOutlet var eventEndTime: UITextField!
-    
-    
     @IBOutlet var eventStartDate: UITextField!
-    
     @IBOutlet var eventEndDate: UITextField!
-    
-    
     @IBOutlet var invitees: UITableView!
-
     @IBOutlet weak var mondayButton: DLRadioButton!
-    
     @IBOutlet weak var tuesdayButton: DLRadioButton!
-    
     @IBOutlet weak var wednesdayButton: DLRadioButton!
-    
-    
     @IBOutlet weak var thursdayButton: DLRadioButton!
-    
-    
     @IBOutlet weak var fridayButton: DLRadioButton!
-    
     @IBOutlet weak var saturdayButton: DLRadioButton!
-    
-    
     @IBOutlet weak var sundayButton: DLRadioButton!
     
     
@@ -78,11 +57,12 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             
             print("User yes on the event delete")
             
-            self.deleteEventStore(eventID: eventIDChosen)
-            self.deleteEventRequest(eventID: eventIDChosen)
-            self.deleteTemporaryUserEventStore(eventID: eventIDChosen)
-            self.deleteRealTimeDatabaseEventInfo(eventID: eventIDChosen)
-            self.deleteRealTimeDatabaseUserEventLink(eventID: eventIDChosen)
+            self.deleteEventStore(eventID: currentUserSelectedEvent.eventID)
+            self.deleteEventRequest(eventID: currentUserSelectedEvent.eventID)
+            self.deleteTemporaryUserEventStore(eventID: currentUserSelectedEvent.eventID)
+            self.deleteRealTimeDatabaseEventInfo(eventID: currentUserSelectedEvent.eventID)
+            self.deleteRealTimeDatabaseUserEventLink(eventID: currentUserSelectedEvent.eventID)
+            self.eventDeletedNotification(userIDs: currentUserSelectedEvent.users, eventID: currentUserSelectedEvent.eventID)
             
             self.performSegue(withIdentifier: "saveSelected", sender: Any.self)
   
@@ -124,6 +104,9 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         invitees.dataSource = self
         self.invitees.separatorStyle = UITableViewCell.SeparatorStyle.none
         
+//        set the values for the invitees names, used in the tableview
+        inviteesNames = currentUserSelectedEvent.currentUserNames
+        nonUserInviteeNames = currentUserSelectedEvent.nonUserNames
 
 //        print("combinedInviteesNames \(combinedInviteesNames)")
         
@@ -137,12 +120,12 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         view.addGestureRecognizer(tap)
         
         
-        eventTitle.text = eventResultsArrayDetails[2][1] as? String
-        eventLoction.text = eventResultsArrayDetails[1][1] as? String
-        eventStartTime.text = convertToLocalTime(inputTime: (eventResultsArrayDetails[6][0] as? String)!)
-        eventEndTime.text = convertToLocalTime(inputTime:(eventResultsArrayDetails[7][0] as? String)!)
-        eventStartDate.text = convertToDisplayDate(inputDate: (eventResultsArrayDetails[4][0] as? String)!)
-        eventEndDate.text = convertToDisplayDate(inputDate:(eventResultsArrayDetails[5][0] as? String)!)
+        eventTitle.text = currentUserSelectedEvent.eventDescription
+        eventLoction.text = currentUserSelectedEvent.eventLocation
+        eventStartTime.text = convertToLocalTime(inputTime: currentUserSelectedEvent.eventStartTime)
+        eventEndTime.text = convertToLocalTime(inputTime: currentUserSelectedEvent.eventEndTime)
+        eventStartDate.text = convertToDisplayDate(inputDate: currentUserSelectedEvent.eventStartDate)
+        eventEndDate.text = convertToDisplayDate(inputDate:currentUserSelectedEvent.eventEndDate)
         
         
         
@@ -191,20 +174,19 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     
 //    function to add the non users to the tableview
     func checkForNonUsers(){
-        
 //        check to see whether there is already data in the table, if there is then we do not update the table
-        if nonUserInviteeNames.count != 0 || deletedNonUserInviteeNames.count != 0 && nonUserInviteeNames.count == 0 {
+        if currentUserSelectedEvent.nonUserNames.count != 0 || deletedNonUserInviteeNames.count != 0 && currentUserSelectedEvent.nonUserNames.count == 0 {
             
         }
         else{
             
         
-        if eventResultsArrayDetails[10] as? [String] == nil {
+            if currentUserSelectedEvent.nonUserNames.count == 0 {
         nonUserInviteeNames = [""]
 
         }
         else{
-            nonUserInviteeNames = eventResultsArrayDetails[10] as! [String]
+            nonUserInviteeNames = currentUserSelectedEvent.nonUserNames
             }}}
     
     
@@ -212,7 +194,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     
     func setRatioButons(){
         
-     let weekDayArray = eventResultsArrayDetails[9][0] as! [Int]
+        let weekDayArray = currentUserSelectedEvent.daysOfTheWeekArray
         print("weekDayArray \(weekDayArray)")
         
         let sunday = weekDayArray[0]
@@ -244,8 +226,6 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         if saturday != 10{
             saturdayButton.isSelected = true
         }
-        
-        
     }
 
     
@@ -422,10 +402,10 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             }
 // checks to see whether the user has made any changes to the event timing
         
-            if eventStartTime.text == convertToLocalTime(inputTime: (eventResultsArrayDetails[6][0] as? String)!) &&
-            eventEndTime.text == convertToLocalTime(inputTime:(eventResultsArrayDetails[7][0] as? String)!) &&
-            eventStartDate.text == convertToDisplayDate(inputDate: (eventResultsArrayDetails[4][0] as? String)!) &&
-                eventEndDate.text == convertToDisplayDate(inputDate:(eventResultsArrayDetails[5][0] as? String)!) && daysOfTheWeek == daysOfTheWeekNewEvent {
+            if eventStartTime.text == convertToLocalTime(inputTime: currentUserSelectedEvent.eventStartTime) &&
+                eventEndTime.text == convertToLocalTime(inputTime: currentUserSelectedEvent.eventEndTime) &&
+                eventStartDate.text == convertToDisplayDate(inputDate: currentUserSelectedEvent.eventStartDate) &&
+            eventEndDate.text == convertToDisplayDate(inputDate: currentUserSelectedEvent.eventEndDate) && currentUserSelectedEvent.daysOfTheWeekArray == daysOfTheWeekNewEvent {
                 
                 showProgressHUD(notificationMessage: "Event Information Updated", imageName: "icons8-double-tick-100", delay: 2)
   
@@ -437,7 +417,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
                 
                 //            removes any availability arrays that have already been saved down
                 print("event timmings have changed")
-                updateEventStoreAvailability(eventID: eventIDChosen)
+                updateEventStoreAvailability(eventID: currentUserSelectedEvent.eventID)
                 
                 showProgressHUD(notificationMessage: "Event Information Updated - availability data reset", imageName: "icons8-double-tick-100", delay: 2)
   
@@ -457,11 +437,11 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             
 //            deletes the userEventStore
         
-         deleteUserEventLinkArray(userID: deletedUserIDs, eventID: eventIDChosen)
-        deleteEventStoreAvailability(eventID: eventIDChosen)
+            deleteUserEventLinkArray(userID: deletedUserIDs, eventID: currentUserSelectedEvent.eventID)
+        deleteEventStoreAvailability(eventID: currentUserSelectedEvent.eventID)
             
 //            MARK: this needs to be corrected
-        addUserIDsToEventRequests(userIDs: inviteesUserIDs, currentUserID: [""], existingUserIDs: [""], eventID: eventIDChosen, addCurrentUser: false, currentUserNames: [""], nonUserNames: [""])
+        addUserIDsToEventRequests(userIDs: inviteesUserIDs, currentUserID: [""], existingUserIDs: [""], eventID: currentUserSelectedEvent.eventID, addCurrentUser: false, currentUserNames: [""], nonUserNames: [""])
    
         }
             
@@ -472,7 +452,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             }
             else{
                 
-                deleteNonUsers(eventID: eventIDChosen, userNames: deletedNonUserInviteeNames)
+                deleteNonUsers(eventID: currentUserSelectedEvent.eventID, userNames: deletedNonUserInviteeNames)
             }
 
 //        checks to see if the user has added any invitees
@@ -497,14 +477,16 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
                 print("existentArray \(existentArray)")
                 
 //           adds the non users to the database
-                self.addNonExistingUsers2(phoneNumbers: nonExistentArray, eventID: eventIDChosen, names: nonExistentNameArray)
+                self.addNonExistingUsers2(phoneNumbers: nonExistentArray, eventID: currentUserSelectedEvent.eventID, names: nonExistentNameArray)
                 
 //            Adds the user event link to the userEventStore
                 
-                self.userEventLinkArray(userID: existentArray, userName: userNameArray, eventID: eventIDChosen)
+                self.userEventLinkArray(userID: existentArray, userName: userNameArray, eventID: currentUserSelectedEvent.eventID){
+                    
+                }
 
-//                MARK: this needs to be corected
-                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [""], existingUserIDs: inviteesUserIDs, eventID: eventIDChosen, addCurrentUser: false, currentUserNames: [""], nonUserNames: [""])
+
+                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [""], existingUserIDs: inviteesUserIDs, eventID: currentUserSelectedEvent.eventID, addCurrentUser: false, currentUserNames: [""], nonUserNames: [""])
                 
                 print("new users added")
                 
@@ -621,7 +603,8 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         var numberOfRows = Int()
-    
+        
+        
         
         let combinedInvitees = inviteesNames + nonUserInviteeNames + inviteesNamesNew
         numberOfRows = combinedInvitees.count
@@ -894,7 +877,6 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     
 //    section for deleting the realtime database entries
     
-    
     func deleteRealTimeDatabaseEventInfo(eventID: String){
     let ref = Database.database().reference()
         
@@ -908,19 +890,6 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         
     }
     
-    
-    
-//    this is used to run the getUsersNames when the user hits back, reloading the tableview with the current users names, even when they have removed some, but not saved them
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        if self.isMovingFromParent {
-
-            getUsersNames2{
-                
-            }
-        }
-    }
 }
 
 

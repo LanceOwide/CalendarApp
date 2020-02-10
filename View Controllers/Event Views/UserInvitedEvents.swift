@@ -12,6 +12,7 @@ import MBProgressHUD
 
 
 var currentUserSelectedEvent = eventSearch()
+var currentUserSelectedAvailability = [AvailabilityStruct]()
 
 class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
@@ -93,8 +94,8 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
     
     //    MARK: code to pull down the events the user is invited to and display them
     @objc func getUsersInvtedEvents(){
-        
-        let serialisedEvents = serialiseEvents()
+
+        let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
                         
 //      filter the serilaised events for events hosted by the user and in the pending status
         sectionUserHostedEvents = filteringEventsForDisplay(pending: false, createdByUser: true, pastEvents: false, serialisedEvents: serialisedEvents)

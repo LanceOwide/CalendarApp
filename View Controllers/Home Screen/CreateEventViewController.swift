@@ -104,7 +104,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     var fireStoreRef: DatabaseReference!
     var daysEvents = [PlanrEventStruct]()
     let coachMarksController = CoachMarksController()
-    
+    var todaysEventsSearch = [eventSearch]()
    
     @IBOutlet var collectionViewMenu: UICollectionView!
     
@@ -143,7 +143,13 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         CDAppHasLoaded{
 //            completed getting event data, now check for availability
             self.CDAppHasLoadedAvailability()
+//            engage the listeners to detect event and availability notifications
             self.eventChangeListener()
+            self.availabilityChangeListener()
+            //        get todays events
+//            self.getDaysEventsIDCD{
+//                self.tblViewEventList.reloadData()
+//            }
         }
 
 //        print the directory the SQL database is saved to
@@ -218,17 +224,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         let semaphore = DispatchSemaphore(value: 0)
         let queue = DispatchQueue.global()
         
-//        get todays events
-        getDaysEventsID{(eventIDs) in
-            
-            self.getDaysEventsDetail(eventIDs: eventIDs){_ in
-                
-                self.tblViewEventList.reloadData()
-            }
-            
-        }
-        
-        
+
         checkNotificationStatus(){
             
             self.collectionViewMenu.reloadData()
@@ -287,7 +283,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
                             //                        add the finalAvailabilityArray to the userEventStore
                             
                             
-                            self.commitUserAvailbilityData(userEventStoreID: userEventStoreID, finalAvailabilityArray2: finalAvailabilityArray2)
+                            self.commitUserAvailbilityData(userEventStoreID: userEventStoreID, finalAvailabilityArray2: finalAvailabilityArray2, eventID: self.newEventID)
                                 semaphore.signal()
                             }
                        semaphore.wait()
@@ -461,12 +457,8 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     @objc func refreshCreated(_ sender: Any) {
         
         //        get todays events
-        getDaysEventsID{(eventIDs) in
-            
-            self.getDaysEventsDetail(eventIDs: eventIDs){_ in
-                
-                self.tblViewEventList.reloadData()
-            }
+        getDaysEventsIDCD{
+            self.tblViewEventList.reloadData()
         }
         refreshControlCreated.endRefreshing()
     }
@@ -791,7 +783,7 @@ extension CreateEventViewController: UITableViewDelegate, UITableViewDataSource{
         }
         else{
         
-        numberOfRows = daysEvents.count
+            numberOfRows = todaysEventsSearch.count
         }
         
         return numberOfRows
@@ -816,9 +808,9 @@ extension CreateEventViewController: UITableViewDelegate, UITableViewDataSource{
             
             let text = ("\(daysEvents[indexPath.row].eventStartTime) - \(daysEvents[indexPath.row].eventEndTime)")
             
-            cell.lblTableView.text = daysEvents[indexPath.row].eventDescription
+            cell.lblTableView.text = todaysEventsSearch[indexPath.row].eventDescription
             cell.lbl2TableView.text = text
-            cell.lbl3TableView.text = daysEvents[indexPath.row].eventLocation
+            cell.lbl3TableView.text = todaysEventsSearch[indexPath.row].eventLocation
             cell.lblTableView.font = UIFont.systemFont(ofSize: 17)
             cell.lbl2TableView.font = UIFont.systemFont(ofSize: 15)
             cell.lbl3TableView.font = UIFont.systemFont(ofSize: 13)
@@ -834,20 +826,16 @@ extension CreateEventViewController: UITableViewDelegate, UITableViewDataSource{
         if daysEvents.count == 0{
             
             tableView.deselectRow(at: indexPath, animated: true)
-
         }
         else{
         
-        let chosenEventID = daysEvents[indexPath.row].eventID
-        let eventOwnerID = daysEvents[indexPath.row].eventOwnerID
+        currentUserSelectedEvent = todaysEventsSearch[indexPath.row]
         
-        prepareForEventDetailsPage(eventID: chosenEventID, isEventOwnerID: eventOwnerID, segueName: "todaysEventsSegue", isSummaryView: false, performSegue: true){
-            
+        currentUserSelectedAvailability = serialiseAvailability(eventID: todaysEventsSearch[indexPath.row].eventID)
+        self.prepareForEventDetailsPageCD(segueName: "todaysEventsSegue", isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
             print("selected \(indexPath.row) performing segue to summary page")
-            
             tableView.deselectRow(at: indexPath, animated: true)
-            
-            }
+        }
         }
         
     }
@@ -856,168 +844,68 @@ extension CreateEventViewController: UITableViewDelegate, UITableViewDataSource{
 
 //Firebase extension
 extension CreateEventViewController{
-
-    
 //function to pull down todays events
-func getDaysEventsID(completion: @escaping (_ eventIDs: [String]) -> Void){
-    
-//    since the database stores down the year/month/day the event was chosen for as at the event creators timezone, we must ensure we are adjusting for all potential events occurring today our timezone
-    
-    let today = Date()
-    let todayPlus1 = Calendar.current.date(byAdding: .day, value: 1, to: today)!
-    let todayMinus1 = Calendar.current.date(byAdding: .day, value: -1, to: today)!
-    
-    let monthAsNr = Calendar.current.component(.month, from: today)
-    let dayAsNr = Calendar.current.component(.day, from: today)
-    let yearAsNr = Calendar.current.component(.year, from: today)
-    
-    let monthAsNrPlus1 = Calendar.current.component(.month, from: todayPlus1)
-    let dayAsNrPlus1 = Calendar.current.component(.day, from: todayPlus1)
-    let yearAsNrPlus1 = Calendar.current.component(.year, from: todayPlus1)
-    
-    let monthAsNrMinus1 = Calendar.current.component(.month, from: todayMinus1)
-    let dayAsNrMinus1 = Calendar.current.component(.day, from: todayMinus1)
-    let yearAsNrMinus1 = Calendar.current.component(.year, from: todayMinus1)
-
-    
-    daysEvents.removeAll()
-    var eventIDArray = [String]()
-    eventIDArray.removeAll()
-    
-    print("running func getTodaysEvents - currentMonth: \(monthAsNr) currentDay: \(dayAsNr) currentYear: \(yearAsNr)")
-    
-    if user == nil{
+func getDaysEventsIDCD(completion: @escaping () -> Void){
         
+//    clear the array prior to running the code
+        todaysEventsSearch.removeAll()
+    
+    //    since the database stores down the year/month/day the event was chosen for as at the event creators timezone, we must ensure we are adjusting for all potential events occurring today our timezone
+        let today = Date()
+        let todayPlus1 = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        let todayMinus1 = Calendar.current.date(byAdding: .day, value: -1, to: today)!
+        
+        let monthAsNr = Calendar.current.component(.month, from: today)
+        let dayAsNr = Calendar.current.component(.day, from: today)
+        let yearAsNr = Calendar.current.component(.year, from: today)
+        
+        let monthAsNrPlus1 = Calendar.current.component(.month, from: todayPlus1)
+        let dayAsNrPlus1 = Calendar.current.component(.day, from: todayPlus1)
+        let yearAsNrPlus1 = Calendar.current.component(.year, from: todayPlus1)
+        
+        let monthAsNrMinus1 = Calendar.current.component(.month, from: todayMinus1)
+        let dayAsNrMinus1 = Calendar.current.component(.day, from: todayMinus1)
+        let yearAsNrMinus1 = Calendar.current.component(.year, from: todayMinus1)
+
+        print("running func getTodaysEvents - currentMonth: \(monthAsNr) currentDay: \(dayAsNr) currentYear: \(yearAsNr)")
+//        todays events
+//        let predicate =
+    
+    
+//    let predicate = NSPredicate(format: "chosenDateYear == %@ AND chosenDateMonth == %@ AND chosenDateDay == %@", yearAsNr, monthAsNr, dayAsNr)
+    
+////    tomorrows events
+//    let predicatePlus1 = NSPredicate(format: "chosenDateYear == %@ AND chosenDateMonth == %@ AND chosenDateDay == %@", yearAsNrPlus1, monthAsNrPlus1, dayAsNrPlus1)
+//    //    yesterdays events
+//    let predicateMinus1 = NSPredicate(format: "chosenDateYear == %@ AND chosenDateMonth == %@ AND chosenDateDay == %@", yearAsNrMinus1, monthAsNrMinus1, dayAsNrMinus1)
+    
+//        call CD with the predicate
+    todaysEventsSearch = serialiseEvents(predicate: NSPredicate(format: "chosenDateYear = %@ && chosenDateMonth = %@ && chosenDateDay = %@ || chosenDateYear = %@ && chosenDateMonth = %@ && chosenDateDay = %@ || chosenDateYear = %@ && chosenDateMonth = %@ && chosenDateDay = %@", argumentArray: [yearAsNr,monthAsNr,dayAsNr,yearAsNrPlus1,monthAsNrPlus1,dayAsNrPlus1,yearAsNrMinus1,monthAsNrMinus1,dayAsNrMinus1]), usePredicate: true)
+    
+//    we need to check if the events are occuring today once adjsuted for the timezone
+    let dateFormatterTZ = DateFormatter()
+    dateFormatterTZ.dateFormat = "yyyy-MM-dd HH:mm z"
+    dateFormatterTZ.locale = Locale(identifier: "en_US_POSIX")
+    let todayDay = Calendar.current.component(.day, from: today.addingTimeInterval(TimeInterval(secondsFromGMT)))
+     
+    
+    for i in todaysEventsSearch{
+
+        let startDates = i.startDateArray
+        let chosenDatePosition = i.chosenDatePosition
+        let eventChosenDateString = startDates[chosenDatePosition]
+        let eventChosenDateDate = dateFormatterTZ.date(from: eventChosenDateString)
+        let eventDay = Calendar.current.component(.day, from: eventChosenDateDate!)
+
+//        remove those events that dont occur today
+        if todayDay != eventDay{
+            todaysEventsSearch.removeAll{$0.eventID == i.eventID}
+        }
+
     }
-    else{
-    
-    dbStore.collection("userEventStore").whereField("uid", isEqualTo: user ?? "").whereField("chosenDateMonth", isEqualTo: monthAsNr).whereField("chosenDateYear", isEqualTo: yearAsNr).whereField("chosenDateDay", isEqualTo: dayAsNr).getDocuments { (querySnapshot, error) in
-           if error != nil {
-               print("Error getting documents: \(error!)")
-           }
-           else {
-               for document in querySnapshot!.documents {
-                   print("\(document.documentID) => \(document.data())")
-                
-                let documentID = document.get("eventID") as! String
-                
-                eventIDArray.append(documentID)
-                
-            }}
-        
-//            events for the next day
-        
-        dbStore.collection("userEventStore").whereField("uid", isEqualTo: user ?? "").whereField("chosenDateMonth", isEqualTo: monthAsNrPlus1).whereField("chosenDateYear", isEqualTo: yearAsNrPlus1).whereField("chosenDateDay", isEqualTo: dayAsNrPlus1).getDocuments { (querySnapshot, error) in
-               if error != nil {
-                   print("Error getting documents: \(error!)")
-               }
-               else {
-                   for document in querySnapshot!.documents {
-                       print("\(document.documentID) => \(document.data())")
-                    
-                    let documentID = document.get("eventID") as! String
-                    
-                    eventIDArray.append(documentID)
-                    
-                }}
-            
-//            events for the previous day
-            
-            dbStore.collection("userEventStore").whereField("uid", isEqualTo: user ?? "").whereField("chosenDateMonth", isEqualTo: monthAsNrMinus1).whereField("chosenDateYear", isEqualTo: yearAsNrMinus1).whereField("chosenDateDay", isEqualTo: dayAsNrMinus1).getDocuments { (querySnapshot, error) in
-                   if error != nil {
-                       print("Error getting documents: \(error!)")
-                   }
-                   else {
-                       for document in querySnapshot!.documents {
-                           print("\(document.documentID) => \(document.data())")
-                        
-                        let documentID = document.get("eventID") as! String
-                        
-                        eventIDArray.append(documentID)
-                        
-                    }}
-                
-                completion(eventIDArray)
-            }
-        }
-        
-        }}}
-    
-    
-     func getDaysEventsDetail(eventIDs: [String], completion: @escaping (_ complete: Bool) -> Void){
-            
-            print("running func getMonthEventsDetail: inputs - eventIDs: \(eventIDs)")
-        
-            let dateFormatterTZ = DateFormatter()
-            dateFormatterTZ.dateFormat = "yyyy-MM-dd HH:mm z"
-            dateFormatterTZ.locale = Locale(identifier: "en_US_POSIX")
-            let today = Date()
-            let todayDay = Calendar.current.component(.day, from: today.addingTimeInterval(TimeInterval(secondsFromGMT)))
-            
-            if eventIDs.isEmpty == true{
-                
-                completion(true)
-                
-            }
-            else{
-            
-            for documentID in eventIDs{
-            
-                        let docRef = dbStore.collection("eventRequests").document(documentID)
-                        
-                        var monthsEvent = PlanrEventStruct()
-                        
-                        docRef.getDocument(
-                        completion: { (querySnapshot2, error) in
-                            if error != nil {
-                                print("Error getting documents")
-                            }
-                            else {
-                                
-    //                        print("querySnapshot2: \(String(describing: querySnapshot2?.data()))")
-                                
-//                            for efficiency we pull down the startDates and chosenDatePosition to check which day the event occurs on before continuing
-                                
-                            let startDates = querySnapshot2?.get("startDates") as! [String]
-                            let chosenDatePosition = querySnapshot2?.get("chosenDatePosition") as! Int
-                                
-//                            get the event date as a string, convert it into a date
-                            let eventChosenDateString = startDates[chosenDatePosition]
-                            let eventChosenDateDate = dateFormatterTZ.date(from: eventChosenDateString)
-                            
-                            let eventDay = Calendar.current.component(.day, from: eventChosenDateDate!)
-                                
-                            if eventDay == todayDay{
-                                
-                                monthsEvent.eventDescription = querySnapshot2?.get("eventDescription") as! String
-                                monthsEvent.eventLocation = querySnapshot2?.get("location") as! String
-                                monthsEvent.endDates = querySnapshot2?.get("endDates") as! [String]
-                                monthsEvent.startDates = startDates
-                                monthsEvent.timeStamp = querySnapshot2?.get("timeStamp") as? Float ?? 0.0
-                                monthsEvent.eventID = querySnapshot2!.documentID
-                                monthsEvent.eventOwnerID = querySnapshot2?.get("eventOwner") as! String
-                                monthsEvent.chosenDatePosition = chosenDatePosition
-                                monthsEvent.chosenDate = querySnapshot2?.get("chosenDate") as! String
-                                monthsEvent.hoursFromGMT = querySnapshot2?.get("secondsFromGMT") as! Int
-                                                         
-                                let endTimeString = querySnapshot2?.get("endTimeInput") as! String
-                                let startTimeString = querySnapshot2?.get("startTimeInput") as! String
-                                let endTimeInputResult = self.convertToLocalTime(inputTime: endTimeString)
-                                let startTimeInputResult = self.convertToLocalTime(inputTime: startTimeString)
-                                monthsEvent.eventEndTime = endTimeInputResult
-                                monthsEvent.eventStartTime = startTimeInputResult
+    completion()
+       }
 
-                                self.daysEvents.append(monthsEvent)
-                                }
-                            else{
-                                
-                                }
-
-                            }
-                           completion(true)
-                        })}}
-            
-        }
     
 }
 

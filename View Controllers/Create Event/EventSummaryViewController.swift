@@ -96,57 +96,27 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
     
     @objc func doneSelected(){
         
-        summaryView = true
         selectEventToggle = 1
         
-        let loadingNotification = MBProgressHUD.showAdded(to: view, animated: false)
-        loadingNotification.label.text = "Creating Event"
-        loadingNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
-        loadingNotification.mode = MBProgressHUDMode.customView
+//        let loadingNotification = MBProgressHUD.showAdded(to: view, animated: false)
+//        loadingNotification.label.text = "Creating Event"
+//        loadingNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
+//        loadingNotification.mode = MBProgressHUDMode.customView
         
 
-        addEventToEventStore(){
+        addEventToEventStore(){ (eventID) in
             
-            
-            self.addDatesToResultQuery2(eventID: eventIDChosen, selectEventToggle: 0){ (arrayForEventResultsPage, arrayForEventResultsPageDetails, numberOfDatesInArray)  in
-            
-            
-            
-            let noResultsArray = self.noResultArrayCompletion2(numberOfDatesInArray: numberOfDatesInArray).noResultsArray
-            let nonUserArray = self.noResultArrayCompletion2(numberOfDatesInArray: numberOfDatesInArray).nonUserArray
-            
-            self.addUserToEventArray2(eventID: eventIDChosen, noResultArray: noResultsArray){ (arrayForEventResultsPageAvailability, arrayOfUserDocumentIDs) in
-                
-                self.addNonExistentUsers(eventID: eventIDChosen, noResultArray: nonUserArray){ (addNonExistentUsersAvailability, nonExistentNames, nonExistentPhoneNumbers) in
-                
-                    eventResultsArrayDetails = arrayForEventResultsPageDetails + [nonExistentNames] + [nonExistentPhoneNumbers] + [arrayOfUserDocumentIDs]
-                    print("eventResultsArrayDetails \(eventResultsArrayDetails)")
-                    
-                    let resultsSummary = self.resultsSummary(resultsArray: arrayForEventResultsPage + arrayForEventResultsPageAvailability + addNonExistentUsersAvailability).countedResults
-                    
-                    fractionResults = self.resultsSummary(resultsArray: arrayForEventResultsPage + arrayForEventResultsPageAvailability + addNonExistentUsersAvailability).fractionResults
-                    
-                    
-                    
-                    availabilitySummaryArray = resultsSummary
-                    
-                    print("resultsSummaryArray: \(resultsSummary)")
-                    
-                    loadingNotification.hide(animated: true)
-                    
-                    
-                arrayForEventResultsPageFinal = arrayForEventResultsPage + resultsSummary + arrayForEventResultsPageAvailability + addNonExistentUsersAvailability
-                print("arrayForEventResultsPageFinal \(arrayForEventResultsPageFinal)")
-                    
-                    
-                }}}}}
+//            set the current selected event to the one just created and added to CoreData
+            currentUserSelectedEvent = self.serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: false)[0]
+            self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: true, performSegue: false, userAvailability:  self.serialiseAvailability(eventID: currentUserSelectedEvent.eventID)) {
+            }
+        }
+        }
     
     
     
     @IBAction func donePictureButton(_ sender: UIButton) {
-        
         doneSelected()
-        
     }
     
     
@@ -196,14 +166,20 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
         return headerView
     }
     
-    func addEventToEventStore(completion: @escaping () -> Void){
+    func addEventToEventStore(completion: @escaping (_ eventID: String) -> Void){
             notExistingUserArray.removeAll()
             var selectedPhoneNumbers = [String]()
             var selectedNames = [String]()
             let currentUserID = Auth.auth().currentUser?.uid
             let eventOwnerName = UserDefaults.standard.string(forKey: "name")
+        
+//       start to show the event loading notification
+        let loadingNotification = MBProgressHUD.showAdded(to: view, animated: false)
+        loadingNotification.label.text = "Creating Event"
+        loadingNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
+        loadingNotification.mode = MBProgressHUDMode.customView
 
-            eventQuery { (eventID) in
+            eventQuery { (eventID,startDates,endDates) in
                 print("event commited to the database")
                 print("eventID: \(eventID)")
                 
@@ -222,50 +198,44 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
                 
                 //            Adds the user event link to the userEventStore
                 
-                self.userEventLinkArray(userID: existentArray + [currentUserID!], userName: userNameArray + [eventOwnerName ?? ""], eventID: eventID)
+                self.userEventLinkArray(userID: existentArray + [currentUserID!], userName: userNameArray + [eventOwnerName ?? ""], eventID: eventID){
                 
-                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [currentUserID!], existingUserIDs: [], eventID: eventID, addCurrentUser: true, currentUserNames: userNameArray, nonUserNames: nonExistentNameArray)
+                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [currentUserID!], existingUserIDs: [], eventID: eventID, addCurrentUser: true, currentUserNames: [eventOwnerName ?? ""] + userNameArray, nonUserNames: nonExistentNameArray)
                 
 //                Add a notification to the notificaiton table for each user invited to the event
-                self.eventCreatedNotification(userIDs: existentArray + [user!], eventID: eventID)
+                self.eventCreatedNotification(userIDs: existentArray, eventID: eventID)
                 
+//                add event to this users CoreData, this allows us to show the results page immediately
+                self.commitSingleEventDB(chosenDate: "", chosenDateDay: 999, chosenDateMonth: 999, chosenDatePosition: 999, chosenDateYear: 999, daysOfTheWeek: daysOfTheWeekNewEvent, endDates: endDates, endTimeInput: newEventEndTime, endDateInput: newEventEndDate, eventDescription: newEventDescription, eventID: eventID, eventOwner: user!, eventOwnerName: eventOwnerName ?? "", isAllDay: "0", location: newEventLocation, locationLatitue: newEventLatitude, locationLongitude: newEventLongitude, startDates: startDates, startDateInput: newEventStartDate, startTimeInput: newEventStartTime, currentUserNames: [eventOwnerName ?? ""] + userNameArray, nonUserNames: nonExistentNameArray, users: [user!] + existentArray)
+                
+                    
+//              we need to back to the main queue to show the progress HUD and alert
+                DispatchQueue.main.async {
+//              Stop showing the progress hud loading notification
+                loadingNotification.hide(animated: true)
                 
                 if nonExistentArray.isEmpty == false{
-                    
                 print("there are some invitees that arent users")
-                    
-                    
                     nonExistingUsers = nonExistentNameArray
                     nonExistingNumbers = nonExistentArray
                     
                     self.eventAdditionComplete()
-                    
-                    
                     contactsSelected.removeAll()
                     inviteesNamesNew.removeAll()
                     contactsSorted.removeAll()
                     contactsFiltered.removeAll()
-                    completion()
-
+                    completion(eventID)
                 }
                 else{
-                    
                     print("there are no invitees that arent users")
-                    
                     self.eventAdditionComplete()
                         contactsSelected.removeAll()
                         inviteesNamesNew.removeAll()
                         contactsSorted.removeAll()
                         contactsFiltered.removeAll()
-                    completion()
-                    
-      
-                }
-
-                }
-
+                    completion(eventID)
+                }}}}
             }
-            
         }
 
         
@@ -313,7 +283,7 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
         
         
         //    Adds the new event into the evetRequests table
-        func eventQuery( completion: @escaping (_ eventID: String) -> Void){
+    func eventQuery( completion: @escaping (_ eventID: String, _ startDates: [String], _ endDates: [String]) -> Void){
             
             let timestamp = NSDate().timeIntervalSince1970
             let eventOwnerName = UserDefaults.standard.string(forKey: "name")
@@ -344,7 +314,7 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
                     ref.child("invitedUsers").setValue(self.userIDArray)
                     
                     print("eventID from eventQuery \(eventCreationID)")
-                    completion(eventCreationID)
+                    completion(eventCreationID,startDates,endDates)
                     
                 }
             }

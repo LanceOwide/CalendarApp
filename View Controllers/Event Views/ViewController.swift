@@ -158,7 +158,7 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
 //    MARK: code to pull down the events created by the user and display them
         func getUsersCreatedEvents(){
             
-        let serialisedEvents = serialiseEvents()
+            let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
             
     //      filter the serilaised events for events hosted by the user and in the pending status
          sectionUserHostedEvents = filteringEventsForDisplay(pending: true, createdByUser: true, pastEvents: false, serialisedEvents: serialisedEvents)
@@ -426,6 +426,7 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
         anyArray.removeAll()
     
         summaryView = false
+        let segue = "splitViewResultsController"
         
         let loadingNotification = MBProgressHUD.showAdded(to: view, animated: false)
         loadingNotification.label.text = "Loading"
@@ -439,7 +440,6 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
         if indexPath.section == 0{
 //            set shared property to pass the event selected to other page
             currentUserSelectedEvent = sectionUserHostedEvents[indexPath.row]
-            let segue = "splitViewResultsController"
 
             if currentUserSelectedEvent.newChatMessage == true{
                 newMessageNotification = true
@@ -449,11 +449,16 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
             newMessageNotification = false
             
             }
-            self.performSegue(withIdentifier: segue, sender: self)
+            
+            currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+            self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+                
+                loadingNotification.hide(animated: true)
+            }
+            
         }
           else if indexPath.section == 1{
-                    currentUserSelectedEvent = sectionUpcomingEvents[indexPath.row]
-                    let segue = "splitViewResultsController"
+        currentUserSelectedEvent = sectionUpcomingEvents[indexPath.row]
             
             
             if currentUserSelectedEvent.newChatMessage == true{
@@ -464,8 +469,12 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
             newMessageNotification = false
             
             }
-            self.performSegue(withIdentifier: segue, sender: self)
-   
+            currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+            self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+                
+                loadingNotification.hide(animated: true)
+            }
+            
                     }
         else if indexPath.section == 2{
             
@@ -476,8 +485,12 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
             else{
             newMessageNotification = false
             }
-
-            self.performSegue(withIdentifier: "", sender: self)
+            
+           currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+           self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+               
+               loadingNotification.hide(animated: true)
+           }
             
         }
             else{

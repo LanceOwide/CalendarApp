@@ -38,4 +38,5 @@ struct eventSearch {
     var currentUserNames = [String]()
     var nonUserNames = [String]()
     var startDatesDisplay = [String]()
+    var users = [String]()
 }

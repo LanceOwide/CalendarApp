@@ -72,9 +72,6 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
         resultsCollectionView.dataSource = self
         resultsCollectionView.delegate = self
         
-        //        setup the navigation bar chat icon
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(chatSelected))
-        
         navigationItem.titleView = setAppHeader(colour: UIColor.black)
         
         //        ***For coachMarks
@@ -138,7 +135,7 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
         resultsCollectionView.reloadData()
     }
     
-    @objc func chatSelected(){
+    @objc func editSelected(){
         
 //        performSegue(withIdentifier: "chatSegue", sender: self)
     
@@ -163,11 +160,11 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
             lblEditEvent.isHidden = false
             
             //        setup the navigation bar chat icon
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(chatSelected))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editSelected))
             
             //        get user names for those events where we are owner
             
-            if numberOfNonInviteeUsers == 0{
+            if currentUserSelectedEvent.nonUserNames.count == 0{
                 
               btnInviteNonUsers.isHidden = true
                 lblInviteNonUsers.isHidden = true

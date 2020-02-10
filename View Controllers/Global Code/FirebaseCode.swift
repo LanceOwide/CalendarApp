@@ -202,7 +202,7 @@ extension UIViewController{
                                 
                                 //                        add the finalAvailabilityArray to the userEventStore
                                 
-                                self.commitUserAvailbilityData(userEventStoreID: userEventStoreID, finalAvailabilityArray2: finalAvailabilityArray2)
+                        self.commitUserAvailbilityData(userEventStoreID: userEventStoreID, finalAvailabilityArray2: finalAvailabilityArray2, eventID: eventID)
                                 }}}}}
     
     func getUserPushTokenGlobal(){

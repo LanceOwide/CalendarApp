@@ -332,34 +332,49 @@ class GlobalFunctions: UIViewController {
     
     
 //    adds the user and eventID into the userEventStore
-    func userEventLinkArray( userID: [String], userName: [String], eventID: String){
+        func userEventLinkArray( userID: [String], userName: [String], eventID: String, completionHandler: @escaping () -> ()){
         
         print("running func userEventLinkArray, inputs - userID: \(userID) userName: \(userName) eventID: \(eventID)")
         
         let ref = Database.database().reference()
-        let numberOfUsers = userID.count
+        let numberOfUsers = userID.count - 1
         print("numberOfUsers: \(numberOfUsers)")
+        let semaphore = DispatchSemaphore(value: 0)
+        let queue = DispatchQueue.global()
         var n = 0
         
-        while n <= numberOfUsers - 1{
+//        we use the semaphore signal wait process to ensure the while statement waits for the data to be written to the database before conituining
+        queue.async {
+        while n <= numberOfUsers{
         
-            dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": userID[n], "userName": userName[n], "userResponded": false])
-            
-            
-//            We don't want to send notifications to the user who added the event
-            
-            if userID[n] == user!{
-                
-                
-            }
-            else{
-//            adds the username to the real time database
-            ref.child("userEventLink/\(userID[n])/\(eventID)").setValue(eventID)
-                
-            }
+            var refFireStore: DocumentReference? = nil
         
+            refFireStore = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": userID[n], "userName": userName[n], "userResponded": false]){ err in
+            if let err = err {
+                print("Error adding document: \(err)")
+                semaphore.signal()
+            } else {
+                print("Document added with ID: \(refFireStore!.documentID)")
+//                add the userAvailability to CoreData
+                self.commitSinlgeAvailabilityToCD(documentID: refFireStore!.documentID, eventID: eventID, uid: userID[n], userName: userName[n], userAvailability: [99])
+                
+                //            We don't want to send notifications to the user who added the event
+                            if userID[n] == user!{
+                            }
+                            else{
+                //            adds the username to the real time database
+                            ref.child("userEventLink/\(userID[n])/\(eventID)").setValue(eventID)
+                            }
+                semaphore.signal()
+                if n == numberOfUsers{
+                    print("userEventLinkArray completionHandler")
+                    completionHandler()
+                }
+            }
+            }
+            semaphore.wait()
             n = n + 1
-            
+        }
         }
     }
     
@@ -778,9 +793,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         
         // add the actions (buttons)
         alert.addAction(UIAlertAction(title: "NO", style: UIAlertAction.Style.cancel, handler: { action in
-            
-//            self.eventAdditionComplete()
-            
+                 
         }))
         alert.addAction(UIAlertAction(title: "YES", style: UIAlertAction.Style.default, handler: { action in
             
@@ -788,7 +801,6 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
 //            self.sendInviteTextMessages(notExistingUserArray: notExistingUserArray)
             
             self.shareLinkToTheEvent()
-//            self.eventAdditionComplete()
         }))
         // show the alert
         
@@ -805,10 +817,8 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         
     func eventAdditionComplete(){
         
-//        performSegue(withIdentifier: "eventCreatedSegue", sender: self)
-        
-        
         print("running func eventAdditionComplete")
+        
         
         let alertEventComplete = UIAlertController(title: "Congratualtions! Your event has been created", message: "Check 'Pending Events' to see responses", preferredStyle: UIAlertController.Style.alert)
         
@@ -1152,8 +1162,8 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
     }
     
     
-    
-    func commitUserAvailbilityData(userEventStoreID: String, finalAvailabilityArray2: [Int]){
+//    commits the user availability data to the userEventStore and also adds the notifications to the availabilityNotificationStore
+        func commitUserAvailbilityData(userEventStoreID: String, finalAvailabilityArray2: [Int], eventID: String){
         
         let dbStoreInd = Firestore.firestore()
     
@@ -2322,7 +2332,6 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             return navLabel
             
         }
-        
         
         //    Gets the users names
             func getUsersNames2( completion: @escaping () -> Void){

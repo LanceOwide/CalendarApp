@@ -27,7 +27,9 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     var messages = [Message]()
     
     func observeMessages() {
-        let userMessagesRef = Database.database().reference().child("messages").child(eventIDChosen)
+
+        let userMessagesRef = Database.database().reference().child("messages").child(currentUserSelectedEvent.eventID)
+        
         userMessagesRef.observe(.childAdded, with: { (snapshot) in
 
                 guard let dictionary = snapshot.value as? [String: AnyObject] else {
@@ -41,9 +43,6 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                     self.collectionView?.reloadData()
                     self.collectionView.scrollToLast()
                 })
-
-    
-
             }, withCancel: nil)
     }
     
@@ -297,15 +296,15 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
 //    function to remove the messagenotification once the user opens the chat
     func updateNotificationArray(){
         
-      let ref2 = Database.database().reference().child("messageNotifications").child(eventIDChosen)
+      let ref2 = Database.database().reference().child("messageNotifications").child(currentUserSelectedEvent.eventID)
         
        ref2.child(user!).updateChildValues(["notification": false])
     }
     
     
     @objc func handleSend() {
-        let ref = Database.database().reference().child("messages").child(eventIDChosen)
-        let ref2 = Database.database().reference().child("messageNotifications").child(eventIDChosen)
+        let ref = Database.database().reference().child("messages").child(currentUserSelectedEvent.eventID)
+        let ref2 = Database.database().reference().child("messageNotifications").child(currentUserSelectedEvent.eventID)
         let childRef = ref.childByAutoId()
         let fromId = user!
         let timestamp = Int(Date().timeIntervalSince1970)
