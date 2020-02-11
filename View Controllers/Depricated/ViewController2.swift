@@ -628,6 +628,9 @@ class ViewController2: UIViewController, UICollectionViewDataSource, UICollectio
     
     
     func automaticallyRespondNow(){
+        
+        print("running automaticallyRespondNow")
+        
         dbStore.collection("userEventStore").whereField("uid", isEqualTo: user!).whereField("eventID", isEqualTo: eventIDChosen).getDocuments { (querySnapshot, error) in
                 if error != nil {
                     print("there was an error")

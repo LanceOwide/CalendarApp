@@ -155,9 +155,10 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
         refreshControlCreated.endRefreshing()
     }
     
-//    MARK: code to pull down the events created by the user and display them
+//    MARK: code to pull down all events and then display them
         func getUsersCreatedEvents(){
             
+//            DUMMY predicate
             let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
             
     //      filter the serilaised events for events hosted by the user and in the pending status

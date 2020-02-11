@@ -823,7 +823,7 @@ func removeTheAvailabilityNotifications(){
     }
     
     
-//    create availability array for current user of the app
+//    create availability array for current users of the app
     func createArrayForResultsNonUser(nonUserNames: [String], nonUserAvailability: [Int]) -> [[Any]]{
         var availabilityArrayOutput = [[Any]]()
         var nextArray = [Any]()
@@ -908,12 +908,12 @@ func removeTheAvailabilityNotifications(){
     
     
 //    notification function for new availability
-        func availabilityCreatedNotification(userIDs: [String], availabilityString: String){
-          print("running func availabilityCreatedNotification- adding notificaitons to userAvailabilityUpdates - inputs - userIDs \(userIDs) availabilityString \(availabilityString)")
+        func availabilityCreatedNotification(userIDs: [String], availabilityDocumentID: String){
+          print("running func availabilityCreatedNotification- adding notificaitons to userAvailabilityUpdates - inputs - userIDs \(userIDs) availabilityString \(availabilityDocumentID)")
             
             for i in userIDs{
     //            add the eventID and an updated notification to the userEventUpdates tbales
-                dbStore.collection("userEventUpdates").document(i).setData([availabilityString: "New"], merge: true)
+                dbStore.collection("userEventUpdates").document(i).setData([availabilityDocumentID: "New"], merge: true)
             }
         }
     
@@ -967,29 +967,34 @@ func removeTheAvailabilityNotifications(){
     func availabilityChangeListener(){
         print("engaging availabilityChangeListener")
 
-        var availabilityID = [String: Any]()
-        
         dbStore.collection("userAvailabilityUpdates").document(user!).addSnapshotListener(){ (querySnapshot, error) in
                 if error != nil {
                     print("Error getting documents: \(error!)")
                 }
                 else {
+                    let source = querySnapshot!.metadata.hasPendingWrites ? "Local" : "Server"
                     
-                    if querySnapshot!.exists == false{
-                      
-        //                the user doesn't have any  event data to retrieve
-                        print("user has no new event notifications")}
+                    if source == "local"{
+                        print("This is the local trigger, we don't do anything with this")
+                    }
                     else{
-                        print("user has new event notifications")
+                    
+                    if querySnapshot!.data()?.isEmpty == true || querySnapshot!.data() == nil{
+                        print("availabilityChangeListener triggered")
+
+        //                the user doesn't have any  event data to retrieve
+                        print("availabilityChangeListener user has no new availability notifications")}
+                    else{
                         
-                        let documentData: [String: Any]  = (querySnapshot?.data())!
+                        let documentData: [String: Any] = (querySnapshot!.data()!)
                         
-                        availabilityID = documentData
-                        self.CDRetrieveUpdatedAvailability(availabilityID: availabilityID)
+                        print("availabilityChangeListener triggered - there is data in the document \(documentData.keys) \(documentData.values)")
                         
-                        print(" availabilityChangeListener availabilityID \(availabilityID)")
+                        self.CDRetrieveUpdatedAvailability(availabilityID: documentData)
                         
-                }}}}
+                        print("availabilityChangeListener availabilityID \(documentData)")
+                        
+                        }}}}}
     
     
 //    MARK: Misc functions

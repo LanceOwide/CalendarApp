@@ -107,7 +107,7 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
         addEventToEventStore(){ (eventID) in
             
 //            set the current selected event to the one just created and added to CoreData
-            currentUserSelectedEvent = self.serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: false)[0]
+            currentUserSelectedEvent = self.serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: true)[0]
             self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: true, performSegue: false, userAvailability:  self.serialiseAvailability(eventID: currentUserSelectedEvent.eventID)) {
             }
         }

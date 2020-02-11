@@ -161,6 +161,8 @@ extension UIViewController{
     
     func sendUserAvailability(eventID: String){
         
+        print("running sendUserAvailability with inputs - eventID: \(eventID)")
+        
         let docRefUserEventStore = dbStore.collection("userEventStore")
         
         docRefUserEventStore.whereField("eventID", isEqualTo: eventID).whereField("uid", isEqualTo: user!).getDocuments() { (querySnapshot, err) in

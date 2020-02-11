@@ -36,6 +36,7 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
     var firstWeekDayOfMonth = 0   //(Sunday-Saturday 1-7)
     var monthsEvents = [PlanrEventStruct]()
     var eventDetailsArray = [[PlanrEventStruct?]]()
+    var planrEventsSearch = [eventSearch]()
     
     let monthView: MonthView = {
         let v=MonthView()
@@ -91,18 +92,10 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
             
             navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
 
-            getMonthEventsID{(eventIDs) in
-                
-                self.getMonthEventsDetail(eventIDs: eventIDs) {_ in
-                    
-                    print("monthsEvents: \(self.monthsEvents)")
-                    
-                    self.createEventArray{_ in
-                       
-                        self.myCollectionView.reloadData()
-                        self.myTableView.reloadData()
-                    }
-                }
+            getMonthEventsID{
+                print("monthsEvents: \(self.monthsEvents)")
+                self.myCollectionView.reloadData()
+                self.myTableView.reloadData()
             }
         }
     
@@ -141,20 +134,11 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
             
             firstWeekDayOfMonth=getFirstWeekDay()
             
-            getMonthEventsID{(eventIDs) in
-                
-                self.getMonthEventsDetail(eventIDs: eventIDs) {_ in
-                    
+            getMonthEventsID{
                     print("monthsEvents: \(self.monthsEvents)")
-                    
-                    self.createEventArray{_ in
-                       
-                        self.myCollectionView.reloadData()
-                        self.myTableView.reloadData()
-                    }
-                    
+                    self.myCollectionView.reloadData()
+                    self.myTableView.reloadData()
                 }
-            }
 
 //            self.myCollectionView.reloadData()
 //            self.myTableView.reloadData()
@@ -393,26 +377,21 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
                 prepareForEventDetailsPage(eventID: eventID, isEventOwnerID: eventOwner, segueName: "planrEventSelected", isSummaryView: false, performSegue: true){
                     
                     tableView.deselectRow(at: indexPath, animated: true)
-                }
-            
-            
-            
+                }   
         }
         }
         
 }
 
 
-//firebase extension
+//CD extension
 extension PlanrViewController{
     
-    func getMonthEventsID(completion: @escaping (_ eventIDs: [String]) -> Void){
+    func getMonthEventsID(completion: @escaping () -> Void){
         
-        monthsEvents.removeAll()
-        var eventIDArray = [String]()
-        eventIDArray.removeAll()
+        planrEventsSearch.removeAll()
+        let today = Date()
         let calendar = Calendar(identifier: .gregorian)
-        
         let componentsFirstDayOfMonth = DateComponents(year: currentYear, month: currentMonthIndex, day: 1, hour: 0, minute: 0, second: 0)
         
         let componentsFirstDayOfMonthDate = calendar.date(from: componentsFirstDayOfMonth)!
@@ -428,161 +407,30 @@ extension PlanrViewController{
         let yearAsNrMinus1 = Calendar.current.component(.year, from: priorMonth)
         
         print("running func getMonthEvents - currentMonthIndex: \(currentMonthIndex) currentYear: \(currentYear)")
+
+        planrEventsSearch = serialiseEvents(predicate: NSPredicate(format: "chosenDateYear = %@ && chosenDateMonth = %@ || chosenDateYear = %@ && chosenDateMonth = %@ && chosenDateDay = %@ || chosenDateYear = %@ && chosenDateMonth = %@ && chosenDateDay = %@", argumentArray: [currentYear,currentMonthIndex,yearAsNrPlus1,monthAsNrPlus1,dayAsNrPlus1,yearAsNrMinus1,monthAsNrMinus1,dayAsNrMinus1]), usePredicate: true)
         
-        dbStore.collection("userEventStore").whereField("uid", isEqualTo: user!).whereField("chosenDateMonth", isEqualTo: currentMonthIndex).whereField("chosenDateYear", isEqualTo: currentYear).getDocuments { (querySnapshot, error) in
-               if error != nil {
-                   print("Error getting documents: \(error!)")
-               }
-               else {
-                   for document in querySnapshot!.documents {
-                       print("\(document.documentID) => \(document.data())")
-                    
-                    let documentID = document.get("eventID") as! String
-                    
-                    eventIDArray.append(documentID)
-                    
-                }}
-            
-            dbStore.collection("userEventStore").whereField("uid", isEqualTo: user!).whereField("chosenDateMonth", isEqualTo: monthAsNrPlus1).whereField("chosenDateYear", isEqualTo: yearAsNrPlus1).whereField("chosenDateDay", isEqualTo: dayAsNrPlus1).getDocuments { (querySnapshot, error) in
-                   if error != nil {
-                       print("Error getting documents: \(error!)")
-                   }
-                   else {
-                       for document in querySnapshot!.documents {
-                           print("\(document.documentID) => \(document.data())")
-                        
-                        let documentID = document.get("eventID") as! String
-                        
-                        eventIDArray.append(documentID)
-                        
-                    }}
-                
-            dbStore.collection("userEventStore").whereField("uid", isEqualTo: user!).whereField("chosenDateMonth", isEqualTo: monthAsNrMinus1).whereField("chosenDateYear", isEqualTo: yearAsNrMinus1).whereField("chosenDateDay", isEqualTo: dayAsNrMinus1).getDocuments { (querySnapshot, error) in
-                       if error != nil {
-                           print("Error getting documents: \(error!)")
-                       }
-                       else {
-                           for document in querySnapshot!.documents {
-                               print("\(document.documentID) => \(document.data())")
-                            
-                            let documentID = document.get("eventID") as! String
-                            
-                            eventIDArray.append(documentID)
-                            
-                        }}
-                    
-                    completion(eventIDArray)
-                }
-            }
-        }}
-    
-    func getMonthEventsDetail(eventIDs: [String], completion: @escaping (_ complete: Bool) -> Void){
-        
-        print("running func getMonthEventsDetail: inputs - eventIDs: \(eventIDs)")
-        
+        //    we need to check if the events are occuring today once adjsuted for the timezone
         let dateFormatterTZ = DateFormatter()
         dateFormatterTZ.dateFormat = "yyyy-MM-dd HH:mm z"
         dateFormatterTZ.locale = Locale(identifier: "en_US_POSIX")
+        let todayMonth = Calendar.current.component(.month, from: today.addingTimeInterval(TimeInterval(secondsFromGMT)))
         
-        if eventIDs.isEmpty == true{
-            
-            completion(true)
-            
-        }
-        else{
-        
-        for documentID in eventIDs{
-        
-                    let docRef = dbStore.collection("eventRequests").document(documentID)
-                    
-                    var monthsEvent = PlanrEventStruct()
-                    
-                    docRef.getDocument(
-                    completion: { (querySnapshot2, error) in
-                        if error != nil {
-                            print("Error getting documents")
-                        }
-                        else {
-                            
-//                        print("querySnapshot2: \(String(describing: querySnapshot2?.data()))")
-                            
-                            
-                            let startDates = querySnapshot2?.get("startDates") as! [String]
-                            let chosenDatePosition = querySnapshot2?.get("chosenDatePosition") as! Int
-                                                            
-//                            get the event date as a string, convert it into a date
-                            let eventChosenDateString = startDates[chosenDatePosition]
-                            let eventCosenDateDate = dateFormatterTZ.date(from: eventChosenDateString)
-                            let eventMonth = Calendar.current.component(.month, from: eventCosenDateDate!)
-                            
-                            if eventMonth == self.currentMonthIndex{
-                            
-                            
-                        monthsEvent.eventDescription = querySnapshot2?.get("eventDescription") as! String
-                        monthsEvent.eventLocation = querySnapshot2?.get("location") as! String
-                        monthsEvent.endDates = querySnapshot2?.get("endDates") as! [String]
-                        monthsEvent.startDates = startDates
-                        monthsEvent.timeStamp = querySnapshot2?.get("timeStamp") as? Float ?? 0.0
-                        monthsEvent.eventID = querySnapshot2!.documentID
-                        monthsEvent.eventOwnerID = querySnapshot2?.get("eventOwner") as! String
-                        monthsEvent.chosenDatePosition = chosenDatePosition
-                        monthsEvent.chosenDate = querySnapshot2?.get("chosenDate") as! String
-                        
-                        let endTimeString = querySnapshot2?.get("endTimeInput") as! String
-                        let startTimeString = querySnapshot2?.get("startTimeInput") as! String
-                        let endTimeInputResult = self.convertToLocalTime(inputTime: endTimeString)
-                        let startTimeInputResult = self.convertToLocalTime(inputTime: startTimeString)
-                        monthsEvent.eventEndTime = endTimeInputResult
-                        monthsEvent.eventStartTime = startTimeInputResult
-                            
-                        
-                        
-                        
-                        let chosenDay = String(monthsEvent.chosenDate[8...9])
-                            
-                        monthsEvent.chosenDay = Int(chosenDay)!
-                            
-                        self.monthsEvents.append(monthsEvent)
+            for i in planrEventsSearch{
+                let startDates = i.startDateArray
+                let chosenDatePosition = i.chosenDatePosition
+                let eventChosenDateString = startDates[chosenDatePosition]
+                let eventChosenDateDate = dateFormatterTZ.date(from: eventChosenDateString)
+                let eventMonth = Calendar.current.component(.month, from: eventChosenDateDate!)
 
-                        }
-                            else{
-                                  
-                            }
-                        }
-                       completion(true)
-                    })}}
-        
-        
-    }
-    
-    
-    func createEventArray(completion: @escaping (_ array: [[PlanrEventStruct?]]) -> Void){
-        
-        var emptyArray = [[PlanrEventStruct?]](repeating: [nil], count: numOfDaysInMonth[currentMonthIndex-1])
-//        print("emptyArray: \(emptyArray)")
-        
-        let listOfEvents = monthsEvents
-        
-        for events in listOfEvents{
-            
-            if emptyArray[events.chosenDay - 1] == [nil]{
-                
-                emptyArray[events.chosenDay - 1] = [events]
-                
+        //        remove those events that dont occur today
+                if todayMonth != eventMonth{
+                    planrEventsSearch.removeAll{$0.eventID == i.eventID}
+                }
+
             }
-            else{
-                
-                var newArray = emptyArray[events.chosenDay - 1] as! [PlanrEventStruct]
-                
-                newArray.append(events)
-                
-                emptyArray[events.chosenDay - 1] = newArray
-            }
+        completion()
         }
-        print("retunred emptyArray: \(emptyArray)")
-        eventDetailsArray = emptyArray
-        completion(emptyArray)
-    }
     }
  
 

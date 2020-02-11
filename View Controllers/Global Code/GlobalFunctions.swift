@@ -1164,14 +1164,19 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
     
 //    commits the user availability data to the userEventStore and also adds the notifications to the availabilityNotificationStore
         func commitUserAvailbilityData(userEventStoreID: String, finalAvailabilityArray2: [Int], eventID: String){
-        
+        print("running func commitUserAvailbilityData inputs - userEventStoreID: \(userEventStoreID) finalAvailabilityArray2: \(finalAvailabilityArray2) eventID: \(eventID)")
         let dbStoreInd = Firestore.firestore()
     
-        print("running func commitUserAvailbilityData inputs - userEventStoreID: \(userEventStoreID) finalAvailabilityArray2: \(finalAvailabilityArray2)")
-    
-    
         dbStoreInd.collection("userEventStore").document(userEventStoreID).setData(["userAvailability" : finalAvailabilityArray2,"userResponded": true], merge: true)
-    
+            
+        
+            if serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: true).count == 0{
+                print("commitUserAvailbilityData the event wasnt in CD - maybe we should do something about it")
+            }
+            else{
+                let userIDs = serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: true)[0].users
+                availabilityCreatedNotification(userIDs: userIDs, availabilityDocumentID: userEventStoreID)
+            }
     }
     
 //    function to adjust the days of the week for timezones, if the users is in a timezone where there start date of thier event will be the next day we adjust thier days of the week array forward one day
@@ -1707,7 +1712,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
 //            If the user doesn't have any events in thier calendar for the period we create a useravailability array of 0
         if startDatesOfTheEvents.count == 0{
             
-            print("User deosn't have events in thier calendar for this period")
+            print("User doesn't have events in thier calendar for this period")
         
             while y <= numeberOfDatesToCheck{
                 print("y \(y)")
