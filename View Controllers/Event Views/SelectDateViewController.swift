@@ -257,7 +257,7 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
                 print("manualEditCoachMarksCount \(manualEditCoachMarksCount)")
                 
                 
-                if manualEditCoachMarksCount < 3 || createEventCoachMarksPermenant == true{
+                if manualEditCoachMarksCount < 2 || createEventCoachMarksPermenant == true || selectEventToggle == 1{
                 
                 coachMarksController.start(in: .window(over: self))
                     

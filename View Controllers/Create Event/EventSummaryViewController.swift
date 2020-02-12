@@ -97,14 +97,12 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
     @objc func doneSelected(){
         
         selectEventToggle = 1
-        
-//        let loadingNotification = MBProgressHUD.showAdded(to: view, animated: false)
-//        loadingNotification.label.text = "Creating Event"
-//        loadingNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
-//        loadingNotification.mode = MBProgressHUDMode.customView
-        
 
+//        add the new event to the event store, add each users userEventStore and add the data to coreData
         addEventToEventStore(){ (eventID) in
+            
+//            adds the current users availability to the userEventStore
+            self.uploadCurrentUsersAvailability(eventID: eventID)
             
 //            set the current selected event to the one just created and added to CoreData
             currentUserSelectedEvent = self.serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: true)[0]

@@ -238,60 +238,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
 
             queue.async {
 
-
             snapshot.documentChanges.forEach { diff in
-                if (diff.type == .added) {
-                    print("New event: \(diff.document.data())")
-
-                    let source = diff.document.metadata.hasPendingWrites ? "Local" : "Server"
-
-//                    To check whether availability has already been supplied
-                    let userAvailabilityCheck = diff.document.get("userAvailability") as? [Int] ?? [99]
-                    print("userAvailabilityCheck: \(userAvailabilityCheck)")
-
-
-//                    if availability exist then stop the process
-                    if source == "local" || userAvailabilityCheck[0] != 99 {
-
-                        //                        for local updates we do nothing
-
-                    }
-                    else{
-
-                        self.checkCalendarStatus2()
-                        self.newEventID = diff.document.get("eventID") as! String
-                        self.userEventStoreID = diff.document.documentID
-
-                        self.getEventInformation3(eventID: self.newEventID, userEventStoreID: self.userEventStoreID) { (userEventStoreID, eventSecondsFromGMT, startDates, endDates) in
-
-                            print("Succes getting the event data")
-
-                            print("startDates: \(startDates), endDates: \(endDates)")
-
-
-                            let numberOfDates = endDates.count - 1
-
-                            let startDateDate = self.dateFormatterTZ.date(from: startDates[0])
-                            let endDateDate = self.dateFormatterTZ.date(from: endDates[numberOfDates])
-
-                            let endDatesOfTheEvents = self.getCalendarData3(startDate: startDateDate!, endDate: endDateDate!).endDatesOfTheEvents
-                            let startDatesOfTheEvents = self.getCalendarData3(startDate: startDateDate!, endDate: endDateDate!).startDatesOfTheEvents
-
-                            let finalAvailabilityArray2 = self.compareTheEventTimmings3(datesBetweenChosenDatesStart: startDates, datesBetweenChosenDatesEnd: endDates, startDatesOfTheEvents: startDatesOfTheEvents, endDatesOfTheEvents: endDatesOfTheEvents)
-
-
-                            //                        add the finalAvailabilityArray to the userEventStore
-
-
-                            self.commitUserAvailbilityData(userEventStoreID: userEventStoreID, finalAvailabilityArray2: finalAvailabilityArray2, eventID: self.newEventID)
-                                semaphore.signal()
-                            }
-                       semaphore.wait()
-                    }
-
-
-
-                }
 
 //                for modifications to the event we watch for changes to the chosen date
                 if (diff.type == .modified) {
@@ -407,7 +354,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
 
                 }
                 if (diff.type == .removed) {
-                    print("Removed event: \(diff.document.data())")
+//                    print("Removed event: \(diff.document.data())")
                 }
 
                 }
@@ -415,34 +362,9 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
             }
 
         }
-
-//    EVENT DATE CHOSEN: listener to detect when an event we have been invited to or created has had its chosen date set
-
-       var dateChosenListener = dbStore.collection("userEventStore").whereField("uid", isEqualTo: user ?? "").addSnapshotListener { querySnapshot, error in
-            guard let snapshot = querySnapshot else {
-                print("Error fetching snapshots: \(error!)")
-                return
-            }
-
-        print("dateChosenListener has been triggered")
-
-            snapshot.documentChanges.forEach { diff in
-                if (diff.type == .modified) {
-
-
-
-                }
-
-            }
-
-
-        }
-        
-                
          func viewWillDisappear(_ animated: Bool) {
                 
                 newEventListener.remove()
-                dateChosenListener.remove()
                 coachMarksController.stop(immediately: true)
             
             }

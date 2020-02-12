@@ -76,9 +76,17 @@ class ManualAvailabilityViewController: UIViewController,CoachMarksControllerDat
     @objc func saveAvailability() {
         
         let eventID = currentUserSelectedEvent.eventID
-        commitUserAvailbilityData(userEventStoreID: currentUserAvailabilityDocID, finalAvailabilityArray2: temporaryCurrentUsersAvailability, eventID: eventID)
+        
+        let currentUserAvailability = currentUserSelectedAvailability.filter {$0.uid == user! && $0.eventID == eventID}
+        
+        commitUserAvailbilityData(userEventStoreID: currentUserAvailability[0].documentID, finalAvailabilityArray2: temporaryCurrentUsersAvailability, eventID: eventID)
+        
+        
+        
+        updateUsersAvailability(documentID: currentUserAvailability[0].documentID, eventID: eventID, uid: user!, userAvailability: temporaryCurrentUsersAvailability)
 
-        prepareForEventDetailsPage(eventID: eventID, isEventOwnerID: currentUserSelectedEvent.eventOwnerID, segueName: "", isSummaryView: false, performSegue: false){
+        currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+        prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability){
             
             self.view.removeFromSuperview()
             
@@ -156,7 +164,7 @@ class ManualAvailabilityViewController: UIViewController,CoachMarksControllerDat
             print("selectDateCoachMarksCount \(selectDateCoachMarksCount)")
             
             
-            if selectDateCoachMarksCount < 3 || createEventCoachMarksPermenant == true{
+            if selectDateCoachMarksCount < 2 || createEventCoachMarksPermenant == true{
             
             coachMarksController.start(in: .window(over: self))
                 
@@ -285,7 +293,7 @@ extension ManualAvailabilityViewController:UICollectionViewDataSource, UICollect
                 }
                 
                 
-                if temporaryCurrentUsersAvailability[indexPath.section] == 10{
+                if temporaryCurrentUsersAvailability[indexPath.section] == 10 || temporaryCurrentUsersAvailability[indexPath.section] == 99{
                 
                     cell.collectionViewLabel.font = UIFont(name: "Helvetica Neue", size: 20)
                 cell.collectionViewLabel.text = "   ？ "
@@ -340,7 +348,7 @@ extension ManualAvailabilityViewController:UICollectionViewDataSource, UICollect
                 availabilityCollectionView.reloadData()
                 
             }
-            else if temporaryCurrentUsersAvailability[indexPath.section] == 10{
+            else if temporaryCurrentUsersAvailability[indexPath.section] == 10 || temporaryCurrentUsersAvailability[indexPath.section] == 99{
                 
                 print("Currently not responded")
                 

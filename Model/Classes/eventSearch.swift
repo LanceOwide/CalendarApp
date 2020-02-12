@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct eventSearch {
+struct eventSearch: Equatable {
     
     var eventID: String = ""
     var eventDescription: String = ""

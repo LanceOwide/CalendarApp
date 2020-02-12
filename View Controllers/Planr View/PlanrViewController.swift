@@ -23,9 +23,7 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
     
     @IBOutlet weak var myBottomView: UIView!
     
-    
-    
-    
+
     var numOfDaysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
     var monthsArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     var currentMonthIndex: Int = 0
@@ -34,8 +32,8 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
     var presentYear = 0
     var todaysDate = 0
     var firstWeekDayOfMonth = 0   //(Sunday-Saturday 1-7)
-    var monthsEvents = [PlanrEventStruct]()
-    var eventDetailsArray = [[PlanrEventStruct?]]()
+    var monthsEvents = [eventSearch]()
+    var eventDetailsArray = [[eventSearch?]]()
     var planrEventsSearch = [eventSearch]()
     
     let monthView: MonthView = {
@@ -93,9 +91,11 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
             navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
 
             getMonthEventsID{
+                self.createEventArray{
                 print("monthsEvents: \(self.monthsEvents)")
                 self.myCollectionView.reloadData()
                 self.myTableView.reloadData()
+                }
             }
         }
     
@@ -106,8 +106,6 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
         
     }
 
-    
-        
         func getFirstWeekDay() -> Int {
                let day  = ("\(currentYear)-\(currentMonthIndex)-01".date?.firstDayOfTheMonth.weekday)!
                //return day == 7 ? 1 : day
@@ -135,9 +133,11 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
             firstWeekDayOfMonth=getFirstWeekDay()
             
             getMonthEventsID{
+                self.createEventArray{
                     print("monthsEvents: \(self.monthsEvents)")
                     self.myCollectionView.reloadData()
                     self.myTableView.reloadData()
+                }
                 }
 
 //            self.myCollectionView.reloadData()
@@ -431,6 +431,36 @@ extension PlanrViewController{
             }
         completion()
         }
+    
+//    function to create an array for all dates in the chosen month
+    func createEventArray(completion: @escaping () -> Void){
+            
+            var emptyArray = [[eventSearch?]](repeating: [nil], count: numOfDaysInMonth[currentMonthIndex-1])
+    //        print("emptyArray: \(emptyArray)")
+            
+            let listOfEvents = planrEventsSearch
+            
+            for events in listOfEvents{
+                
+                if emptyArray[events.chosenDateDay - 1] == [nil]{
+                    
+                    emptyArray[events.chosenDateDay - 1] = [events]
+                    
+                }
+                else{
+                    
+                    var newArray = emptyArray[events.chosenDateDay - 1] as! [eventSearch]
+                    
+                    newArray.append(events)
+                    
+                    emptyArray[events.chosenDateDay - 1] = newArray
+                }
+            }
+            print("retunred emptyArray: \(emptyArray)")
+            eventDetailsArray = emptyArray
+            completion()
+        }
+    
     }
  
 

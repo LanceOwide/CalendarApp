@@ -106,8 +106,14 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         
 //        set the values for the invitees names, used in the tableview
         inviteesNames = currentUserSelectedEvent.currentUserNames
-        nonUserInviteeNames = currentUserSelectedEvent.nonUserNames
+        
+//        if non user invitees = none, we need to show nothing
+        if currentUserSelectedEvent.nonUserNames.count != 0{
+            print("there is some data in currentUserSelectedEvent")
+            nonUserInviteeNames = currentUserSelectedEvent.nonUserNames
 
+        }
+        
 //        print("combinedInviteesNames \(combinedInviteesNames)")
         
         
@@ -182,7 +188,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             
         
             if currentUserSelectedEvent.nonUserNames.count == 0 {
-        nonUserInviteeNames = [""]
+//        nonUserInviteeNames = [""]
 
         }
         else{
@@ -389,15 +395,16 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             getStartAndEndDates3(startDate: startDateInputString, endDate: endDateInputString, startTime: eventStartTime.text!, endTime: eventEndTime.text!, daysOfTheWeek: daysOfTheWeekNewEvent){ (startDates,endDates) in
             
 //            commit the updated event information to the database
-            
-            let documentID = eventResultsArrayDetails[3][1] as? String
-                dbStore.collection("eventRequests").document(documentID!).setData(["eventDescription" : self.eventTitle.text!, "location" : self.eventLoction.text!, "endTimeInput" :self.convertToGMT(inputTime: self.eventEndTime.text!), "startTimeInput" :self.convertToGMT(inputTime: self.eventStartTime.text!), "endDateInput" : self.convertToStringDate(inputDate: self.eventEndDate.text!), "startDateInput" : self.convertToStringDate(inputDate:self.eventStartDate.text!), "daysOfTheWeek" : daysOfTheWeekNewEvent, "startDates": startDates, "endDates": endDates, "locationLongitude": newEventLongitude, "locationLatitude": newEventLatitude], merge: true)
+                dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["eventDescription" : self.eventTitle.text!, "location" : self.eventLoction.text!, "endTimeInput" :self.convertToGMT(inputTime: self.eventEndTime.text!), "startTimeInput" :self.convertToGMT(inputTime: self.eventStartTime.text!), "endDateInput" : self.convertToStringDate(inputDate: self.eventEndDate.text!), "startDateInput" : self.convertToStringDate(inputDate:self.eventStartDate.text!), "daysOfTheWeek" : daysOfTheWeekNewEvent, "startDates": startDates, "endDates": endDates, "locationLongitude": newEventLongitude, "locationLatitude": newEventLatitude], merge: true)
+                
+//                AmendNotifiction  - post to the eventNotification to table that the event has been amended
+                self.eventAmendedNotification(userIDs: currentUserSelectedEvent.users, eventID: currentUserSelectedEvent.eventID)
+                print("event updates committed")
             
 //            updated the realtime database
-            
             let rRef = Database.database().reference()
             
-                rRef.child("events/\(eventCreationID)/eventDescription").setValue(self.eventTitle.text!)
+                rRef.child("events/\(currentUserSelectedEvent.eventID)/eventDescription").setValue(self.eventTitle.text!)
                 
             }
 // checks to see whether the user has made any changes to the event timing
@@ -408,10 +415,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             eventEndDate.text == convertToDisplayDate(inputDate: currentUserSelectedEvent.eventEndDate) && currentUserSelectedEvent.daysOfTheWeekArray == daysOfTheWeekNewEvent {
                 
                 showProgressHUD(notificationMessage: "Event Information Updated", imageName: "icons8-double-tick-100", delay: 2)
-  
-            print("event updates committed")
             
-
         }
             else{
                 
@@ -426,19 +430,17 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         print("contactsSelected: \(contactsSelected)")
         
 //        We need to first check if the user removed an invitees, the users deleted names and user IDs are held in two arrays
-        
         if deletedUserIDs.count == 0{
-            
             print("user didnt delete any invitees")
-            
         }
         else{
 //            we now need to delete the users from the eventRequest and userEventStore
             
 //            deletes the userEventStore
-        
-            deleteUserEventLinkArray(userID: deletedUserIDs, eventID: currentUserSelectedEvent.eventID)
+        deleteUserEventLinkArray(userID: deletedUserIDs, eventID: currentUserSelectedEvent.eventID)
         deleteEventStoreAvailability(eventID: currentUserSelectedEvent.eventID)
+//            post a deleted notification for these users
+        eventDeletedNotification(userIDs: deletedUserIDs, eventID: currentUserSelectedEvent.eventID)
             
 //            MARK: this needs to be corrected
         addUserIDsToEventRequests(userIDs: inviteesUserIDs, currentUserID: [""], existingUserIDs: [""], eventID: currentUserSelectedEvent.eventID, addCurrentUser: false, currentUserNames: [""], nonUserNames: [""])
@@ -491,7 +493,6 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
                 print("new users added")
                 
 //            remove the selected contacts from the array
-                
              contactsSelected.removeAll()
                 inviteesNamesNew.removeAll()
                 selectedContacts.removeAll()
@@ -623,7 +624,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         }
         
         let combinedInvitees = inviteesNames + nonUserInviteeNames + inviteesNamesNew
- 
+        print("combinedInvitees \(combinedInvitees)")
         
         cell.delegate = self
         cell.cellLabel.text = combinedInvitees[indexPath.row]
