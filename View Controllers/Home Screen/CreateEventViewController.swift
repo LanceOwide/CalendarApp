@@ -102,7 +102,6 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     var finalAvailabilityArray = Array<Int>()
     var userEventStoreID = String()
     var fireStoreRef: DatabaseReference!
-    var daysEvents = [PlanrEventStruct]()
     let coachMarksController = CoachMarksController()
     var todaysEventsSearch = [eventSearch]()
    
@@ -121,9 +120,6 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     
     
     @IBAction func testTheCode(_ sender: UIButton) {
-
-        
-        
     }
     
     
@@ -147,9 +143,9 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
             self.eventChangeListener()
             self.availabilityChangeListener()
             //        get todays events
-//            self.getDaysEventsIDCD{
-//                self.tblViewEventList.reloadData()
-//            }
+            self.getDaysEventsIDCD{
+                self.tblViewEventList.reloadData()
+            }
         }
 
 //        print the directory the SQL database is saved to
@@ -217,162 +213,23 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
 //        restrict the rotation of the device to portrait
         (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
         
-        
-        //        Mark: Firebase listeners
-        //        listener to detect when any events are added with the users username in them
-        
-        let semaphore = DispatchSemaphore(value: 0)
-        let queue = DispatchQueue.global()
-        
 
         checkNotificationStatus(){
             
             self.collectionViewMenu.reloadData()
         }
-
-        var newEventListener = dbStore.collection("userEventStore").whereField("uid", isEqualTo: user ?? "").whereField("userResponded", isEqualTo: false).addSnapshotListener { querySnapshot, error in
-            guard let snapshot = querySnapshot else {
-                print("Error fetching snapshots: \(error!)")
-                return
-            }
-
-            queue.async {
-
-            snapshot.documentChanges.forEach { diff in
-
-//                for modifications to the event we watch for changes to the chosen date
-                if (diff.type == .modified) {
-                    print("Modified event: \(diff.document.data())")
-
-                    if diff.document.get("chosenDate") == nil {
-                                            print("no date chosen")
-                                        }
-                                        else{
-
-                                            //            the default for a firebase listener is to react to both the local write and the cloud stored event, hence we isolate the cloud event only to ensure we only add the event to the calendar once
-                                            let source = diff.document.metadata.hasPendingWrites ? "Local" : "Server"
-                                            //            print("\(source) data: \(diff.document.data() )")
-
-                                            //            we set nothing to happen if the source is the local write
-                                            if source == "local" {
-
-                                            }
-                                            else{
-
-                                                //            print("date chosen: \(diff.document.get("chosenDate") ?? "date chosen did not unwrap")")
-                                                let eventID = diff.document.get("eventID")
-                                                print("date chosen listener eventID \(String(describing: eventID))")
-                                                let chosenDateCreate = diff.document.get("chosenDate") as! String
-                                                print("date chosen listener chosen date \(chosenDateCreate)")
-
-                                                self.userEventStoreID = diff.document.documentID
-
-                                                var calendarEventIDGotCheck = String()
-
-                                                let calendarEventIDGot = diff.document.get("calendarEventID") ?? ""
-
-
-
-                    //                            this flag indicates whether the user has been asked if they would like to add this event to thier calendar previosuly, if they have then we will stop here
-
-                                                let eventSeenFlag = diff.document.get("chosenDateSeen") as! Bool
-                                                print("eventSeenFlag \(eventSeenFlag)")
-
-                                                if eventSeenFlag == true{
-
-                                                }
-                                                else{
-                                                dbStore.collection("eventRequests").document(eventID as! String).getDocument(completion: { (documentEventData, error) in
-                                                    if error != nil {
-                                                        print("Error getting documents for adding event")
-                                                    }
-                                                    else{
-
-                                                        var checkForData = documentEventData!.get("startTimeInput") as? String ?? ""
-
-                                                        if checkForData == "" {
-
-                                                            print("This event was deleted - we do not continue")
-
-                                                        }
-                                                        else{
-
-                                                            print(documentEventData!)
-
-                                                        let startTimeString = documentEventData!.get("startTimeInput") as! String
-
-                                                        let allStartDates = documentEventData!.get("startDates") as! [String]
-
-
-                                                            let allEndDates = documentEventData!.get("endDates") as! [String]
-
-                                                            let dateFormatterTZCreate = DateFormatter()
-                                                            dateFormatterTZCreate.dateFormat = "yyyy-MM-dd HH:mm z"
-                                                            dateFormatterTZCreate.locale = Locale(identifier: "en_US_POSIX")
-
-
-
-                                                        let chosenDatePosition = documentEventData!.get("chosenDatePosition") as! Int
-
-                                                            let chosenStartDate = allStartDates[chosenDatePosition]
-                                                            print("chosenStartDate \(chosenStartDate)")
-
-                                                            let chosenEndDate = allEndDates[chosenDatePosition]
-                                                            print("chosenEndDate: \(chosenEndDate)")
-
-                                                            let starDateDisplay = documentEventData!.get("chosenDate") as? String ?? ""
-                    //
-                    //                                        let chosenStartDateDate = dateFormatterTZCreate.date(from:chosenStartDate)
-                    //                                        print("chosenStartDateDate: \(String(describing: chosenStartDateDate))")
-                    //                                        let chosenEndDateDate = dateFormatterTZCreate.date(from:chosenEndDate)
-                    //                                        print("chosenEndDateDate: \(String(describing: chosenEndDateDate))")
-
-                                                        let eventCreatorCreate = documentEventData!.get("eventOwnerName") as? String ?? ""
-
-                                                        let eventCreatorID = documentEventData!.get("eventOwner") as? String ?? ""
-
-                                                        let eventLocationCreate = documentEventData!.get("location") as? String ?? ""
-                                                        //                    print(eventLocationCreate)
-                                                        let eventDescriptionCreate = documentEventData!.get("eventDescription") as? String ?? ""
-
-                    //                                    get event geolocation
-                                                        let locationLongitude = documentEventData!.get("locationLongitude") as? Double ?? 0.0
-
-                                                        let locationLatitude = documentEventData!.get("locationLatitude") as? Double ?? 0.0
-
-
-                                                        //                    Adds the event to the users calendar
-                                                            self.addEventToCalendar(title: eventDescriptionCreate, description: eventDescriptionCreate, startDate:  chosenStartDate, endDate: chosenEndDate, location: eventLocationCreate, eventOwner: eventCreatorCreate, startDateDisplay: starDateDisplay, eventOwnerID: eventCreatorID, locationLongitude: locationLongitude, locationLatitude: locationLatitude, userEventStoreID: self.userEventStoreID, calendarEventIDInput: calendarEventIDGot as! String)
-                                                        }
-
-                                                    }})
-
-                                                }
-                                            }
-                                        }
-
-
-                }
-                if (diff.type == .removed) {
-//                    print("Removed event: \(diff.document.data())")
-                }
-
-                }
-
-            }
-
-        }
-         func viewWillDisappear(_ animated: Bool) {
-                
-                newEventListener.remove()
-                coachMarksController.stop(immediately: true)
-            
-            }
         
         
 //        end of viewDidLoad - note: viewWillDisappear is contained within the viewDidLoad, this allows for the removal of the listeners
         
     }
+    
+    
+    override func viewWillDisappear(_ animated: Bool) {
+
+           coachMarksController.stop(immediately: true)
+       
+       }
     
     
     //    function to get any updated data once the table is pulled down
@@ -699,7 +556,7 @@ extension CreateEventViewController: UITableViewDelegate, UITableViewDataSource{
         
         var numberOfRows = Int()
         
-        if daysEvents.count == 0{
+        if todaysEventsSearch.count == 0{
             numberOfRows = 1
             
         }
@@ -719,7 +576,7 @@ extension CreateEventViewController: UITableViewDelegate, UITableViewDataSource{
             fatalError("error creating cell TableViewCellHomePage")
         }
         
-        if daysEvents.count == 0{
+        if todaysEventsSearch.count == 0{
           
             cell.lblTableView.text = ""
             cell.lbl2TableView.text = "No events in your Planr"
@@ -728,7 +585,7 @@ extension CreateEventViewController: UITableViewDelegate, UITableViewDataSource{
         }
         else{
             
-            let text = ("\(daysEvents[indexPath.row].eventStartTime) - \(daysEvents[indexPath.row].eventEndTime)")
+            let text = ("\(todaysEventsSearch[indexPath.row].eventStartTime) - \(todaysEventsSearch[indexPath.row].eventEndTime)")
             
             cell.lblTableView.text = todaysEventsSearch[indexPath.row].eventDescription
             cell.lbl2TableView.text = text
@@ -745,7 +602,7 @@ extension CreateEventViewController: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         
-        if daysEvents.count == 0{
+        if todaysEventsSearch.count == 0{
             
             tableView.deselectRow(at: indexPath, animated: true)
         }
@@ -798,17 +655,19 @@ func getDaysEventsIDCD(completion: @escaping () -> Void){
     dateFormatterTZ.dateFormat = "yyyy-MM-dd HH:mm z"
     dateFormatterTZ.locale = Locale(identifier: "en_US_POSIX")
     let todayDay = Calendar.current.component(.day, from: today.addingTimeInterval(TimeInterval(secondsFromGMT)))
-     
+     print("todayDay \(todayDay)")
     
     for i in todaysEventsSearch{
-
+        print("todaysEventsSearch \(todaysEventsSearch)")
         let startDates = i.startDateArray
         let chosenDatePosition = i.chosenDatePosition
         let eventChosenDateString = startDates[chosenDatePosition]
         let eventChosenDateDate = dateFormatterTZ.date(from: eventChosenDateString)
         let eventDay = Calendar.current.component(.day, from: eventChosenDateDate!)
+        print("eventDay \(eventDay)")
+        
 
-//        remove those events that dont occur today
+//        remove those events that don't occur today
         if todayDay != eventDay{
             todaysEventsSearch.removeAll{$0.eventID == i.eventID}
         }

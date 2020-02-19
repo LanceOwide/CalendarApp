@@ -192,7 +192,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                             cell.userInvitedCellLabel1.attributedText = eventTitleDescription
                             cell.userInvitedCellLabel2.text =  item.eventLocation
                             cell.userInvitedCellLabel4.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
-                            cell.userInvitedCellLabel3.text = convertToDisplayDate(inputDate: item.chosenDate)
+                            cell.userInvitedCellLabel3.text = dateTZToDisplayDate(date: item.chosenDate)
                     
                     
                     //                        check if there is an outstanding chat message
@@ -223,7 +223,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                             cell.userInvitedCellLabel1.attributedText = eventTitleDescription
                             cell.userInvitedCellLabel2.text = ("\(item.eventLocation) \n\(item.eventStartTime) - \(item.eventEndTime)")
                             cell.userInvitedCellLabel4.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
-                            cell.userInvitedCellLabel3.text = convertToDisplayDate(inputDate: item.chosenDate)
+                            cell.userInvitedCellLabel3.text = dateTZToDisplayDate(date: item.chosenDate)
                     
                     
                     //                        check if there is an outstanding chat message
@@ -254,7 +254,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                             cell.userInvitedCellLabel1.attributedText = eventTitleDescription
                             cell.userInvitedCellLabel2.text = ("Location: \(item.eventLocation) \nTime: \(item.eventStartTime) - \(item.eventEndTime)")
                             cell.userInvitedCellLabel4.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
-                            cell.userInvitedCellLabel3.text = convertToDisplayDate(inputDate: item.chosenDate)
+                            cell.userInvitedCellLabel3.text = dateTZToDisplayDate(date: item.chosenDate)
                     
                     //                        check if there is an outstanding chat message
                     if item.newChatMessage == true{
@@ -395,9 +395,13 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                 newMessageNotification = false
                 
                 }
+                
+                currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+                self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+                
                     loadingNotification.hide(animated: true)
                     
-//                }
+                }
    
             }
                 
@@ -411,7 +415,12 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                 else{
                 newMessageNotification = false
                 }
-                    loadingNotification.hide(animated: true)
+                    currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+                    self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+                    
+                        loadingNotification.hide(animated: true)
+                        
+                    }
                         }
             else{
                 
@@ -426,9 +435,14 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                 newMessageNotification = false
                 
                 }
+                
+                currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+                self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+                
                     loadingNotification.hide(animated: true)
                     
-//                }
+                }
+
                 }}}}
 
 

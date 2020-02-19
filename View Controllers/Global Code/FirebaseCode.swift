@@ -180,7 +180,7 @@ extension UIViewController{
                 let documentID = document.documentID
                 
 
-                    self.getEventInformation3(eventID: eventID, userEventStoreID: documentID) { (userEventStoreID, eventSecondsFromGMT, startDates, endDates) in
+                    self.getEventInformation3(eventID: eventID, userEventStoreID: documentID) { (userEventStoreID, eventSecondsFromGMT, startDates, endDates, users) in
                                 
                                 print("Succes getting the event data")
                                 
@@ -202,8 +202,10 @@ extension UIViewController{
                                 let finalAvailabilityArray2 = self.compareTheEventTimmings3(datesBetweenChosenDatesStart: startDates, datesBetweenChosenDatesEnd: endDates, startDatesOfTheEvents: startDatesOfTheEvents, endDatesOfTheEvents: endDatesOfTheEvents)
                                 
                                 
-                                //                        add the finalAvailabilityArray to the userEventStore
                                 
+//                          Add notitications that the availability has been loaded
+                        self.availabilityCreatedNotification(userIDs: users, availabilityDocumentID: userEventStoreID)
+//                        add the finalAvailabilityArray to the userEventStore
                         self.commitUserAvailbilityData(userEventStoreID: userEventStoreID, finalAvailabilityArray2: finalAvailabilityArray2, eventID: eventID)
                                 }}}}}
     

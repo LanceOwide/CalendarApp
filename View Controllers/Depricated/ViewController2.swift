@@ -645,7 +645,7 @@ class ViewController2: UIViewController, UICollectionViewDataSource, UICollectio
         
             let userEventStoreID = document.documentID
             
-            self.getEventInformation3(eventID: eventIDChosen, userEventStoreID: userEventStoreID) { (userEventStoreID, eventSecondsFromGMT, startDates, endDates) in
+            self.getEventInformation3(eventID: eventIDChosen, userEventStoreID: userEventStoreID) { (userEventStoreID, eventSecondsFromGMT, startDates, endDates, users) in
                 
                 print("Succes getting the event data")
                 

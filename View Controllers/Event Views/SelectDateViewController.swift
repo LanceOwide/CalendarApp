@@ -46,15 +46,9 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let currentDate = arrayForEventResultsPageFinal[0][popUpLocation[1]] as! String
-        
-        
         let vc = splitViewController
         
-        vc?.title = currentDate
-        
-//        self.title = currentDate
+        vc?.title = selectedDate
         
         
         //        setup the navigation bar
@@ -73,18 +67,6 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
         
     buttonSettings(uiButton: closeButton)
     buttonSettings(uiButton: selectDateButton)
-        
-//    labelSettings(uiLabel: lblCurrentDate)
-        
-        
-    
-        
-        print("currentDate: \(currentDate)")
-        
-        
-//        lblCurrentDate.text = currentDate
-        
-        
         visibleButtons()
         
 //        end of viewDidLoad
@@ -112,16 +94,17 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
     
 @objc func saveDateSelected() {
     
+//    need to find the position of the date in the dates array, to upload to FB
+    dateChosenPosition = currentUserSelectedEvent.startDatesDisplay.index(of: selectedDate) ?? 999
     
-    dateChosen = eventResultsArrayDetails[0][popUpLocation[1]] as! String
+//    need to convert the selected date from the display format into a fomrat without the time
+//    1. get the date from the start dates list and convert to the required YYYY-MM-DD format
+    dateChosen = currentUserSelectedEvent.startDateArray[dateChosenPosition]
     
-    let currentDate = arrayForEventResultsPageFinal[0][popUpLocation[1]] as! String
-    
-    dateChosenPosition = popUpLocation[1] - 1
     
     
     // create the alert
-            let alert = UIAlertController(title: "Select Date \(currentDate)", message: "You're about to select this date for your event, would you like to continue?", preferredStyle: UIAlertController.Style.alert)
+            let alert = UIAlertController(title: "Select Date \(selectedDate)", message: "You're about to select this date for your event, would you like to continue?", preferredStyle: UIAlertController.Style.alert)
             
             // add the actions (buttons)
             alert.addAction(UIAlertAction(title: "NO", style: UIAlertAction.Style.cancel, handler: { action in
@@ -139,44 +122,26 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
                 let chosenDateYearInt = Int(chosenDateYear)!
                 let chosenDateMonthInt = Int(chosenDateMonth)!
                 let chosenDateDayInt = Int(chosenDateDay)!
-                    
-                dbStore.collection("eventRequests").document(eventResultsArrayDetails[3][1] as! String).setData(["chosenDate" : self.dateChosen, "chosenDateMonth" : chosenDateMonthInt, "chosenDateYear" : chosenDateYearInt, "chosenDateDay": chosenDateDayInt], merge: true)
-                
-                
-                        
-                dbStore.collection("eventRequests").document(eventResultsArrayDetails[3][1] as! String).setData(["chosenDatePosition" : self.dateChosenPosition], merge: true)
+                  
+//                write the data into the eventRequets
+                dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["chosenDate" : self.dateChosen, "chosenDateMonth" : chosenDateMonthInt, "chosenDateYear" : chosenDateYearInt, "chosenDateDay": chosenDateDayInt, "chosenDatePosition" : self.dateChosenPosition], merge: true)
+
                     
                     
                 print("date submitted to the eventRequest table: \(self.dateChosen)")
                     
-                    //            Adds the chosen date to each individuals user event store
-                    dbStore.collection("userEventStore").whereField("eventID", isEqualTo: eventResultsArrayDetails[3][1] as! String).getDocuments { (querySnapshot, error) in
-                        if error != nil {
-                            print("Error getting documents: \(error!)")
-                        }
-                        else {
-                            
-                            for document in querySnapshot!.documents {
-                                //                    print("\(document.documentID) => \(document.data())")
-                                
-                                var documentIdentifier : String
-                                
-                                documentIdentifier = document.documentID
-                                
+//            Adds the chosen date to each individuals user event store + add a notification for each user that the date for the event has been chosen
 
-                                
-                                dbStore.collection("userEventStore").document(documentIdentifier).setData(["chosenDate" : self.dateChosen, "chosenDateMonth" : chosenDateMonthInt, "chosenDateYear" : chosenDateYearInt, "chosenDateDay": chosenDateDayInt, "chosenDateSeen": false], merge: true)
-                                
-                                
-                                
-                                print("chosen dates added to the userEventStore")
-                            
-                                
-                            }}
-                        
-                    }
+                for i in currentUserSelectedAvailability{
                     
+                    dbStore.collection("userEventStore").document(i.documentID).setData(["chosenDate" : self.dateChosen, "chosenDateMonth" : chosenDateMonthInt, "chosenDateYear" : chosenDateYearInt, "chosenDateDay": chosenDateDayInt, "chosenDateSeen": false], merge: true)
                     
+                    dbStore.collection("userEventUpdates").document(i.uid).setData([currentUserSelectedEvent.eventID : "DateChosen"], merge: true)   
+                }
+                
+
+                
+                      
                 self.performSegue(withIdentifier: "dateChosenSave", sender: Any.self)
                     
             }))
@@ -184,7 +149,6 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
             // show the alert
             
             self.present(alert, animated: true, completion: nil)
-
     }
     
     
@@ -257,7 +221,7 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
                 print("manualEditCoachMarksCount \(manualEditCoachMarksCount)")
                 
                 
-                if manualEditCoachMarksCount < 2 || createEventCoachMarksPermenant == true || selectEventToggle == 1{
+                if manualEditCoachMarksCount < 2 && selectEventToggle == 1 || createEventCoachMarksPermenant == true {
                 
                 coachMarksController.start(in: .window(over: self))
                     
@@ -326,7 +290,7 @@ extension SelectDateViewController:UITableViewDelegate, UITableViewDataSource{
         var headersList = [String]()
         headersList.removeAll()
         
-        let currentDate = arrayForEventResultsPageFinal[0][popUpLocation[1]] as! String
+        let currentDate = selectedDate
         
         
         let headersListStatic = ["Available - \(currentDate)","Unavailable - \(currentDate)","Not Responded - \(currentDate)","Non User - \(currentDate)"]
@@ -424,27 +388,9 @@ extension SelectDateViewController:UITableViewDelegate, UITableViewDataSource{
             arrays.append(nonUserArray)
 
         }
-
-//        if indexPath.section == 0{
                    
             cell.textLabel?.text = arrayForEventResultsPageFinal[arrays[indexPath.section][indexPath.row]][0] as? String
                    
-//               }
-//               else if indexPath.section == 1{
-//
-//            cell.textLabel?.text = arrayForEventResultsPageFinal[nonAvailableArray[indexPath.row]][0] as? String
-//
-//                   }
-//               else if indexPath.section == 2{
-//
-//            cell.textLabel?.text = arrayForEventResultsPageFinal[nonUserArray[indexPath.row]][0] as? String
-//
-//               }
-//               else if indexPath.section == 3{
-//
-//            cell.textLabel?.text = arrayForEventResultsPageFinal[availableUserArray[indexPath.row]][0] as? String
-//
-//               }
         
         cell.textLabel?.adjustsFontSizeToFitWidth = true
         cell.layer.borderColor = UIColor.lightGray.cgColor

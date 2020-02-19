@@ -15,6 +15,7 @@ struct AvailabilityStruct {
     var uid = String()
     var documentID = String()
     var userAvailability = [Int]()
+    var calendarEventID = String()
 
 }
 

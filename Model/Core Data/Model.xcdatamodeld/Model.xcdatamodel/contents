@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19C57" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CoreDataAvailability" representedClassName=".CoreDataAvailability" syncable="YES" codeGenerationType="class">
+        <attribute name="calendarEventID" optional="YES" attributeType="String"/>
         <attribute name="documentID" optional="YES" attributeType="String"/>
         <attribute name="eventID" optional="YES" attributeType="String"/>
         <attribute name="uid" optional="YES" attributeType="String"/>
@@ -36,7 +37,7 @@
         <attribute name="users" optional="YES" attributeType="Transformable" customClassName="[String]"/>
     </entity>
     <elements>
-        <element name="CoreDataAvailability" positionX="-63" positionY="135" width="128" height="118"/>
+        <element name="CoreDataAvailability" positionX="-63" positionY="135" width="128" height="133"/>
         <element name="CoreDataEvent" positionX="-63" positionY="-18" width="128" height="433"/>
     </elements>
 </model>

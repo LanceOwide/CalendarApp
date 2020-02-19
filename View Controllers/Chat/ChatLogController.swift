@@ -310,9 +310,8 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         let timestamp = Int(Date().timeIntervalSince1970)
         let dbStore = Firestore.firestore()
         
-        let userIDs = eventResultsArrayDetails[8][0] as! [String]
-//        let userEventStoreIDs = eventResultsArrayDetails[9][0] as! [String]
-        
+        let userIDs = currentUserSelectedEvent.users
+     
         
         for ids in userIDs{
             

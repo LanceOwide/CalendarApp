@@ -294,7 +294,7 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
             
 
         if  let eventDetails = storyboard.instantiateViewController(withIdentifier: "ResultsSplitViewViewController") as? ResultsSplitViewViewController, let navController = self.window?.rootViewController as? UINavigationController  {
-
+            
             FirebaseCode().prepareForEventDetailsPage(eventID: newEventID, isEventOwnerID: "", segueName: "None", isSummaryView: false, performSegue: false){
 
             // set the view controller as root
@@ -311,7 +311,6 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
         eventIDChosen = newEventID
         
 //        set the new notification count for the event, pulling from the userdefaults and saving back to user defaults
-        
         if let data = UserDefaults.standard.value(forKey:"notifications") as? Data {
         let notification = try? PropertyListDecoder().decode(Array<notificationModel>.self, from: data)
             
@@ -327,9 +326,20 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
         
         // instantiate the view controller from storyboard
             if  let messageController = storyboard.instantiateViewController(withIdentifier: "chatLogController") as? ChatLogController, let navController = self.window?.rootViewController as? UINavigationController  {
-
-                // set the view controller as root
-                    navController.pushViewController(messageController, animated: true)
+                
+//                we need to retrieve the event the user has just received a message for
+                let predicate = NSPredicate(format: "eventID == %@", argumentArray: [eventIDChosen])
+                let filteredEvents = CoreDataCode().serialiseEvents(predicate: predicate, usePredicate: true)
+                
+                if filteredEvents.count == 0{
+                    print("something went wrong")
+                }
+                else{
+                    currentUserSelectedEvent = filteredEvents[0]
+                    // set the view controller as root
+                        navController.pushViewController(messageController, animated: true)
+        
+                }
         }
     }}
   // tell the app that we have finished processing the user’s action / response

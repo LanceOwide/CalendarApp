@@ -9,7 +9,7 @@
 import UIKit
 import Instructions
 
-var popUpLocation = [Int]()
+
 var availableUserArray = [Int]()
 var nonAvailableArray = [Int]()
 var notRespondedArray = [Int]()
@@ -22,6 +22,10 @@ var arrayForEventResultsPageFinal = [[Any]]()
 var nonUserInviteeNames = Array<String>()
 var numberOfNonInviteeUsers = Int()
 var currentAvailability = [AvailabilityStruct]()
+var allAvailablePositions = [Int]()
+var someAvailablePositions = [Int]()
+var selectedDate = String()
+
 
 class ResultsSplitViewViewController: UIViewController, CoachMarksControllerDataSource, CoachMarksControllerDelegate{
     
@@ -55,8 +59,7 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
     @IBOutlet weak var imgMessageNotification: UIImageView!
     
     
-    var allAvailablePositions = [Int]()
-    var someAvailablePositions = [Int]()
+    
     let redColour = UIColor.init(red: 255, green: 235, blue: 230)
     let greenColour = UIColor.init(red: 100, green: 250, blue: 100)
     let appColour = UIColor(red: 0, green: 176, blue: 156)
@@ -88,7 +91,7 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
             chosenDateForLabel = ("\(startTime) - \(endTime)")
         }
         else{
-            chosenDateForLabel = ("\(convertToDisplayDate(inputDate: currentUserSelectedEvent.chosenDate)): \(startTime) - \(endTime)")
+            chosenDateForLabel = ("\(dateTZToDisplayDate(date: currentUserSelectedEvent.chosenDate)): \(startTime) - \(endTime)")
         }
         lblEventChosenDate.text = chosenDateForLabel
         lblEventChosenDate.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.gray, thickness: 0.5)
@@ -209,14 +212,14 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
    
         }while n <= array.count - 1
         
-//        print("allAvailablePositionsArray: \(allAvailablePositionsArray)")
+        print("allAvailablePositionsArray: \(allAvailablePositionsArray) someAvailablePositionsArray: \(someAvailablePositionsArray)")
         return (allAvailablePositionsArray, someAvailablePositionsArray)
     }
     
 
     func getUserAvailabilityArrays(position: Int){
         
-        print("running func: getUserAvailabilityArrays - inputs: position")
+        print("running func: getUserAvailabilityArrays - inputs: position: \(position)")
         
         
         var n = 2
@@ -225,6 +228,7 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
         notRespondedArray.removeAll()
         nonUserArray.removeAll()
         let numberOfRows = arrayForEventResultsPageFinal.count - 1
+        print("arrayForEventResultsPageFinal \(arrayForEventResultsPageFinal)")
         
         repeat{
             
@@ -427,25 +431,27 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        popUpLocation.removeAll()
 
         print("indexPath: row: \(indexPath.row) section: \(indexPath.section)")
         
         if indexPath.section == 0{
-            popUpLocation.append(indexPath.section)
-            popUpLocation.append(allAvailablePositions[indexPath.row] + 1)
             
-            getUserAvailabilityArrays(position: popUpLocation[1])
+//            set the selected date to the display date of cell the user selected
+            selectedDate = ("\(arrayForEventResultsPageFinal[0][allAvailablePositions[indexPath.row] + 1] as! String)")
+            print("selected Date \(selectedDate)")
+//            get index of the selected date
+//            let index = arrayForEventResultsPageFinal[0].index(of: selectedDate)
+            getUserAvailabilityArrays(position: allAvailablePositions[indexPath.row] + 1)
+            
             
         }
         else if indexPath.section == 1{
-            popUpLocation.append(indexPath.section)
-            popUpLocation.append(someAvailablePositions[indexPath.row] + 1)
-            
-            getUserAvailabilityArrays(position: popUpLocation[1])
+//            set the selected date to the display date of cell the user selected
+            selectedDate = ("\(arrayForEventResultsPageFinal[0][someAvailablePositions[indexPath.row] + 1] as! String)")
+            print("selected Date \(selectedDate)")
+            getUserAvailabilityArrays(position: someAvailablePositions[indexPath.row] + 1)
         }
-        
-        
+
         let popOverVC = storyboard?.instantiateViewController(withIdentifier: "popUpInviteesView") as! SelectDateViewController
 
 
@@ -583,55 +589,6 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
             coachMarksController.stop(immediately: true)
         }
     
-    
-    //    Gets the users names
-        func getUsersNames(){
-            
-            if selectEventToggle == 0{
-            }
-            else{
-            
-                inviteesNames.removeAll()
-                inviteesNamesNew.removeAll()
-                inviteesNamesLocation.removeAll()
-                deletedUserIDs.removeAll()
-                deletedInviteeNames.removeAll()
-
-                
-                
-    //            ****** Made a change here!!
-                inviteesUserIDs = eventResultsArrayDetails[8][0] as! Array<String>
-                print("inviteesUserIDs \(inviteesUserIDs)")
-                let numberOfInvitee = inviteesUserIDs.count - 1
-                print("numberOfInvitee: \(numberOfInvitee)")
-            
-
-                for items in inviteesUserIDs {
-
-                    print("inviteesUserIDs: \(items)")
-                    
-                    dbStore.collection("users").whereField("uid", isEqualTo: items).getDocuments { (querySnapshot, error) in
-                        if error != nil {
-                            print("Error getting documents: \(error!)")
-                        }
-                        else {
-                            for document in querySnapshot!.documents {
-                                
-                                inviteesNames.append(document.get("name") as! String)
-                                inviteesNamesLocation.append(items)
-                                
-                                print(items)
-                                print("inviteesNames: \(inviteesNames)")
-                                print("inviteesNamesLocation: \(inviteesNamesLocation)")
-                                
-                            }}
-                    }
-                }
-            }
-
-            }
-    
-      
 }
 
 

@@ -96,6 +96,9 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
         
         updatePendingNotificationStatus()
         
+//        function to populate any non populated availability
+        nonRespondedEvents()
+        
         
         //        setup the navigation bar
         navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)

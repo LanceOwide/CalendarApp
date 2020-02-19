@@ -98,6 +98,8 @@ class GlobalFunctions: UIViewController {
 
     
     //    Function: converts the input string into a date and converts to the database storage format for dates in the app
+//        input fromat:dd MMM yyyy
+//        ouptut format: yyyy-MM-dd
     func convertToStringDate(inputDate: String) -> String{
         
         print("running func convertToDisplayDate inputs - inputDate: \(inputDate)")
@@ -166,6 +168,38 @@ class GlobalFunctions: UIViewController {
         
         return displayDate
     }
+        
+//    convert date array into display format inputs yyyy-mm-dd HH:mm z output E d MMM
+        func dateArrayToDisplayDates(dates: [String]) -> [String]{
+            let dateFormatterTz = DateFormatter()
+            dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
+            dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
+            let dateFormatterForResults = DateFormatter()
+            dateFormatterForResults.dateFormat = "E d MMM"
+            dateFormatterForResults.locale = Locale(identifier: "en_US_POSIX")
+            var formattedDates = [String]()
+            for date in dates{
+                let dateDate = dateFormatterTz.date(from: date)
+                let dateString = dateFormatterForResults.string(from: dateDate!)
+                formattedDates.append(dateString)
+            }
+            return formattedDates
+        }
+        
+        
+//    convert date array into display format inputs yyyy-mm-dd HH:mm z output dd MMM YYYY
+        func dateTZToDisplayDate(date: String) -> String{
+            let dateFormatterTz = DateFormatter()
+            dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
+            dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
+            let dateFormatterForResults = DateFormatter()
+            dateFormatterForResults.dateFormat = "dd MMM YYYY"
+            dateFormatterForResults.locale = Locale(identifier: "en_US_POSIX")
+                let dateDate = dateFormatterTz.date(from: date)
+                let dateString = dateFormatterForResults.string(from: dateDate!)
+
+            return dateString
+        }
     
     
 //    function to allow for the process of a string array into the phone number cleaning function
@@ -379,49 +413,35 @@ class GlobalFunctions: UIViewController {
     }
     
     
-//    deletes the user and eventId from the userEventStore
+//    Deletes the users entry in the UserEventStore table
     func deleteUserEventLinkArray(userID: [String], eventID: String){
         
         print("running func deleteuserEventLinkArray - inputs userID: \(userID) eventID: \(eventID)")
         
-      for users in userID{
-        print("users: \(users)")
-
         let docRefUserEventStore = dbStore.collection("userEventStore")
         
-        docRefUserEventStore.whereField("eventID", isEqualTo: eventID).whereField("uid", isEqualTo: users).getDocuments() { (querySnapshot, err) in
-            
-            print("querySnapshot: \(String(describing: querySnapshot))")
-            print("is querySnapshot empty \(String(describing: querySnapshot?.isEmpty))")
-            
-            if let err = err {
-                print("Error getting documents: \(err)")}
-                
-            else{
-                for document in querySnapshot!.documents{
-                    
-                    let documentID = document.documentID
-                    print("documentID: \(documentID)")
-                    
-                    docRefUserEventStore.document(documentID).delete()
-                    
-                    docRefUserEventStore.document(documentID).updateData(["userAvailability" : FieldValue.delete()]){ err in
-                        if let err = err {
-                            print("Error updating document: \(err)")
-                        } else {
-                            print("Document successfully updated")
-                        }
-                    }
-                    
-//                    docRefUserEventStore.document(documentID).delete()
-                }
-                
-            }
-            
-        }
+         for users in userID{
         
+        let filteredAvailability = currentUserSelectedAvailability.filter { $0.uid == users}
+            let documentID = filteredAvailability[0].documentID
+            if documentID == ""{
+                print("something went wrong in deleteuserEventLinkArray documentID is blank for user \(users)")
+            }
+            else{
+                
+//                delete the useravailability first
+                docRefUserEventStore.document(documentID).updateData(["userAvailability" : FieldValue.delete()]){ err in
+                if let err = err {
+                    print("Error updating document: \(err)")
+                } else {
+                    print("Document successfully updated")
+                }
+            }
+//            delete the document itself
+              docRefUserEventStore.document(documentID).delete()
+    
         }
-   
+        }
     }
     
     
@@ -462,7 +482,7 @@ class GlobalFunctions: UIViewController {
         
         if addCurrentUser == true{
             
-            allUsers = userIDs + currentUserID + existingUserIDs
+            allUsers = currentUserID + userIDs + existingUserIDs
             
             dbStore.collection("eventRequests").document(eventID).setData(["users" : allUsers, "currentUserNames" : currentUserNames, "nonUserNames": nonUserNames], merge: true)
             ref.child("invitedUsers").setValue(allUsers)
@@ -1302,7 +1322,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         let dateFormatterTZCreate = DateFormatter()
         dateFormatterTZCreate.dateFormat = "yyyy-MM-dd HH:mm z"
         dateFormatterTZCreate.locale = Locale(identifier: "en_US_POSIX")
-        let displayDate = convertToDisplayDate(inputDate: startDateDisplay)
+        let displayDate = startDateDisplay
         
 
         
@@ -1394,9 +1414,12 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                             return
                         }
                         
-                    calendarEventID = event.eventIdentifier ?? "NO ID"
+                    calendarEventID = event.eventIdentifier ?? ""
                         
+//                        write the calendarEventID to CoreData
+                        self.saveItemAvailabilty(userEventStoreID: userEventStoreID, key: "calendarEventID", value: calendarEventID)
                         
+//                        write the calendarEventID to the userEventStore
                         dbStore.collection("userEventStore").document(userEventStoreID).setData(["calendarEventID" : calendarEventID, "chosenDateSeen" : true], merge: true)
                         
                         completion?(true, nil)
@@ -1451,8 +1474,8 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                             completion?(false, e)
                             return
                         }
-                        
-                        calendarEventID = event.eventIdentifier ?? "NO ID"
+//                        if error leave the ID blank, we have a protocal to ignore it if blank
+                        calendarEventID = event.eventIdentifier ?? ""
                         
                         
                         dbStore.collection("userEventStore").document(userEventStoreID).setData(["chosenDateSeen" : true], merge: true)
@@ -1486,7 +1509,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                 self.present(alert, animated: true)
             }
             else {
-                self.dismiss(animated: false, completion: nil)
+//                self.dismiss(animated: false, completion: nil)
                 self.present(alert, animated: true)
             }
         
@@ -1832,7 +1855,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
     func getCalendarData3(startDate: Date, endDate: Date) -> (datesOfTheEvents: Array<Date>, startDatesOfTheEvents: Array<Date>, endDatesOfTheEvents: Array<Date>){
         
         
-        print("running func getCalendarData2 inputs - startDate: \(startDate) endDate: \(endDate)")
+        print("running func getCalendarData3 inputs - startDate: \(startDate) endDate: \(endDate)")
         
         var datesOfTheEvents = Array<Date>()
         var startDatesOfTheEvents = Array<Date>()
@@ -1893,7 +1916,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
     }
     
     //    function used to pull down the information of the event stored in the Firebase database
-    func getEventInformation3(  eventID:String, userEventStoreID: String, completion: @escaping (_ userEventStoreID: String, _ eventSecondsFromGMT: Int, _ startDates: [String], _ endDates: [String]) -> Void) {
+    func getEventInformation3(  eventID:String, userEventStoreID: String, completion: @escaping (_ userEventStoreID: String, _ eventSecondsFromGMT: Int, _ startDates: [String], _ endDates: [String],_ userIDs: [String]) -> Void) {
         
         print("running func getEventInformation3 inputs - eventID: \(eventID)")
         
@@ -1922,9 +1945,10 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                     print("eventSecondsFromGMT: \(eventSecondsFromGMT)")
                     let endDates = document!.get("endDates") as! [String]
                     let startDates = document!.get("startDates") as! [String]
+                    let users = document!.get("users") as! [String]
                     daysOfTheWeek = document!.get("daysOfTheWeek") as! [Int]
        
-                        completion( userEventStoreID, eventSecondsFromGMT, startDates, endDates)
+                        completion( userEventStoreID, eventSecondsFromGMT, startDates, endDates, users)
                     }
                 
         })}
@@ -2338,54 +2362,6 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             
         }
         
-        //    Gets the users names
-            func getUsersNames2( completion: @escaping () -> Void){
-                
-                if selectEventToggle == 0{
-                }
-                else{
-                
-                    inviteesNames.removeAll()
-                    inviteesNamesNew.removeAll()
-                    inviteesNamesLocation.removeAll()
-                    deletedUserIDs.removeAll()
-                    deletedInviteeNames.removeAll()
-                    inviteesUserIDs = eventResultsArrayDetails[8][0] as! Array<String>
-                    print("inviteesUserIDs \(inviteesUserIDs)")
-                    let numberOfInvitee = inviteesUserIDs.count - 1
-                    print("numberOfInvitee: \(numberOfInvitee)")
-                
-
-                    for items in inviteesUserIDs {
-
-                        print("inviteesUserIDs: \(items)")
-                        
-                        dbStore.collection("users").whereField("uid", isEqualTo: items).getDocuments { (querySnapshot, error) in
-                            if error != nil {
-                                print("Error getting documents: \(error!)")
-                            }
-                            else {
-                                for document in querySnapshot!.documents {
-                                    
-                                    inviteesNames.append(document.get("name") as! String)
-                                    inviteesNamesLocation.append(items)
-                                    
-                                    print(items)
-                                    print("inviteesNames: \(inviteesNames)")
-                                    print("inviteesNamesLocation: \(inviteesNamesLocation)")
-                                    
-                                }
-                               completion()
-                            }
-                        }
-                    }
-                }
-
-                }
-        
-        
-            
-
     //    end of globally available functions
     
 }

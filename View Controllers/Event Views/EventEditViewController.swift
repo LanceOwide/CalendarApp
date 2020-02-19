@@ -106,6 +106,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         
 //        set the values for the invitees names, used in the tableview
         inviteesNames = currentUserSelectedEvent.currentUserNames
+        inviteesUserIDs = currentUserSelectedEvent.users
         
 //        if non user invitees = none, we need to show nothing
         if currentUserSelectedEvent.nonUserNames.count != 0{
@@ -113,10 +114,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             nonUserInviteeNames = currentUserSelectedEvent.nonUserNames
 
         }
-        
-//        print("combinedInviteesNames \(combinedInviteesNames)")
-        
-        
+
         //Looks for single or multiple taps.
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         
@@ -156,6 +154,8 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         eventEndDate.layer.borderWidth = 1.0
         eventStartDate.layer.borderColor = borderColour.cgColor
         eventStartDate.layer.borderWidth = 1.0
+        
+        inviteesNamesLocation = currentUserSelectedEvent.users
         
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(saveSelected))
@@ -391,24 +391,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             let startDateInputString = dateFormatterInput.string(from: startDateInputDates!)
             let endDateInputString = dateFormatterInput.string(from: endDateInputDates!)
 
-                
-            getStartAndEndDates3(startDate: startDateInputString, endDate: endDateInputString, startTime: eventStartTime.text!, endTime: eventEndTime.text!, daysOfTheWeek: daysOfTheWeekNewEvent){ (startDates,endDates) in
-            
-//            commit the updated event information to the database
-                dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["eventDescription" : self.eventTitle.text!, "location" : self.eventLoction.text!, "endTimeInput" :self.convertToGMT(inputTime: self.eventEndTime.text!), "startTimeInput" :self.convertToGMT(inputTime: self.eventStartTime.text!), "endDateInput" : self.convertToStringDate(inputDate: self.eventEndDate.text!), "startDateInput" : self.convertToStringDate(inputDate:self.eventStartDate.text!), "daysOfTheWeek" : daysOfTheWeekNewEvent, "startDates": startDates, "endDates": endDates, "locationLongitude": newEventLongitude, "locationLatitude": newEventLatitude], merge: true)
-                
-//                AmendNotifiction  - post to the eventNotification to table that the event has been amended
-                self.eventAmendedNotification(userIDs: currentUserSelectedEvent.users, eventID: currentUserSelectedEvent.eventID)
-                print("event updates committed")
-            
-//            updated the realtime database
-            let rRef = Database.database().reference()
-            
-                rRef.child("events/\(currentUserSelectedEvent.eventID)/eventDescription").setValue(self.eventTitle.text!)
-                
-            }
 // checks to see whether the user has made any changes to the event timing
-        
             if eventStartTime.text == convertToLocalTime(inputTime: currentUserSelectedEvent.eventStartTime) &&
                 eventEndTime.text == convertToLocalTime(inputTime: currentUserSelectedEvent.eventEndTime) &&
                 eventStartDate.text == convertToDisplayDate(inputDate: currentUserSelectedEvent.eventStartDate) &&
@@ -429,78 +412,83 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         
         print("contactsSelected: \(contactsSelected)")
         
-//        We need to first check if the user removed an invitees, the users deleted names and user IDs are held in two arrays
-        if deletedUserIDs.count == 0{
-            print("user didnt delete any invitees")
-        }
-        else{
-//            we now need to delete the users from the eventRequest and userEventStore
+//            MARK: loop through a series of check to update the users invited to the event and save down the event
             
-//            deletes the userEventStore
-        deleteUserEventLinkArray(userID: deletedUserIDs, eventID: currentUserSelectedEvent.eventID)
-        deleteEventStoreAvailability(eventID: currentUserSelectedEvent.eventID)
-//            post a deleted notification for these users
-        eventDeletedNotification(userIDs: deletedUserIDs, eventID: currentUserSelectedEvent.eventID)
-            
-//            MARK: this needs to be corrected
-        addUserIDsToEventRequests(userIDs: inviteesUserIDs, currentUserID: [""], existingUserIDs: [""], eventID: currentUserSelectedEvent.eventID, addCurrentUser: false, currentUserNames: [""], nonUserNames: [""])
-   
-        }
-            
-            if deletedNonUserInviteeNames.count == 0{
-               
-              print("no non users deleted")
-                
+//        0. if the user didn't make any change so the event we can save down the new event information
+            if deletedUserIDs.count == 0 && deletedNonUserInviteeNames.count == 0 && contactsSelected.count == 0{
+                commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: false, deletedNonUser: false, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""])
             }
             else{
-                
-                deleteNonUsers(eventID: currentUserSelectedEvent.eventID, userNames: deletedNonUserInviteeNames)
+            
+//        1. Did the user delete users and non users and not add anyone?
+        if deletedUserIDs.count != 0 && deletedNonUserInviteeNames.count != 0 && contactsSelected.count == 0{
+            deletedUsers{
+                self.deletedNonUsers {
+                    self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: true, deletedNonUser: true, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""])
+                }
             }
-
-//        checks to see if the user has added any invitees
-        if contactsSelected.count == 0{
-            print("no new invitees selected")
-            
         }
-        else{
-            print("New invitees selected")
-            
-            var selectedPhoneNumbers = [String]()
-            var selectedNames = [String]()
-            
-            selectedPhoneNumbers = getSelectedContactsPhoneNumbers2().phoneNumbers
-            selectedNames = getSelectedContactsPhoneNumbers2().names
+//        2. Did the user delete users and not add anyone?
+                if deletedUserIDs.count != 0 && contactsSelected.count == 0{
+                    deletedUsers{
+                            self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: true, deletedNonUser: false, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""])
+                    }
+                }
                 
+//        3. Did the user delete non users and not add anyone?
+                if deletedNonUserInviteeNames.count != 0 && contactsSelected.count == 0{
+                    deletedNonUsers {
+                        self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: false, deletedNonUser: true, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""])
+                    }
+                }
+//        4. Did the user add somone new to the event?
+                if contactsSelected.count != 0{
+//                    check if the user also deleted anyone
+                    if deletedUserIDs.count != 0{
+                        deletedUsers{}
+                        
+                    }
+                    if deletedNonUserInviteeNames.count != 0{
+                        deletedNonUsers {}
+                    }
 
-            
-            createUserIDArrays(phoneNumbers: selectedPhoneNumbers, names: selectedNames) { (nonExistentArray, existentArray, userNameArray, nonExistentNameArray) in
-                
-                print("nonExistentArray \(nonExistentArray)")
-                print("existentArray \(existentArray)")
-                
-//           adds the non users to the database
-                self.addNonExistingUsers2(phoneNumbers: nonExistentArray, eventID: currentUserSelectedEvent.eventID, names: nonExistentNameArray)
-                
-//            Adds the user event link to the userEventStore
-                
-                self.userEventLinkArray(userID: existentArray, userName: userNameArray, eventID: currentUserSelectedEvent.eventID){
+                           print("the user has added new invitees")
+                                var selectedPhoneNumbers = [String]()
+                                var selectedNames = [String]()
+                                
+                //                1. get the phone numbers and names of the new users added
+                                selectedPhoneNumbers = getSelectedContactsPhoneNumbers2().phoneNumbers
+                                selectedNames = getSelectedContactsPhoneNumbers2().names
+                                
+                //                2. confirm which of the new invitees are users or not and add them to the arrya
+                                createUserIDArrays(phoneNumbers: selectedPhoneNumbers, names: selectedNames) { (nonExistentArray, existentArray, userNameArray, nonExistentNameArray) in
+                                                
+                                print("nonExistentArray \(nonExistentArray)")
+                                print("existentArray \(existentArray)")
+                                                
+                //           3. adds the non users to the database
+                                self.addNonExistingUsers2(phoneNumbers: nonExistentArray, eventID: currentUserSelectedEvent.eventID, names: nonExistentNameArray)
+                                                
+                //            4. Adds the user event link to the userEventStore. this also adds the required availability notification
+                            self.userEventLinkArray(userID: existentArray, userName: userNameArray, eventID: currentUserSelectedEvent.eventID){
+                                                    
+                                                }
+                //           5. Add the new user names and IDs to the database
+                                    self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: false, deletedNonUser: false, addedNewInvitees: true, nonUserNames: nonUserInviteeNames + nonExistentNameArray, userNames: inviteesNames + userNameArray, userIDs: inviteesUserIDs + existentArray)
+                            
+                                                
+                                                print("new users added")
+                                                
+                                //            remove the selected contacts from the array
+                                             contactsSelected.removeAll()
+                                                inviteesNamesNew.removeAll()
+                                                selectedContacts.removeAll()
+                            }
                     
                 }
+            }
+            
 
-
-                self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [""], existingUserIDs: inviteesUserIDs, eventID: currentUserSelectedEvent.eventID, addCurrentUser: false, currentUserNames: [""], nonUserNames: [""])
-                
-                print("new users added")
-                
-//            remove the selected contacts from the array
-             contactsSelected.removeAll()
-                inviteesNamesNew.removeAll()
-                selectedContacts.removeAll()
-                
-                }
-   
-        }
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // Change `1.0` to the desired number of seconds.
             self.performSegue(withIdentifier: "saveSelected", sender: Any.self)
         }
@@ -674,7 +662,6 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         print("Button tapped on row \(indexPath.row)")
         
 //        we remove the users name and ID from our array
-        
         let originalInvitees = inviteesNames.count - 1
         print("originalInvitees: \(originalInvitees)")
         let nonUserInvitees = nonUserInviteeNames.count + originalInvitees
@@ -753,22 +740,16 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         docRefEventRequest.document(eventID).delete()
     }
     
+//    fucntion to delete the eventStore
     func deleteEventStore(eventID: String){
         
-        print("running func deleteEventStore, inputs - eventID: \(eventID)")
+        for i in currentUserSelectedAvailability{
+        
+        print("running func deleteEventStore, inputs - eventID: \(i.documentID)")
         
         let docRefUserEventStore = dbStore.collection("userEventStore")
         
-        docRefUserEventStore.whereField("eventID", isEqualTo: eventID).getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")}
-                
-            else{
-                for document in querySnapshot!.documents{
-                    
-                    let documentID = document.documentID
-                    
-                    docRefUserEventStore.document(documentID).updateData(["userAvailability" : FieldValue.delete()]){ err in
+            docRefUserEventStore.document(i.documentID).updateData(["userAvailability" : FieldValue.delete()]){ err in
                         if let err = err {
                             print("Error updating document: \(err)")
                         } else {
@@ -776,9 +757,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
                         }
                     }
                     
-                    docRefUserEventStore.document(documentID).delete()
-                }
-            }
+                    docRefUserEventStore.document(i.documentID).delete()
         }
     }
     
@@ -811,67 +790,50 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         }
     }
     
+//
     func deleteEventStoreAvailability(eventID: String){
         
         print("running func deleteEventStoreAvailability, inputs - eventID: \(eventID)")
-        
         let docRefUserEventStore = dbStore.collection("userEventStore")
         
-        docRefUserEventStore.whereField("eventID", isEqualTo: eventID).getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")}
-                
-            else{
-                for document in querySnapshot!.documents{
-                    
-                    let documentID = document.documentID
-                    
-                    docRefUserEventStore.document(documentID).updateData(["userAvailability" : FieldValue.delete()]){ err in
-                        if let err = err {
-                            print("Error updating document: \(err)")
-                        } else {
-                            print("Document successfully updated")
-                        }
-                    }
-                    
-                    docRefUserEventStore.document(documentID).updateData(["chosenDate" : FieldValue.delete()]){ err in
-                        if let err = err {
-                            print("Error updating document: \(err)")
-                        } else {
-                            print("Document successfully updated")
-                        }
-                    }
-                    
+        for i in  currentUserSelectedAvailability{
+            
+            docRefUserEventStore.document(i.documentID).updateData(["userAvailability" : FieldValue.delete()]){ err in
+                if let err = err {
+                    print("Error updating document: \(err)")
+                } else {
+                    print("Document successfully updated")
+                }
+            }
+            
+            docRefUserEventStore.document(i.documentID).updateData(["chosenDate" : FieldValue.delete()]){ err in
+                if let err = err {
+                    print("Error updating document: \(err)")
+                } else {
+                    print("Document successfully updated")
                 }
             }
         }
-    }
+        }
     
+//    resets the availability array for all remaining users
     func updateEventStoreAvailability(eventID: String){
         
         print("running func updateEventStoreAvailability, inputs - eventID: \(eventID)")
-        
         let docRefUserEventStore = dbStore.collection("userEventStore")
         
-        docRefUserEventStore.whereField("eventID", isEqualTo: eventID).getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")}
-                
-            else{
-                for document in querySnapshot!.documents{
-                    
-                    let documentID = document.documentID
-                    
-                    docRefUserEventStore.document(documentID).updateData(["userAvailability" : FieldValue.delete(), "userResponded" : false, "chosenDate" : FieldValue.delete(), "chosenDateDay" : FieldValue.delete(), "chosenDateMonth" : FieldValue.delete(), "chosenDateYear" : FieldValue.delete()]){ err in
-                        if let err = err {
-                            print("Error updating document: \(err)")
-                        } else {
-                            print("Document successfully updated")
-                        }
+//        1. get the availability for all users
+        
+        for i in  currentUserSelectedAvailability{
+            
+            docRefUserEventStore.document(i.documentID).updateData(["userAvailability" : FieldValue.delete(), "userResponded" : false, "chosenDate" : FieldValue.delete(), "chosenDateDay" : FieldValue.delete(), "chosenDateMonth" : FieldValue.delete(), "chosenDateYear" : FieldValue.delete()]){ err in
+                                   if let err = err {
+                                       print("Error updating document: \(err)")
+                                   } else {
+                                       print("Document successfully updated")
+                                   }
                     }
-                    
-                }
-            }
+            availabilityAmendedNotification(userIDs: [i.uid], availabilityDocumentID: i.documentID)
         }
     }
 
@@ -888,6 +850,85 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     func deleteRealTimeDatabaseUserEventLink(eventID: String){
         let ref = Database.database().reference()
         ref.child("userEventLink/\(user!)/\(eventID)").removeValue()
+        
+    }
+    
+    
+//    fucntion to commit data to the database
+    func commitDataToDB(startDateInputString: String, endDateInputString: String, deletedUsers: Bool, deletedNonUser: Bool, addedNewInvitees: Bool, nonUserNames: [String], userNames: [String], userIDs: [String]){
+        
+                        getStartAndEndDates3(startDate: startDateInputString, endDate: endDateInputString, startTime: eventStartTime.text!, endTime: eventEndTime.text!, daysOfTheWeek: daysOfTheWeekNewEvent){ (startDates,endDates) in
+                        
+            //            commit the updated event information to the database, we merge the data, if there are changes to the user invitees we deal with this later in the code
+                            dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["eventDescription" : self.eventTitle.text!, "location" : self.eventLoction.text!, "endTimeInput" :self.convertToGMT(inputTime: self.eventEndTime.text!), "startTimeInput" :self.convertToGMT(inputTime: self.eventStartTime.text!), "endDateInput" : self.convertToStringDate(inputDate: self.eventEndDate.text!), "startDateInput" : self.convertToStringDate(inputDate:self.eventStartDate.text!), "daysOfTheWeek" : daysOfTheWeekNewEvent, "startDates": startDates, "endDates": endDates, "locationLongitude": newEventLongitude, "locationLatitude": newEventLatitude], merge: true)
+                            
+//                            did the user delete users
+                            if deletedUsers == true{
+                                dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["users": inviteesUserIDs, "currentUserNames": inviteesNames], merge: true)
+                                
+                            }
+//                            did the user delete non users
+                            if deletedNonUser == true{
+                                dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["nonUserNames": nonUserInviteeNames], merge: true)
+                            }
+                            if addedNewInvitees == true{
+                              
+                                dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["users": userIDs, "currentUserNames": userNames, "nonUserNames": nonUserNames], merge: true)
+                                
+                            }
+                            
+                            
+                            
+            //                AmendNotifiction  - post to the eventNotification to table that the event has been amended
+                            self.eventAmendedNotification(userIDs: currentUserSelectedEvent.users, eventID: currentUserSelectedEvent.eventID)
+                            print("event updates committed")
+                        
+            //            updated the realtime database
+                        let rRef = Database.database().reference()
+                        
+                            rRef.child("events/\(currentUserSelectedEvent.eventID)/eventDescription").setValue(self.eventTitle.text!)
+                            
+                        }
+        }
+    
+    
+//    delete data for users of the app that have been removed
+    func deletedUsers(completion: @escaping () -> Void){
+        
+                    print("user deleted invitees that are already users \(deletedUserIDs)")
+              
+        //            1. deletes the userEventStore
+                            deleteUserEventLinkArray(userID: deletedUserIDs, eventID: currentUserSelectedEvent.eventID)
+        //            2. clear the user
+                            deleteEventStoreAvailability(eventID: currentUserSelectedEvent.eventID)
+        //            3. post a deleted notification for these users, so their app deletes the event
+                            eventDeletedNotification(userIDs: deletedUserIDs, eventID: currentUserSelectedEvent.eventID)
+
+        //            4. post delete notification for the users availability, so other users have thier availability deleted
+                                for i in deletedUserIDs{
+                                    
+                                let filteredAvailability = currentUserSelectedAvailability.filter {$0.uid == i}
+                                let filteredAvailabilityDocumentID = filteredAvailability[0].documentID
+                                availabilityDeletedNotification(userIDs: inviteesUserIDs, availabilityDocumentID: filteredAvailabilityDocumentID)
+                                    
+                                }
+        //            5. reset the tracking array
+                    deletedUserIDs.removeAll()
+        
+        completion()
+        
+    }
+    
+//    delete data for non users of that app that have been removed
+    func deletedNonUsers(completion: @escaping () -> Void){
+        
+        print("user deleted invitees that are not users \(deletedNonUserInviteeNames)")
+                       
+        //                1. remove the non user invitees
+                     deleteNonUsers(eventID: currentUserSelectedEvent.eventID, userNames: deletedNonUserInviteeNames)
+        //                2. reset the tracking array
+                        deletedNonUserInviteeNames.removeAll()
+        completion()
         
     }
     
