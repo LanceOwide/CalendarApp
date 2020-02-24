@@ -1099,7 +1099,6 @@ func removeTheAvailabilityNotifications(){
         }
     
 //    MARK: snapshot listener section
-        
 //    fuction for turning on and off the snapshot listener on the eventNotification table
     func eventChangeListener(){
         
@@ -1300,10 +1299,18 @@ func removeTheAvailabilityNotifications(){
         
     }
     
-    
-    func somethingWentWrongRestEvent(eventID: String){
+//    function to handle any errors with the data for an event
+    func somethingWentWrongResetEvent(eventID: String, eventInfo: Bool, availabilityInfo: Bool){
         
-        
+//        trigger to set the funtion to delete any current data for the event and then download the new data
+        if eventInfo == true{
+            
+        }
+        if availabilityInfo == true{
+            
+            
+            
+        }
         
         
     }

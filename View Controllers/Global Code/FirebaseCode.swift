@@ -254,6 +254,8 @@ extension UIViewController{
     
     func checkForPhoneNumberInvited(phoneNumber: String, completion: @escaping () -> Void){
         
+        var fireStoreRef: DocumentReference? = nil
+        
         print("running func checkForPhoneNumberInvited, inputs: phoneNumber: \(phoneNumber)")
         dbStore.collection("temporaryUserEventStore").whereField("phoneNumber", isEqualTo: phoneNumber).getDocuments { (querySnapshot, error) in
             if error != nil {
@@ -267,20 +269,39 @@ extension UIViewController{
                     
                     //                    add the required info to the userEventStore
                     
-                    dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": uid!, "userName": registeredName])
-                    
+                    fireStoreRef = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": uid!, "userName": registeredName]){
+                        error in
+                        if let error = error {
+                            print("Error adding document: \(error)")
+                        } else {
+                            //                print("Document added with ID: \(ref!.documentID)")
+                            
+                            let availabilityID = fireStoreRef!.documentID
+
                     //                    adds the uid to the eventRequests
                     
                     let docRef = dbStore.collection("eventRequests").document(eventID)
                     
+//                    add the new users userID to the event, add add the notifiction for everyone invited to update their event
                     docRef.getDocument { (document, error) in
                         if let document = document, document.exists {
+                            
+//                            get the userIDs from the eventRequest table, post a new availability notification and event notification for the userIDs
+                            
+                            let userIDs = document.get("users") as! [String]
+                            
+                                self.eventAmendedNotification(userIDs: userIDs, eventID: eventID)
+                                self.availabilityAmendedNotification(userIDs: userIDs, availabilityDocumentID: availabilityID)
+
                             
                             dbStore.collection("eventRequests").document(eventID).updateData(["users" : FieldValue.arrayUnion([uid!])])
                             
                         } else {
                             print("Document does not exist")
                         }
+                    }
+                    }
+                                
                     }
                   completion()
                 }

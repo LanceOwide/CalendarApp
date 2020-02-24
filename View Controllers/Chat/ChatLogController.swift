@@ -227,7 +227,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         
         var height: CGFloat = 80
         
-        //get estimated height somehow????
+        //get estimated height
         if let text = messages[indexPath.item].text {
             height = estimateFrameForText(text).height + 40
         }
@@ -315,7 +315,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         
         for ids in userIDs{
             
-//        we do not want to write a notification if we sent the message
+//        we do not want to write a notification if we sent the message, this writes to the real time database for notifications
             if ids == user!{
                 
             }
@@ -327,7 +327,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         }
                    
         
-//        Need to check if we can create a document with the userID as the DocumentID
+//        This writes to the FireStore for our notification table
         for ids in userIDs{
             
             //        we do not want to write a notification if we sent the message
@@ -349,6 +349,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             
         }
         
+//        Posts the message into the RealTime DB, first we use getUserName to ensure we have the latest name for the user
         getUserName { (fromName) in
             
             let values = ["text": self.inputTextField.text!, "fromId": fromId, "timestamp": timestamp, "fromName": fromName] as [String : Any]

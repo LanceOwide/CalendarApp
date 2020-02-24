@@ -253,6 +253,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
   
     override func viewDidAppear(_ animated: Bool) {
         
+//        MARK: here we run th code to check if the user opened the app from a notification and we determine which notification they opened it from and run the desired code for that page
         print("viewDidAppear is now running")
             
           let category = UserDefaults.standard.string(forKey: "notificationSent3") ?? ""
@@ -273,9 +274,18 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     
             UserDefaults.standard.set("", forKey: "notificationSent3")
                 
-              // set the view controller as root
-              performSegue(withIdentifier: "newMessageNotification", sender: self)
-  
+                //                we need to retrieve the event the user has just received a message for from CoreData
+                                let predicate = NSPredicate(format: "eventID == %@", argumentArray: [eventIDChosen])
+                                let filteredEvents = CoreDataCode().serialiseEvents(predicate: predicate, usePredicate: true)
+                                
+                                if filteredEvents.count == 0{
+                                    print("something went wrong")
+                                }
+                                else{
+                                    currentUserSelectedEvent = filteredEvents[0]
+                                    // set the view controller as root
+                                    performSegue(withIdentifier: "newMessageNotification", sender: self)
+                        }
               }
           }
           else if category == "newEvent"{
@@ -292,14 +302,33 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
                 print("segue to event page")
             
               UserDefaults.standard.set("", forKey: "notificationSent3")
-            
-            prepareForEventDetailsPage(eventID: eventIDChosen, isEventOwnerID: "", segueName: "None", isSummaryView: false, performSegue: false){
                 
-//                 set the view controller as root
-                self.performSegue(withIdentifier: "todaysEventsSegue", sender: self)
-                    
-            }
-            }}
+//                need to ensure we retrieve the data for the new event from FB
+                CDRetrieveUpdatedEventCheck{(eventIDs) in
+                self.CDRetrieveUpdatedEvents(eventIDs: eventIDs)
+//                    we also need to retrieve the new availability data for the event
+                    self.CDRetrieveUpdatedAvailabilityCheck{(availabilityIDs) in
+                        
+                        self.CDRetrieveUpdatedAvailability(availabilityID: availabilityIDs)
+                        
+//              retrieve the event data from CD
+                        let predicate = NSPredicate(format: "eventID = %@", eventIDChosen)
+                        let predicateReturned = self.serialiseEvents(predicate: predicate, usePredicate: true)
+                        if predicateReturned.count == 0{
+                            print("something went wrong")
+                            
+                        }
+                        else{
+                            
+                            currentUserSelectedEvent = predicateReturned[0]
+                            
+                            //                load the required availability
+                            currentUserSelectedAvailability = self.serialiseAvailability(eventID: eventIDChosen)
+                            self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability){
+                            //                 set the view controller as root
+                                                self.performSegue(withIdentifier: "todaysEventsSegue", sender: self)
+                                                
+                            }}}}}}
           else{
             print("category not set for app opening")
             

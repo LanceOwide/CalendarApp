@@ -35,6 +35,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         registerForPushNotifications()
         
+        
+//        MARK: when the user opens the app and the app isnt running, this code below runs, instead of the usernotification center. In order to still run the requiured code, we set the property notificationSent3 to message or new event, then in the HomePage we check for this property having been set and run the required code to load up the data for desired screens
         if let option = launchOptions {
             let info = option[UIApplication.LaunchOptionsKey.remoteNotification]
             if (info != nil) {
@@ -249,7 +251,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
 extension AppDelegate: UNUserNotificationCenterDelegate{
   
-// This function will be called right after user tap on the notification when the app is running the the background
+//  MARK: This function will be called right after user tap on the notification when the app is running the the background, it is not called if the app ws not running
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
     
     let notificationContent = response.notification.request.content.userInfo
@@ -295,11 +297,25 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
 
         if  let eventDetails = storyboard.instantiateViewController(withIdentifier: "ResultsSplitViewViewController") as? ResultsSplitViewViewController, let navController = self.window?.rootViewController as? UINavigationController  {
             
-            FirebaseCode().prepareForEventDetailsPage(eventID: newEventID, isEventOwnerID: "", segueName: "None", isSummaryView: false, performSegue: false){
-
-            // set the view controller as root
-                navController.pushViewController(eventDetails, animated: true)
-
+            //              retrieve the event data, eventSearch
+            let predicate = NSPredicate(format: "eventID = %@", eventIDChosen)
+            let predicateReturned = CoreDataCode().serialiseEvents(predicate: predicate, usePredicate: true)
+            if predicateReturned.count == 0{
+                print("something went wrong")
+                
+            }
+            else{
+                
+                currentUserSelectedEvent = predicateReturned[0]
+                
+                //                load the required availability
+                                currentUserSelectedAvailability = CoreDataCode().serialiseAvailability(eventID: eventIDChosen)
+                                CoreDataCode().prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability){
+                                    // set the view controller as root
+                                    navController.pushViewController(eventDetails, animated: true)
+                                    
+                }
+                
             }}}}
     else if eventType == "newMessage"{
         
