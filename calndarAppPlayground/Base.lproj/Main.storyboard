@@ -1372,6 +1372,26 @@ we'll link the number to your account
                                     <constraint firstAttribute="height" constant="32" id="mDd-Wj-dvB"/>
                                 </constraints>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TaC-hW-tBT">
+                                <rect key="frame" x="320" y="10" width="45" height="45"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="45" id="0Qg-0Y-m4h"/>
+                                    <constraint firstAttribute="height" constant="45" id="hHO-38-8xu"/>
+                                </constraints>
+                                <state key="normal" title="Button" image="Refresh-100"/>
+                                <connections>
+                                    <action selector="btnAutoResponPressed:" destination="rcN-zK-8lx" eventType="touchUpInside" id="lbm-QH-Kjz"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Auto Respond" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kWV-6m-4S8">
+                                <rect key="frame" x="310" y="55" width="65" height="8.5"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="65" id="Gi6-RS-CvS"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="7"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
@@ -1384,6 +1404,7 @@ we'll link the number to your account
                             <constraint firstItem="aEB-it-J0H" firstAttribute="leading" secondItem="KXb-pZ-3jH" secondAttribute="trailing" constant="47.5" id="GKT-ZQ-R2s"/>
                             <constraint firstItem="Xgg-2s-PMT" firstAttribute="trailing" secondItem="b4g-sv-5rE" secondAttribute="trailing" constant="16" id="KNs-gQ-BPm"/>
                             <constraint firstItem="qgA-WM-X4z" firstAttribute="leading" secondItem="Xgg-2s-PMT" secondAttribute="leading" constant="5" id="Mgx-h4-Kua"/>
+                            <constraint firstItem="kWV-6m-4S8" firstAttribute="top" secondItem="TaC-hW-tBT" secondAttribute="bottom" id="NpX-gu-i5Z"/>
                             <constraint firstItem="aQ1-ke-3Nj" firstAttribute="top" secondItem="5h6-hw-WqY" secondAttribute="bottom" constant="15" id="OwR-xH-AAp"/>
                             <constraint firstItem="5h6-hw-WqY" firstAttribute="top" secondItem="XrQ-Pz-x9S" secondAttribute="bottom" id="T25-g1-zLm"/>
                             <constraint firstItem="F6Y-vi-QNT" firstAttribute="centerX" secondItem="QFU-2i-6vK" secondAttribute="centerX" id="UV6-VV-f3r"/>
@@ -1394,13 +1415,16 @@ we'll link the number to your account
                             <constraint firstItem="5h6-hw-WqY" firstAttribute="leading" secondItem="Xgg-2s-PMT" secondAttribute="leading" constant="16" id="ezA-q7-kqP"/>
                             <constraint firstItem="b4g-sv-5rE" firstAttribute="leading" secondItem="Xgg-2s-PMT" secondAttribute="leading" constant="16" id="fmN-Up-Vt4"/>
                             <constraint firstItem="aEB-it-J0H" firstAttribute="leading" secondItem="rsL-QB-uGI" secondAttribute="trailing" constant="50" id="hrB-AC-Ou6"/>
+                            <constraint firstItem="TaC-hW-tBT" firstAttribute="top" secondItem="Xgg-2s-PMT" secondAttribute="top" constant="10" id="lJR-U7-Ysl"/>
                             <constraint firstItem="qgA-WM-X4z" firstAttribute="top" secondItem="5h6-hw-WqY" secondAttribute="bottom" constant="97.5" id="nZR-6p-en5"/>
                             <constraint firstItem="KXb-pZ-3jH" firstAttribute="top" secondItem="5h6-hw-WqY" secondAttribute="bottom" constant="18" id="nhL-Xv-k9a"/>
+                            <constraint firstAttribute="trailing" secondItem="TaC-hW-tBT" secondAttribute="trailing" constant="10" id="pMc-6s-7rN"/>
                             <constraint firstItem="aEB-it-J0H" firstAttribute="centerX" secondItem="QFU-2i-6vK" secondAttribute="centerX" id="tHs-0Z-b7z"/>
                             <constraint firstItem="90o-5b-36b" firstAttribute="leading" secondItem="F6Y-vi-QNT" secondAttribute="trailing" constant="40" id="taI-yn-TYo"/>
                             <constraint firstItem="XrQ-Pz-x9S" firstAttribute="leading" secondItem="Xgg-2s-PMT" secondAttribute="leading" constant="16" id="twa-rn-fso"/>
                             <constraint firstItem="iWi-L1-3OC" firstAttribute="top" secondItem="rsL-QB-uGI" secondAttribute="bottom" constant="-5" id="vcK-Pd-Gpz"/>
                             <constraint firstItem="F6Y-vi-QNT" firstAttribute="leading" secondItem="iWi-L1-3OC" secondAttribute="trailing" constant="40" id="ysj-lP-XuG"/>
+                            <constraint firstItem="Xgg-2s-PMT" firstAttribute="trailing" secondItem="kWV-6m-4S8" secondAttribute="trailing" id="znw-7b-oWo"/>
                             <constraint firstItem="Xgg-2s-PMT" firstAttribute="trailing" secondItem="5h6-hw-WqY" secondAttribute="trailing" constant="16" id="zyG-ng-8OA"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Xgg-2s-PMT"/>
@@ -3987,10 +4011,10 @@ we'll link the number to your account
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="3Ns-ZF-dR6"/>
-        <segue reference="Yv7-9d-Gt7"/>
+        <segue reference="2wf-ve-N4b"/>
         <segue reference="j5g-mX-T67"/>
         <segue reference="6XA-gQ-hLu"/>
-        <segue reference="qo0-DN-67N"/>
+        <segue reference="qUg-0V-vNl"/>
         <segue reference="PIS-fn-f47"/>
         <segue reference="0B5-Yr-1G9"/>
     </inferredMetricsTieBreakers>

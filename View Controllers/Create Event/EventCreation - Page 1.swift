@@ -42,6 +42,8 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
     
     var dateFormatter = DateFormatter()
     var dateFormatterTime = DateFormatter()
+    let dateFormatterTZ = DateFormatter()
+    
     private var timePicker: UIDatePicker?
     let coachMarksController = CoachMarksController()
     let popTip = PopTip()
@@ -155,6 +157,9 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
 
         dateFormatterTime.dateFormat = "HH:mm"
         dateFormatter.dateFormat = "HH:mm"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatterTZ.dateFormat = "yyyy-MM-dd HH:mm z"
+        dateFormatterTZ.locale = Locale(identifier: "en_US_POSIX")
         timePicker = UIDatePicker()
         timePicker?.datePickerMode = .time
         createTimePicker()
@@ -240,21 +245,24 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
         dateFormatterTime.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         
-        if eventDescription.text == "" {
-            
-
-            showProgressHUD(notificationMessage: "Please add an event title", imageName: "Unavailable", delay: 2)
-            
-
+//        need to define the timezone for use later when we check if the user has selected times before or after each other
+        var secondsFromGMT: Int { return TimeZone.current.secondsFromGMT() }
+        let hoursFromGMT = secondsFromGMT / 3600
+        var hoursFromGMTString = String()
+        if hoursFromGMT >= 0{
+            hoursFromGMTString = ("+\(hoursFromGMT)")
         }
-            
-            
-            
+        else{
+           hoursFromGMTString = ("\(hoursFromGMT)")
+        }
+        
+        if eventDescription.text == "" {
+            showProgressHUD(notificationMessage: "Please add an event title", imageName: "Unavailable", delay: 2)
+        }
+   
         else if eventStartTime.text ==  ""{
-            
             showProgressHUD(notificationMessage: "Please add a start time", imageName: "Unavailable", delay: 2)
-
-            
+ 
         }
             
         else if eventEndTime.text ==  ""{
@@ -263,7 +271,8 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
             
         }
             
-        else if dateFormatterTime.date(from: eventEndTime.text!)! <= dateFormatterTime.date(from: eventStartTime.text!)!{
+        else if dateFormatterTZ.date(from: ("\("2000-01-01") \(eventEndTime.text!) GMT\(hoursFromGMTString)"))! <= dateFormatterTZ.date(from: "\("2000-01-01") \(eventStartTime.text!) GMT\(hoursFromGMTString)")!{
+
             
             showProgressHUD(notificationMessage: "Start time must be before end time", imageName: "Unavailable", delay: 2)
             
@@ -400,15 +409,25 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
         
         print("user selected row: \(indexPath.row)")
         
-    eventDescription.text = userEventChoices[indexPath.row]
-    eventLocation.text = userEventChoicesLocations[indexPath.row]
-    eventStartTime.text = userEventChoicesStartTime[indexPath.row]
-    eventEndTime.text = userEventChoicesEndTime[indexPath.row]
-        
-    selectedArray[indexPath.row] = 1
-        
-        collectionView.reloadData()
-   
+//      we need to check if the name is blank and download their name
+        getUserName{ (usersName) in
+            
+         //        we need to split the user name
+                 let fullName = usersName
+                 let fullNameArr = fullName.components(separatedBy: " ")
+
+                 let name    = fullNameArr[0]
+         //        let surname = fullNameArr[1]
+                 
+            self.eventDescription.text = ("\(name)'s \(self.userEventChoices[indexPath.row])")
+            self.eventLocation.text = self.userEventChoicesLocations[indexPath.row]
+            self.eventStartTime.text = self.userEventChoicesStartTime[indexPath.row]
+            self.eventEndTime.text = self.userEventChoicesEndTime[indexPath.row]
+                 
+            self.selectedArray[indexPath.row] = 1
+                 
+            collectionView.reloadData()
+        }
     }
     
     
@@ -524,5 +543,6 @@ extension EventCreation___Page_1 : UICollectionViewDelegateFlowLayout {
 extension Notification.Name {
      static let locationSet = Notification.Name("locationSet")
     static let availabilityUpdated = Notification.Name("availabilityUpdated")
+
 }
 

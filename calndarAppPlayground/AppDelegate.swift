@@ -14,8 +14,9 @@ import UserNotifications
 import UserNotificationsUI
 import IQKeyboardManagerSwift
 import CoreData
+import BackgroundTasks
 
-
+//TESTING: e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"Lance-Owide.calndarAppPlayground.getEvents"]
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
@@ -31,8 +32,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         Database.database().isPersistenceEnabled = true
         IQKeyboardManager.shared.enable = true
         
+//        tell the app to refresh in the background as often as apple will allow - NOTE - this is only used for machines using iOS12 and below
+        application.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
+        
+//        MARK: the way to register to background tasks in iOS 13 and above
+        if #available(iOS 13.0, *) {
+            BGTaskScheduler.shared.register(forTaskWithIdentifier:
+                "Lance-Owide.calndarAppPlayground.getEvents",
+                                            using: nil){task in
+                // Downcast the parameter to an app refresh task as this identifier is used for a refresh request.
+                                                self.handleAppRefresh(task: task)
+            }
+        }
+        
         UNUserNotificationCenter.current().delegate = self
         
+//        run code to allow push notifications
         registerForPushNotifications()
         
         
@@ -77,7 +92,58 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         return true
         
     }
+    
+//    handled for the application refresh, this tells the app which function to run when it refreshes
+    @available(iOS 13.0, *)
+     func handleAppRefresh(task: BGTask) {
+        print("background refresh triggered")
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        
+        task.expirationHandler = {
+            // After all operations are cancelled, the completion block below is called to set the task to complete.
+            queue.cancelAllOperations()
+        }
 
+//        add the operation to the queue
+        queue.addOperation{
+            print("operation in the queue")
+            AutoRespondHelper.CDRetrieveUpdatedEventCheckAuto{(eventIDs) in
+                print("handleAppRefresh - eventIDs \(eventIDs)")
+                if eventIDs.count == 0 {
+                    task.setTaskCompleted(success: true)
+                    //this will schedule the background refresh to run again
+                    self.scheduleAppRefresh()
+                }
+                else{
+
+                    AutoRespondHelper.CDRetrieveUpdatedEventsAuto(eventIDs: eventIDs){
+                    task.setTaskCompleted(success: true)
+                    //this will schedule the background refresh to run again
+                        self.scheduleAppRefresh()
+                    }}}
+        }
+        
+
+    }
+    
+//    function to schedule the app to refresh
+    @available(iOS 13.0, *)
+     func scheduleAppRefresh(){
+        
+//        how frequently do we want the background refresh to be called? this should be based on the cost
+            let request = BGAppRefreshTaskRequest(identifier: "Lance-Owide.calndarAppPlayground.getEvents")
+            request.earliestBeginDate = Date(timeIntervalSinceNow: 60 * 60 * 3)
+        do {
+                try BGTaskScheduler.shared.submit(request)
+            print("registered for background refresh")
+        } catch {
+            print("Couldn't schedule app refresh: \(error)")
+        }
+    }
+    
+    
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disablef timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
@@ -86,10 +152,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+//        we remove the listeners so they don't interfere with background work
+        
+        if availabilityListenerEngaged == true{availabilityListenerRegistration.remove()}
+        
+        if eventListenerEngaged == true{eventListenerRegistration.remove()}
+        
+        eventListenerEngaged = false
+        availabilityListenerEngaged = false
+        
+        //        save down the coredata if the app is going to terminate
+        self.saveContext()
+        
+//        need to schedule the app tp refresh when it is closed
+        if #available(iOS 13.0, *) {
+            scheduleAppRefresh()
+        } else {
+            // Fallback on earlier versions
+        }
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        print("running func applicationWillEnterForeground")
+        
+//            engage the listeners to detect event and availability notifications
+        CoreDataCode().eventChangeListener()
+        CoreDataCode().availabilityChangeListener()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -245,8 +335,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                }
            }
        }
-
-
+    
+    
+//    function for running a background fetch, we will use this to retrieve and respond to events in the background NOTE - this is only used for machines running iOS 12 and below
+    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        // fetch new events now
+        
+        
+        print("running background update check")
+        CoreDataCode().CDRetrieveUpdatedEventCheck{(eventIDs) in
+            
+            if eventIDs.count == 0 {
+                completionHandler(.noData)
+            }
+            else{
+        
+        CoreDataCode().CDRetrieveUpdatedEvents(eventIDs: eventIDs)
+            completionHandler(.newData)
+            }}
+    }
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate{
@@ -260,22 +367,20 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
     let eventType = userInfo["gcm.notification.eventType"] as! String
     let appOpening = UserDefaults.standard.string(forKey: "appRunning") ?? ""
     let aps = userInfo["aps"] as? [String: AnyObject]
+    var newEventID = String()
     
     if appOpening == "appWasNotRunning"{
         print("the app was not running")
-        
         UserDefaults.standard.set("", forKey: "appRunning")
-        
     }
     else{
         print("the app was running")
         UserDefaults.standard.set("", forKey: "appRunning")
-        
 
     if eventType == "newEvent"{
         print("notification category = newEvent")
     
-        let newEventID = userInfo["gcm.notification.eventID"] as! String
+        newEventID = userInfo["gcm.notification.eventID"] as! String
         print("newEventID \(String(describing: newEventID))")
         
         UserDefaults.standard.set("", forKey: "notificationSent3")
@@ -286,22 +391,56 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
         
         if response.actionIdentifier == "respondAction"{
             print("user selected auto respond")
-            
-            FirebaseCode().sendUserAvailability(eventID: newEventID)
-            
+            AutoRespondHelper.sendUserAvailabilityAuto(eventID: newEventID){
+              completionHandler()
+                }
         }
         else{
+//            Need to be sure that the listeners are removed before we load the event
+            if availabilityListenerEngaged == true{availabilityListenerRegistration.remove()}
+            if eventListenerEngaged == true{eventListenerRegistration.remove()}
             
             print("user didnt select to auto respond")
             
-
+//          set global variable to tell the homepage not to engage the event listeners
+            eventNotificationAppBackground = true
+            
         if  let eventDetails = storyboard.instantiateViewController(withIdentifier: "ResultsSplitViewViewController") as? ResultsSplitViewViewController, let navController = self.window?.rootViewController as? UINavigationController  {
             
-            //              retrieve the event data, eventSearch
-            let predicate = NSPredicate(format: "eventID = %@", eventIDChosen)
+//              retrieve the event data, eventSearch
+            let predicate = NSPredicate(format: "eventID = %@", newEventID)
             let predicateReturned = CoreDataCode().serialiseEvents(predicate: predicate, usePredicate: true)
             if predicateReturned.count == 0{
-                print("something went wrong")
+                print("something went wrong - we need to retrieve the events")
+                
+//                retrieve the event updates and commit these to the DB
+                CoreDataCode().CDRetrieveUpdatedEventCheck{(eventIDs) in
+                
+                    CoreDataCode().CDRetrieveUpdatedEventsCompletion(eventIDs: eventIDs){
+                        
+                        let predicate = NSPredicate(format: "eventID = %@", newEventID)
+                        let predicateReturned = CoreDataCode().serialiseEvents(predicate: predicate, usePredicate: true)
+                        
+                        if predicateReturned.count == 0{print("we tried for a second time and couldnt find the event")
+                            eventNotificationAppBackground = false
+                            
+                        }else{
+                    
+                            currentUserSelectedEvent = predicateReturned[0]
+                            
+//                        load the required availability
+                        currentUserSelectedAvailability = CoreDataCode().serialiseAvailability(eventID: newEventID)
+                        CoreDataCode().prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
+                            // set the view controller as root
+                            navController.pushViewController(eventDetails, animated: true)
+                            
+//          set global variable to tell the homepage to engage the event listeners
+                            eventNotificationAppBackground = false
+                                                           
+                                                            completionHandler()
+                                                           
+                            }}
+                    }}
                 
             }
             else{
@@ -309,10 +448,14 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
                 currentUserSelectedEvent = predicateReturned[0]
                 
                 //                load the required availability
-                                currentUserSelectedAvailability = CoreDataCode().serialiseAvailability(eventID: eventIDChosen)
-                                CoreDataCode().prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability){
+                                currentUserSelectedAvailability = CoreDataCode().serialiseAvailability(eventID: newEventID)
+                                CoreDataCode().prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
                                     // set the view controller as root
                                     navController.pushViewController(eventDetails, animated: true)
+//          set global variable to tell the homepage to engage the event listeners
+                                    eventNotificationAppBackground = false
+                                    
+                                     completionHandler()
                                     
                 }
                 
@@ -354,14 +497,33 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
                     currentUserSelectedEvent = filteredEvents[0]
                     // set the view controller as root
                         navController.pushViewController(messageController, animated: true)
+                    
+                     completionHandler()
         
                 }
         }
     }}
-  // tell the app that we have finished processing the user’s action / response
-  completionHandler()
+}
+    
+//    function used for checking for new events, when the users is on iOS 13 or higher
+    func checkForNewEvents(){
+        print("running checkForNewEvents()")
+        CoreDataCode().CDRetrieveUpdatedEventCheck{(eventIDs) in
+            
+            if eventIDs.count == 0 {
+
+            }
+            else{
+        
+        CoreDataCode().CDRetrieveUpdatedEvents(eventIDs: eventIDs)
+            }}
+    }
+    
+    
+
+    
+    
 }
 
-}
 
 

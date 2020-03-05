@@ -28,20 +28,20 @@
                                 <rect key="frame" x="50" y="94" width="314" height="718"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PlusCircleCloud" translatesAutoresizingMaskIntoConstraints="NO" id="wiY-cj-dAr">
-                                        <rect key="frame" x="57" y="59" width="200" height="200"/>
+                                        <rect key="frame" x="57" y="50" width="200" height="200"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="200" id="fDC-V1-u4O"/>
                                             <constraint firstAttribute="height" constant="200" id="r20-vm-FbP"/>
                                         </constraints>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Create Events" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nj0-Ht-HRr">
-                                        <rect key="frame" x="73" y="309" width="168" height="34"/>
+                                        <rect key="frame" x="73" y="280" width="168" height="34"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Choose the time and place for your event, letting Planr know the 'search period' (e.g. next 6 weeks) and who to invite. " textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S1Y-xI-b7R">
-                                        <rect key="frame" x="16" y="383" width="272" height="82.5"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Choose the time and place for your event, letting Planr know when you want to meet-up and who to invite. " textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S1Y-xI-b7R">
+                                        <rect key="frame" x="16" y="334" width="272" height="61.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -50,11 +50,11 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <constraints>
                                     <constraint firstItem="S1Y-xI-b7R" firstAttribute="leading" secondItem="ts8-iH-M5n" secondAttribute="leading" constant="16" id="5SS-R0-Ljo"/>
-                                    <constraint firstItem="wiY-cj-dAr" firstAttribute="top" secondItem="ts8-iH-M5n" secondAttribute="top" constant="59" id="A3Z-Fl-l1K"/>
+                                    <constraint firstItem="wiY-cj-dAr" firstAttribute="top" secondItem="ts8-iH-M5n" secondAttribute="top" constant="50" id="A3Z-Fl-l1K"/>
                                     <constraint firstItem="nj0-Ht-HRr" firstAttribute="centerX" secondItem="ts8-iH-M5n" secondAttribute="centerX" id="GE2-Wt-GZ7"/>
                                     <constraint firstAttribute="trailing" secondItem="S1Y-xI-b7R" secondAttribute="trailing" constant="26" id="Kaq-OR-nOD"/>
-                                    <constraint firstItem="nj0-Ht-HRr" firstAttribute="top" secondItem="wiY-cj-dAr" secondAttribute="bottom" constant="50" id="aV5-eJ-8pK"/>
-                                    <constraint firstItem="S1Y-xI-b7R" firstAttribute="top" secondItem="nj0-Ht-HRr" secondAttribute="bottom" constant="40" id="oSE-XT-v3l"/>
+                                    <constraint firstItem="nj0-Ht-HRr" firstAttribute="top" secondItem="wiY-cj-dAr" secondAttribute="bottom" constant="30" id="aV5-eJ-8pK"/>
+                                    <constraint firstItem="S1Y-xI-b7R" firstAttribute="top" secondItem="nj0-Ht-HRr" secondAttribute="bottom" constant="20" id="oSE-XT-v3l"/>
                                     <constraint firstItem="wiY-cj-dAr" firstAttribute="centerX" secondItem="ts8-iH-M5n" secondAttribute="centerX" id="suE-cS-k2F"/>
                                 </constraints>
                             </view>
@@ -92,14 +92,15 @@
                                         </constraints>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Instant availability" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AZV-Ua-qNP">
-                                        <rect key="frame" x="50" y="245" width="214" height="34"/>
+                                        <rect key="frame" x="50" y="250" width="214" height="34"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="9" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v8x-gN-Yii">
-                                        <rect key="frame" x="16" y="304" width="282" height="103.5"/>
-                                        <string key="text">Plugging directly into your calendars to gather availability, Planr determines the best dates for your event. You choose the date and Planr adds it to your invitees calendars.</string>
+                                        <rect key="frame" x="16" y="304" width="282" height="166.5"/>
+                                        <string key="text">Plugging directly into the calendars of you and your friends, Planr automatically determines the best dates for your event. 
+ If your calendar isn't up to date, manually update your availability in the App.</string>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -116,9 +117,9 @@
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="v8x-gN-Yii" secondAttribute="trailing" constant="16" id="3DQ-P7-5ID"/>
                                     <constraint firstItem="gN9-a1-YSs" firstAttribute="leading" secondItem="3kh-VG-E8W" secondAttribute="leading" id="3mR-Sb-nBC"/>
-                                    <constraint firstItem="v8x-gN-Yii" firstAttribute="top" secondItem="AZV-Ua-qNP" secondAttribute="bottom" constant="25" id="3vT-Wq-mqH"/>
+                                    <constraint firstItem="v8x-gN-Yii" firstAttribute="top" secondItem="AZV-Ua-qNP" secondAttribute="bottom" constant="20" id="3vT-Wq-mqH"/>
                                     <constraint firstItem="gN9-a1-YSs" firstAttribute="top" secondItem="3kh-VG-E8W" secondAttribute="top" constant="20" id="DVO-DD-h70"/>
-                                    <constraint firstItem="AZV-Ua-qNP" firstAttribute="top" secondItem="gN9-a1-YSs" secondAttribute="bottom" constant="25" id="dXC-wj-3UA"/>
+                                    <constraint firstItem="AZV-Ua-qNP" firstAttribute="top" secondItem="gN9-a1-YSs" secondAttribute="bottom" constant="30" id="dXC-wj-3UA"/>
                                     <constraint firstItem="v8x-gN-Yii" firstAttribute="leading" secondItem="3kh-VG-E8W" secondAttribute="leading" constant="16" id="sBC-o6-U5v"/>
                                     <constraint firstAttribute="trailing" secondItem="gN9-a1-YSs" secondAttribute="trailing" id="wyd-uX-tYx"/>
                                     <constraint firstItem="AZV-Ua-qNP" firstAttribute="centerX" secondItem="3kh-VG-E8W" secondAttribute="centerX" id="zuS-y9-4f9"/>
@@ -151,7 +152,7 @@
                             <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0BK-2Z-Ve7">
                                 <rect key="frame" x="50" y="94" width="314" height="718"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icons8-like-message-200" translatesAutoresizingMaskIntoConstraints="NO" id="5RQ-Av-UBs">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icons8-like-message-500" translatesAutoresizingMaskIntoConstraints="NO" id="5RQ-Av-UBs">
                                         <rect key="frame" x="57" y="59" width="200" height="200"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="200" id="g8l-lA-m91"/>
@@ -196,7 +197,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gL3-q1-N6s" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="751" y="1631"/>
+            <point key="canvasLocation" x="751" y="1660"/>
         </scene>
         <!--Tutorial1 View Controller-->
         <scene sceneID="YcR-ks-x09">
@@ -215,7 +216,7 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tired of sending 100s of messages just to meet up with friends? Welcome to the app that makes it happen instantly." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oFu-CD-Rwu">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tired of sending 100s of messages just to meet-up with friends? Welcome to the app that makes it happen instantly." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oFu-CD-Rwu">
                                         <rect key="frame" x="16" y="353.5" width="282" height="82.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                         <nil key="textColor"/>
@@ -261,6 +262,6 @@
         <image name="PlanrLogoCentreRounded" width="4096" height="4096"/>
         <image name="PlusCircleCloud" width="500" height="500"/>
         <image name="availability cropped" width="358" height="238"/>
-        <image name="icons8-like-message-200" width="200" height="200"/>
+        <image name="icons8-like-message-500" width="500" height="500"/>
     </resources>
 </document>

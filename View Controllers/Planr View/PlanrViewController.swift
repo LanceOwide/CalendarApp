@@ -373,12 +373,21 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
             
             let eventID = selectedEvent!.eventID
             let eventOwner = selectedEvent!.eventOwnerID
-
-                prepareForEventDetailsPage(eventID: eventID, isEventOwnerID: eventOwner, segueName: "planrEventSelected", isSummaryView: false, performSegue: true){
-                    
+                
+                let events = serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: true)
+                if events.count == 0{
+                    print("something went wrong")
                     tableView.deselectRow(at: indexPath, animated: true)
-                }   
-        }
+                }
+                else{
+                currentUserSelectedEvent = events[0]
+                    
+                currentUserSelectedAvailability = serialiseAvailability(eventID: eventID)
+                prepareForEventDetailsPageCD(segueName: "planrEventSelected", isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
+                    tableView.deselectRow(at: indexPath, animated: true)
+                }
+       
+                }}
         }
         
 }

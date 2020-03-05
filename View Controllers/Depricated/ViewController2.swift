@@ -494,7 +494,7 @@ class ViewController2: UIViewController, UICollectionViewDataSource, UICollectio
 
             
 
-            let hintLabels = ["Decided on the date for your event? Press the button and we'll notify all the invitees","Everyone invited has received a notification, once they open the App their availability will automatically populate","You can manually ammend your availability here","The event details are available on the 'Your Events' section on the home screen"]
+            let hintLabels = ["Decided on the date for your event? Press the button and we'll notify all the invitees","Everyone invited has received a notification, once they open the App their availability will automatically populate","You can manually amend your availability here","The event details are available on the 'Your Events' section on the home screen"]
             
             let nextlabels = ["OK","OK","OK","OK"]
             

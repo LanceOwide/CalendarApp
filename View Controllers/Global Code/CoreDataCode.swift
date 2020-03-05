@@ -11,6 +11,7 @@ import CoreData
 import UIKit
 import Firebase
 import MBProgressHUD
+import BackgroundTasks
 
 //variable to hold all events during core data processes
 var CDEevents = [CoreDataEvent]()
@@ -31,12 +32,17 @@ extension UIViewController{
     
     
 // MARK: prepare for results pages
-    func prepareForEventDetailsPageCD(segueName: String, isSummaryView: Bool, performSegue: Bool, userAvailability: [AvailabilityStruct], completion: @escaping () -> Void){
+    func prepareForEventDetailsPageCD(segueName: String, isSummaryView: Bool, performSegue: Bool, userAvailability: [AvailabilityStruct], triggerNotification: Bool, completion: @escaping () -> Void){
         
         print("running func prepareForEventDetailsPageCD inputs - segueName: \(segueName), isSummaryView: \(isSummaryView), performSegue: \(performSegue), userAvailability: \(userAvailability)")
             
 //        globally selected current event
         let userSelectedEvent = currentUserSelectedEvent
+        
+//        we only want to update the is summary view when it is set to false, otherwise we will let the already set value persist
+        if isSummaryView == false{
+          summaryView = isSummaryView
+        }
         
             summaryView = isSummaryView
         
@@ -81,12 +87,12 @@ extension UIViewController{
         print("resultsInputArray \(resultsInputArray)")
 
                     if performSegue{
-                        NotificationCenter.default.post(name: .availabilityUpdated, object: nil)
+                        if triggerNotification == true{NotificationCenter.default.post(name: .availabilityUpdated, object: nil)}
                        self.performSegue(withIdentifier: segueName, sender: self)
                         completion()
                     }
                     else{
-                        NotificationCenter.default.post(name: .availabilityUpdated, object: nil)
+                        if triggerNotification == true{NotificationCenter.default.post(name: .availabilityUpdated, object: nil)}
                         completion()
 
                     }
@@ -128,10 +134,8 @@ extension UIViewController{
     
     
 //    first function we call when the app opens, this itterates through all other functions
-        func CDAppHasLoadedAvailability(){
+        func CDAppHasLoadedAvailability(completion: @escaping () -> Void){
 //        fetch the core data saved for availability
-            
-            
             var eventIDs = [String]()
             var eventNumberOfDates = [Int]()
 //            get array of all eventIDs and number of dates
@@ -149,6 +153,7 @@ extension UIViewController{
                 CDRetrieveAllAvailabilityFB(eventIDs: eventIDs, eventNumberOfDates: eventNumberOfDates){
                     
                     self.nonRespondedEvents()
+                    completion()
                     
                 }
                         }
@@ -158,11 +163,13 @@ extension UIViewController{
                 CDRetrieveUpdatedAvailabilityCheck{(availabilityIDs) in
                                 
                     self.CDRetrieveUpdatedAvailability(availabilityID: availabilityIDs)
+                    completion()
             }}
         }
         else{
             
           print("there was an issue contacting CoreDataAvailability")
+            completion()
         }
     }
     
@@ -256,9 +263,9 @@ extension UIViewController{
                     CDEevents.remove(at: index)
                     print("index: \(index)")
                     self.CDSaveData()
-//                    remove the event notification from the event notification table
-                    self.removeSignleEventNotifications(eventID: i.key)
                 }
+//                    remove the event notification from the event notification table
+                self.removeSignleEventNotifications(eventID: i.key)
             }
             else if notification == "amend" || notification == "Amend"{
                 print("CDRetrieveUpdatedEvents - amending event \(i.key)")
@@ -272,8 +279,9 @@ extension UIViewController{
                 CDRetrieveSinglEventsFB(eventID: i.key){(numberOfDates) in
 //                    remove the event notification from the event notification table
                     self.nonRespondedEvents()
-                    self.removeSignleEventNotifications(eventID: i.key)
+                    
                 }
+                self.removeSignleEventNotifications(eventID: i.key)
             }
             else if notification == "new" || notification == "New"{
                 print("CDRetrieveUpdatedEvents - new event \(i.key)")
@@ -288,10 +296,11 @@ extension UIViewController{
                     self.CDRetrieveAllAvailabilityFB(eventIDs: [i.key], eventNumberOfDates: numberOfDates){
 //                        add the users availability to the user eventStore
                         self.uploadCurrentUsersAvailability(eventID: i.key)
-//                    remove the event notification from the event notification table
-                        self.removeSignleEventNotifications(eventID: i.key)
+
                     }
                 }
+//                    remove the event notification from the event notification table
+                self.removeSignleEventNotifications(eventID: i.key)
             }
             else if notification == "DateChosen" || notification == "dateChosen"{
              print("CDRetrieveUpdatedEvents - dateChosen event \(i.key)")
@@ -306,15 +315,94 @@ extension UIViewController{
                                     self.removeSignleEventNotifications(eventID: i.key)
 //                    notify the user there has been an date chosen and present them the notification
                     self.dateChosenNotification(eventID: i.key)
-                    
-                    
-                    
+   
                 }
     
             }
             
         }
     }
+    
+    
+//    adds, deletes and amends events based on the userEventNotifications table in FireStore - with completion
+        func CDRetrieveUpdatedEventsCompletion(eventIDs: [String: Any], completion: @escaping () -> Void){
+         
+            print("running func CDRetrieveUpdatedEvents inputs - eventIDs: \(eventIDs)")
+            
+    //        loop thorugh the eventIDs and determine the action for each notification
+            for i in eventIDs{
+                let notification = i.value as! String
+                
+                if notification == "delete" || notification == "Delete"{
+                    print("CDRetrieveUpdatedEvents - deleting event \(i.key)")
+    //                event has been deleted, we remove it from our array of events
+                    if let index = CDEevents.index(where: {$0.eventID == i.key}){
+                        context.delete(CDEevents[index])
+                        CDEevents.remove(at: index)
+                        print("index: \(index)")
+                        self.CDSaveData()
+                    }
+    //                    remove the event notification from the event notification table
+                    self.removeSignleEventNotifications(eventID: i.key)
+                    completion()
+                }
+                else if notification == "amend" || notification == "Amend"{
+                    print("CDRetrieveUpdatedEvents - amending event \(i.key)")
+    //                event has been updated, delete the event from our array of events and repalce it
+                    if let index = CDEevents.index(where: {$0.eventID == i.key}){
+                        context.delete(CDEevents[index])
+                        CDEevents.remove(at: index)
+                        print("index: \(index)")
+                        self.CDSaveData()
+                    }
+                    CDRetrieveSinglEventsFB(eventID: i.key){(numberOfDates) in
+    //                    remove the event notification from the event notification table
+                        self.nonRespondedEvents()
+                        self.removeSignleEventNotifications(eventID: i.key)
+                        completion()
+                    }
+                    
+                }
+                else if notification == "new" || notification == "New"{
+                    print("CDRetrieveUpdatedEvents - new event \(i.key)")
+                    if let index = CDEevents.index(where: {$0.eventID == i.key}){
+                        context.delete(CDEevents[index])
+                        CDEevents.remove(at: index)
+                        print("index: \(index)")
+                        self.CDSaveData()
+                    }
+                    CDRetrieveSinglEventsFB(eventID: i.key){ (numberOfDates) in
+    //                if the event is new, we also need to retrieve any availabilty data
+                        self.CDRetrieveAllAvailabilityFB(eventIDs: [i.key], eventNumberOfDates: numberOfDates){
+    //                        add the users availability to the user eventStore
+                            self.uploadCurrentUsersAvailability(eventID: i.key)
+    //                    remove the event notification from the event notification table
+                        self.removeSignleEventNotifications(eventID: i.key)
+                        completion()
+                        }
+                    }
+                }
+                else if notification == "DateChosen" || notification == "dateChosen"{
+                 print("CDRetrieveUpdatedEvents - dateChosen event \(i.key)")
+                    if let index = CDEevents.index(where: {$0.eventID == i.key}){
+                        context.delete(CDEevents[index])
+                        CDEevents.remove(at: index)
+                        print("index: \(index)")
+                        self.CDSaveData()
+                    }
+                    CDRetrieveSinglEventsFB(eventID: i.key){(numberOfDates) in
+                    //                    remove the event notification from the event notification table
+                                        self.removeSignleEventNotifications(eventID: i.key)
+    //                    notify the user there has been an date chosen and present them the notification
+                        self.dateChosenNotification(eventID: i.key)
+                        completion()
+       
+                    }
+        
+                }
+                
+            }
+        }
     
     
     
@@ -335,9 +423,10 @@ extension UIViewController{
                         CDAvailability.remove(at: index)
                         print("index: \(index)")
                         self.CDSaveData()
-//                        remove the notificaiton from the notification table
-                        removeSingleAvailabilityNotifications(documentID: i.key)
+
                     }
+//                        remove the notificaiton from the notification table
+                    removeSingleAvailabilityNotifications(documentID: i.key)
                 }
                 else if notification == "amend" || notification == "Amend"{
                     print("CDRetrieveUpdatedAvailability - amending availability \(i.key)")
@@ -351,8 +440,9 @@ extension UIViewController{
                     CDRetrieveSingleAvailabilityFB(availabilityID: i.key){
 //                        remove the specific notificaiton for that availability
                         self.nonRespondedEvents()
-                        self.removeSingleAvailabilityNotifications(documentID: i.key)
+//                        NotificationCenter.default.post(name: .availabilityUpdated, object: nil)
                     }
+                    self.removeSingleAvailabilityNotifications(documentID: i.key)
                 }
                 else if notification == "new" || notification == "New"{
                     print("CDRetrieveUpdatedAvailability - new availability \(i.key)")
@@ -363,10 +453,13 @@ extension UIViewController{
                         self.CDSaveData()
                     }
                     CDRetrieveSingleAvailabilityFB(availabilityID: i.key){
-//                        remove the specific notificaiton for that availability
-                        self.removeSingleAvailabilityNotifications(documentID: i.key)
+                        NotificationCenter.default.post(name: .availabilityUpdated, object: nil)
+
                     }
-                }}
+                }
+//                        remove the specific notificaiton for that availability
+                self.removeSingleAvailabilityNotifications(documentID: i.key)
+            }
         }
     
     
@@ -473,11 +566,11 @@ extension UIViewController{
 //    function to retrieve all the events from Firebase the user has been invited to, this should only be used if the coredata is currently empty
     func CDRetrieveAllEventsFB(completion: @escaping () -> Void){
         
-        print("running func CDRetrieveAllEvents")
+        print("running func CDRetrieveAllEvents with user: \(user ?? "")")
         
         //        we unwrap user, hence we must confirm it is has a value
         if user == nil{
-            
+            print("user is equal to nil")
         }
         else{
         
@@ -584,7 +677,7 @@ extension UIViewController{
                             CDNewAvailability.eventID = documentEventData.get("eventID") as? String
                             CDNewAvailability.uid = documentEventData.get("uid") as? String
                             CDNewAvailability.userName = documentEventData.get("userName") as? String
-                            CDNewAvailability.userAvailability = documentEventData.get("userAvailability") as? [Int] ?? notRespondedArray
+                            CDNewAvailability.userAvailability = documentEventData.get("userAvailability") as? [Int] ?? [99]
 
     //                        append the new event onto CDAvailability
                             CDAvailability.append(CDNewAvailability)
@@ -740,6 +833,10 @@ extension UIViewController{
 func removeTheEventNotifications(){
         
         print("running func - removeTheEventNotifications")
+    
+    if user == nil{
+    }
+    else{
         
         dbStore.collection("userEventUpdates").document(user!).delete() { err in
             if let err = err {
@@ -747,7 +844,7 @@ func removeTheEventNotifications(){
             } else {
                 print("Document successfully removed!")
             }
-        }
+        }}
     }
     
 
@@ -755,12 +852,16 @@ func removeTheEventNotifications(){
     func removeSignleEventNotifications(eventID: String){
         
         print("running func - removeTheEventNotifications")
+        if user == nil{
+        }
+        else{
         
         dbStore.collection("userEventUpdates").document(user!).updateData([eventID : FieldValue.delete()]) { err in
             if let err = err {
                 print("Error removing document: \(err)")
             } else {
                 print("Document successfully removed!")
+            }
             }
         }
     }
@@ -770,13 +871,17 @@ func removeTheEventNotifications(){
 func removeTheAvailabilityNotifications(){
         
         print("running func - removeTheAvailabilityNotifications")
-        
+    
+    if user == nil{
+    }
+    else{
+    
         dbStore.collection("userAvailabilityUpdates").document(user!).delete() { err in
             if let err = err {
                 print("Error removing document: \(err)")
             } else {
                 print("Document successfully removed!")
-            }
+            }}
         }
     }
     
@@ -784,13 +889,16 @@ func removeTheAvailabilityNotifications(){
     func removeSingleAvailabilityNotifications(documentID: String){
         
         print("running func - removeSingleAvailabilityNotifications")
+        if user == nil{
+        }
+        else{
         
         dbStore.collection("userAvailabilityUpdates").document(user!).updateData([documentID : FieldValue.delete()]) { err in
             if let err = err {
                 print("Error removing document: \(err)")
             } else {
                 print("Document successfully removed!")
-            }
+            }}
         }
     }
     
@@ -996,6 +1104,11 @@ func removeTheAvailabilityNotifications(){
                 print("events \(events)")
             return events
             }
+        else if createdByUser == true && pending == true && pastEvents == true{
+                    let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate == "" && $0.finalSearchDate < dateFromComponents}
+                print("events \(events)")
+            return events
+            }
         else if createdByUser == true && pending == false && pastEvents == false{
                 let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate != "" && $0.finalSearchDate > dateFromComponents}
             print("events \(events)")
@@ -1011,6 +1124,11 @@ func removeTheAvailabilityNotifications(){
             print("events \(events)")
             return events
         }
+        else if createdByUser == true && pending == false && pastEvents == true{
+                    let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate != "" && $0.finalSearchDate < dateFromComponents}
+                print("events \(events)")
+                return events
+            }
         else{
             
             let emptyEvents = [eventSearch]()
@@ -1065,7 +1183,7 @@ func removeTheAvailabilityNotifications(){
     
 //    notification function for amended availability
         func availabilityAmendedNotification(userIDs: [String], availabilityDocumentID: String){
-          print("running func availabilityCreatedNotification- adding notificaitons to userAvailabilityUpdates - inputs - userIDs \(userIDs) availabilityString \(availabilityDocumentID)")
+          print("running func availabilityAmendedNotification- adding notificaitons to userAvailabilityUpdates - inputs - userIDs \(userIDs) availabilityString \(availabilityDocumentID)")
             
             for i in userIDs{
     //            add the eventID and an updated notification to the userEventUpdates tbales
@@ -1102,15 +1220,20 @@ func removeTheAvailabilityNotifications(){
 //    fuction for turning on and off the snapshot listener on the eventNotification table
     func eventChangeListener(){
         
+        
         if eventListenerEngaged == true{
             print("eventChangeListener already engaged, not re-engaging")
             
         }
         else{
             eventListenerEngaged = true
+            
+            if user == nil{
+            }
+            else{
         
         print("engaging eventChangeListener")
-            dbStore.collection("userEventUpdates").document(user!).addSnapshotListener(){ querySnapshot, error in
+           eventListenerRegistration = dbStore.collection("userEventUpdates").document(user!).addSnapshotListener(){ querySnapshot, error in
                 guard let snapshot = querySnapshot else {
                     print("Error fetching snapshots: \(error!)")
                     return
@@ -1131,7 +1254,10 @@ func removeTheAvailabilityNotifications(){
                         let documentData: [String: Any] = (snapshot.data()!)
                  
                         self.CDRetrieveUpdatedEvents(eventIDs: documentData)
-                }}}
+                        
+                        
+                    }}}}
+            
         }}
     
     
@@ -1146,8 +1272,12 @@ func removeTheAvailabilityNotifications(){
                 availabilityListenerEngaged = true
         
         print("engaging availabilityChangeListener")
+            
+            if user == nil{
+            }
+            else{
 
-        dbStore.collection("userAvailabilityUpdates").document(user!).addSnapshotListener(){ (querySnapshot, error) in
+        availabilityListenerRegistration = dbStore.collection("userAvailabilityUpdates").document(user!).addSnapshotListener(){ (querySnapshot, error) in
                 if error != nil {
                     print("Error getting documents: \(error!)")
                 }
@@ -1170,14 +1300,15 @@ func removeTheAvailabilityNotifications(){
                         
                         self.CDRetrieveUpdatedAvailability(availabilityID: documentData)
                         
-                        }}}}}}
+                        }}}}}
+
+        }}
     
     
 //    MARK: Misc functions
     
     
     func uploadCurrentUsersAvailability(eventID: String){
-        
         print("running func uploadCurrentUsersAvailability inputs - eventID: \(eventID)")
         
         var dateFormatterTZ = DateFormatter()
@@ -1197,6 +1328,10 @@ func removeTheAvailabilityNotifications(){
 //        2. retrieve the documentID for the users eventStore ID
         let availabilityData = serialiseAvailability(eventID: eventID)
         let filteredAvailabilityData = availabilityData.filter { $0.uid == user!}
+            if filteredAvailabilityData.count == 0{
+                print("something went wrong")
+            }
+            else{
         let documentID = filteredAvailabilityData[0].documentID
         print("uploadCurrentUsersAvailability documentID: \(documentID)")
         
@@ -1216,7 +1351,7 @@ func removeTheAvailabilityNotifications(){
 //                        add the finalAvailabilityArray to the userEventStore
 
         commitUserAvailbilityData(userEventStoreID: documentID, finalAvailabilityArray2: finalAvailabilityArray2, eventID: eventID)
-        }
+            }}
     }
     
     
@@ -1307,12 +1442,101 @@ func removeTheAvailabilityNotifications(){
             
         }
         if availabilityInfo == true{
+   
+        }
+    }
+    
+    
+//    this function runs everytime the user opens the app, it checks that the data in our database appears consistent, if not corrective measures are preformed. This runs as part of the homepage opening and should be run last after all the data has been loaded into CoreData checks are as follows:
+//    1. A list of key attributes that can't be missing from our database
+//    2. does each event in our database have the correct number of userAvailability checks, if they are not equal delete and start again (need to ensure we don't get stuck in an infinitie loop, if there is an issue in the datbase)
+    func dataConsistencyCheck(){
+        print("dataConsistencyCheck")
+        
+        var userAvailabilityForTesting = [AvailabilityStruct]()
+        
+//        1. check key attributes
+//        1.1 arrays that should be equal
+        
+        
+//        2. check availability validity
+//        2.1 itterate through the list of events to check the number of invitees
+        
+        for event in CDEevents{
+//            count the number of invitees
+            let inviteeCount = event.currentUserNames!.count
+//            retrieve each availability
+            userAvailabilityForTesting = serialiseAvailability(eventID: event.eventID!)
+            let availabilityInviteeCount = userAvailabilityForTesting.count
             
-            
+            if inviteeCount != availabilityInviteeCount{
+                print("the number of invitees and the number of availabilities are not equal \(event.eventID ?? "")")
+                
+//                2.11 check the event still exists, if not delete it from our database and all its availability data
+                dbStore.collection("eventRequests").document(event.eventID!).getDocument{ (documentEventData, error) in
+                        if error != nil {
+                            print("Error getting documents: \(error!)")
+                        }
+                        else {
+                            if documentEventData!.exists == false{
+                              
+//                the event doesn't appear to exist in the database, we need to remove it from CoreData
+                                print("dataConsistencyCheck - event no longer in FB")
+//                                delete the event
+                                if let index = CDEevents.index(where: {$0.eventID == event.eventID!}){
+                                    context.delete(CDEevents[index])
+                                    CDEevents.remove(at: index)
+                                    print("index: \(index)")
+                                    self.CDSaveData()
+                                }
+//                                delete all availability
+                                for i in userAvailabilityForTesting{
+                                    if let index = CDAvailability.index(where: {$0.documentID == i.documentID}){
+                                        context.delete(CDAvailability[index])
+                                        CDAvailability.remove(at: index)
+                                        print("index: \(index)")
+                                        self.CDSaveData()
+                                    }
+                                    
+                                    
+                                }
+                            }
+                            else{
+//                2.12 if the event does exist inthe database, retreive the correct event data
+                                self.CDRetrieveAllAvailabilityFB(eventIDs: [event.eventID!], eventNumberOfDates: [event.startDates!.count]){
+                                    print("issue event now corrected: \(event.eventID ?? "")")
+                                }
+                                
+                            }
+                    }}
+            }
+            else{
+                
+                print("no issues with availability versus event invitee count")
+                
+            }
             
         }
+  
+    }
+    
+//    deletes all entried in CoreData, this is used when the user logs out to ensure we don't carry over data we shouldn't, inputs should be the name of the entity in core data i.e. CoreDataAvailability and CoreDataEvent
+    func deleteAllRecords(entityName: String) {
         
+        print("running fun deleteAllRecords inputs - entityName: \(entityName)")
         
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let context = delegate.persistentContainer.viewContext
+
+        let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
+
+        do {
+            try context.execute(deleteRequest)
+            try context.save()
+        } catch {
+            print ("There was an error")
+        }
     }
     
     }

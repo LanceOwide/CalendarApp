@@ -15,6 +15,7 @@ import AMPopTip
 import Alamofire
 import Fabric
 import Crashlytics
+import BackgroundTasks
 
 
 
@@ -1101,6 +1102,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             
             if accessGranted == true {
                 //                print("we got access")
+                self.loadCalendars2()
             }
             else{
                 print("no access to the calendar")
@@ -1109,77 +1111,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         })
     }
     
-    
-    
-    func getCalendarData2(startDate: Date, endDate: Date) -> (datesOfTheEvents: Array<Date>, startDatesOfTheEvents: Array<Date>, endDatesOfTheEvents: Array<Date>){
-        
-        
-        print("running func getCalendarData2 inputs - startDate: \(startDate) endDate: \(endDate)")
-        
-        var datesOfTheEvents = Array<Date>()
-        var startDatesOfTheEvents = Array<Date>()
-        var endDatesOfTheEvents = Array<Date>()
-        var calendarToUse: [EKCalendar]?
-        if SelectedCalendarsStruct.calendarsStruct.count == 0 {
-            calendarToUse = calendars
-            
-            print("calendars being used \(String(describing: calendarToUse))")
-            
-        }
-        else{
-            calendarToUse = SelectedCalendarsStruct.calendarsStruct
-            
-            print("calendars being used \(String(describing: calendarToUse))")
-            
-        }
-        datesOfTheEvents.removeAll()
-        startDatesOfTheEvents.removeAll()
-        endDatesOfTheEvents.removeAll()
-        calendarArray = eventStore.events(matching: eventStore.predicateForEvents(withStart: startDate as Date, end: endDate as Date, calendars: calendarToUse))
-        
-        
-        print("Start date of the period to search \(startDate)")
-        print("End date of the period to search \(endDate)")
-        
-        //                print(calendarArray)
-        
-        numberOfItems = calendarArray.count
-        
-        for event in calendarArray{
-            
-            //            appends new items into the array calendarEventsArray
-            let newItemInArray = Event()
-            newItemInArray.alarms = event.alarms
-            newItemInArray.title = event.title
-            newItemInArray.location = event.location!
-            newItemInArray.URL = event.url
-            newItemInArray.lastModified = event.lastModifiedDate
-            newItemInArray.startDate = event.startDate
-            newItemInArray.endDate = event.endDate
-            newItemInArray.allDay = event.isAllDay
-            newItemInArray.recurrence = event.recurrenceRules
-            newItemInArray.attendees = event.attendees
-            newItemInArray.timezone = event.timeZone
-            newItemInArray.availability = event.availability
-            newItemInArray.occuranceDate = event.occurrenceDate
-            
-            calendarEventArray.append(newItemInArray)
-            
-            //                creates an array of the dates on which the user has events
-            datesOfTheEvents.append(event.occurrenceDate)
-            startDatesOfTheEvents.append(event.startDate)
-            endDatesOfTheEvents.append(event.endDate)
-            
-            print("dates of the events \(datesOfTheEvents)")
-            print("start dates of the events \(startDatesOfTheEvents)")
-            print("end dates of the events \(endDatesOfTheEvents)")
-            
-        }
-        
-        return (datesOfTheEvents: datesOfTheEvents, startDatesOfTheEvents: startDatesOfTheEvents, endDatesOfTheEvents: endDatesOfTheEvents)
-        
-        
-    }
+
     
     
 //    commits the user availability data to the userEventStore and also adds the notifications to the availabilityNotificationStore
@@ -1531,6 +1463,15 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         
         print("numberOfRows: \(numberOfRows)")
         
+//        something looks wrong, we exit and send back to the homepage, with a message
+//        if numberOfRows == 1{
+//            let sampleStoryBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+//            let homeView  = sampleStoryBoard.instantiateViewController(withIdentifier: "CreateEventViewController") as! CreateEventViewController
+//            self.navigationController?.pushViewController(homeView, animated: true)
+//
+//        }
+//        else{
+        
         let numberOfColumns = resultsArray[1].count
         print("numberOfColumns: \(numberOfColumns)")
         
@@ -1561,11 +1502,11 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         }
         
         countedResultArray.insert("Availability", at: 0)
-        
+//        }
         
         print("countedResultArray: \(countedResultArray) countedResultArrayFraction \(countedResultArrayFraction)")
         return (countedResults: [countedResultArray], fractionResults: [countedResultArrayFraction])
-        
+            
     }
         
         
@@ -1605,15 +1546,12 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         let calendar = NSCalendar.current
         let dateFormatter = DateFormatter()
         let dateFormatterTime = DateFormatter()
-        let tz = TimeZone.current.abbreviation()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm z"
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatterTime.dateFormat = "HH:mm"
         dateFormatterTime.locale = Locale(identifier: "en_US_POSIX")
         
         //        create a start and end date with time from the strings input into the function
-        
-      
         let startDateString = ("\(startDate) \(startTime) GMT\(hoursFromGMTString)")
         print("startDateString: \(startDateString)")
         let startEndDateString = ("\(startDate) \(endTime) GMT\(hoursFromGMTString)")
@@ -1772,7 +1710,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                     if startDatesOfTheEvents[n] < datesBetweenChosenDatesStartDate && endDatesOfTheEvents[n] > datesBetweenChosenDatesEndDates || (datesBetweenChosenDatesStartDate ... datesBetweenChosenDatesEndDates).contains(startDatesOfTheEvents[n]) == true || (datesBetweenChosenDatesStartDate ... datesBetweenChosenDatesEndDates).contains(endDatesOfTheEvents[n]) == true{
                         print("within the dates to test")
                         finalAvailabilityArray.append(0)
-                        print(finalAvailabilityArray)
+//                        print(finalAvailabilityArray)
                         n = 0
                         if y == numeberOfDatesToCheck{
                             
@@ -1791,7 +1729,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                         
                         if n == numberOfEventDatesToCheck && y == numeberOfDatesToCheck{
                             finalAvailabilityArray.append(1)
-                            print(finalAvailabilityArray)
+//                            print(finalAvailabilityArray)
                             print("Outside dates to test and end of the list of event dates and dates to test")
                             
                             
@@ -1801,7 +1739,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                         else if n == numberOfEventDatesToCheck{
                             print("Outside dates to test and end of the list of dates to test, going to next event date")
                             finalAvailabilityArray.append(1)
-                            print(finalAvailabilityArray)
+//                            print(finalAvailabilityArray)
                             y = y + 1
                             n = 0
                         }
@@ -1819,6 +1757,119 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         print(finalAvailabilityArray)
         return finalAvailabilityArray
     }
+        
+        
+        func compareTheEventTimmings4(datesBetweenChosenDatesStart: [String], datesBetweenChosenDatesEnd: [String], startDateDate: Date, endDateDate: Date) -> Array<Int>{
+            print("running func compareTheEventTimmings3 inputs - datesBetweenChosenDatesStart:\(datesBetweenChosenDatesStart) datesBetweenChosenDatesEnd: \(datesBetweenChosenDatesEnd) ")
+        
+        let endDatesOfTheEvents = getCalendarData3(startDate: startDateDate, endDate: endDateDate).endDatesOfTheEvents
+        let startDatesOfTheEvents = getCalendarData3(startDate: startDateDate, endDate: endDateDate).startDatesOfTheEvents
+        
+            let numeberOfDatesToCheck = datesBetweenChosenDatesStart.count - 1
+            print("numeberOfDatesToCheck: \(numeberOfDatesToCheck)")
+            let numberOfEventDatesToCheck = startDatesOfTheEvents.count - 1
+            var finalAvailabilityArray = Array<Int>()
+            var n = 0
+            var y = 0
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm z"
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+            
+            finalAvailabilityArray.removeAll()
+            
+    //        validation to cofirm the data pulled from the database is correct, we have the same number of start and end dates
+            if datesBetweenChosenDatesStart.count == 0 || datesBetweenChosenDatesEnd.count == 0 || datesBetweenChosenDatesStart.count != datesBetweenChosenDatesEnd.count{
+                
+                print("Fatal Error, one of the date lists is empty")
+                
+            }
+    //            If the user doesn't have any events in thier calendar for the period we create a useravailability array of 0
+            if startDatesOfTheEvents.count == 0{
+                
+                print("User doesn't have events in thier calendar for this period")
+            
+                while y <= numeberOfDatesToCheck{
+                    print("y \(y)")
+                    
+                    finalAvailabilityArray.append(1)
+                    
+                    y = y + 1
+         
+                }
+                
+                
+            }
+                
+            else{
+                
+                
+                datesLoop: while y <= numeberOfDatesToCheck {
+                    
+                    print("y \(y)")
+                    
+                    eventsLoop: while n <= numberOfEventDatesToCheck {
+                        //                debug only
+                        //                            print("n \(n)")
+                        //                            print("Start dates between chosen dates \(datesBetweenChosenDatesStart)")
+                        //                            print("End dates between chosen dates\(datesBetweenChosenDatesEnd)")
+                        //                            print("Start Date of the events to check \(startDatesOfTheEvents)")
+                        //                            print("End Date of the events to check \(endDatesOfTheEvents)")
+                        //                            print("Date Test Start: Start Date \(datesBetweenChosenDatesStart[y]) End Date \(datesBetweenChosenDatesEnd[y]) Date to test \(startDatesOfTheEvents[n])")
+                        //                            print("Date Test End: Start Date \(datesBetweenChosenDatesStart[y]) End Date \(datesBetweenChosenDatesEnd[y]) Date to test \(endDatesOfTheEvents[n])")
+                        
+                        let datesBetweenChosenDatesStartDate = dateFormatter.date(from: datesBetweenChosenDatesStart[y])!
+                        let datesBetweenChosenDatesEndDates = dateFormatter.date(from: datesBetweenChosenDatesEnd[y])!
+                        
+                        if startDatesOfTheEvents[n] < datesBetweenChosenDatesStartDate && endDatesOfTheEvents[n] > datesBetweenChosenDatesEndDates || (datesBetweenChosenDatesStartDate ... datesBetweenChosenDatesEndDates).contains(startDatesOfTheEvents[n]) == true || (datesBetweenChosenDatesStartDate ... datesBetweenChosenDatesEndDates).contains(endDatesOfTheEvents[n]) == true{
+                            print("within the dates to test")
+                            finalAvailabilityArray.append(0)
+                            print(finalAvailabilityArray)
+                            n = 0
+                            if y == numeberOfDatesToCheck{
+                                
+                                print("break point y checks complete: \(y) numeberOfDatesToCheck \(numeberOfDatesToCheck)")
+                                
+                                break datesLoop
+                                
+                            }
+                            else{
+                                y = y + 1
+                                n = 0
+                            }
+                            
+                        }
+                        else {
+                            
+                            if n == numberOfEventDatesToCheck && y == numeberOfDatesToCheck{
+                                finalAvailabilityArray.append(1)
+                                print(finalAvailabilityArray)
+                                print("Outside dates to test and end of the list of event dates and dates to test")
+                                
+                                
+                                break datesLoop
+                                
+                            }
+                            else if n == numberOfEventDatesToCheck{
+                                print("Outside dates to test and end of the list of dates to test, going to next event date")
+                                finalAvailabilityArray.append(1)
+                                print(finalAvailabilityArray)
+                                y = y + 1
+                                n = 0
+                            }
+                            else{
+                                print("Outside dates to test")
+                                
+                                n = n + 1
+                            }
+                        }
+                        
+                    }
+                    n = n + 1
+                    
+                }}
+            print(finalAvailabilityArray)
+            return finalAvailabilityArray
+        }
     
     
     func getArrayOfChosenDates3(eventID: String, completion: @escaping (_ startDates: [String], _ endDates: [String]) -> Void){
@@ -1854,6 +1905,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
     
     func getCalendarData3(startDate: Date, endDate: Date) -> (datesOfTheEvents: Array<Date>, startDatesOfTheEvents: Array<Date>, endDatesOfTheEvents: Array<Date>){
         
+        checkCalendarStatus2()
         
         print("running func getCalendarData3 inputs - startDate: \(startDate) endDate: \(endDate)")
         
@@ -1968,19 +2020,13 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                 
                 SelectedCalendarsStruct.calendarsStruct = calendars!
                 
-                
-                    SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "US Holidays"})
-                    
-                    SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "UK Holidays"})
-                    
-                    SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "Birthdays"})
-                
+                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "US Holidays"})
+                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "UK Holidays"})
+                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "Birthdays"})
+                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "South Korean Holidays"})
+                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "Hong Kong Holidays"})
                 SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "Holidays in United Kingdom"})
                 
-                
-                    
-//                    defaults.set(SelectedCalendarsStruct.calendarsStruct, forKey: "selectedCalendars")
-                    
                     print("SelectedCalendarsStruct: \(SelectedCalendarsStruct.calendarsStruct)")
    
             }
@@ -2108,10 +2154,11 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                             }}}}
         }
         
-        
+//        function to get the user name from defaults, confirm it is populated and if not get it from the web
         func getUserName(completion: @escaping (_ usersName: String) -> Void){
+        print("running func getUserName")
             
-        let userName = UserDefaults.standard.string(forKey: "name")!
+        let userName = UserDefaults.standard.string(forKey: "name") ?? ""
 //        print("userName \(userName)")
         
         if userName == "" {

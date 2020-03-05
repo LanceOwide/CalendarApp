@@ -45,7 +45,13 @@ var datesToChooseFrom = Array<Any>()
 var countedResultArrayFraction = [Float]()
 var currentUserAvailabilityDocID = String()
 
+//global variables for listeners - allows us to remove them from anyhwere
+var eventListenerRegistration: ListenerRegistration!
+var availabilityListenerRegistration: ListenerRegistration!
 
+
+//global variable for monitoring when the user has loaded the app from a new event notification, whilst the app is in the background
+var eventNotificationAppBackground: Bool = false
 
 // Screen width.
 public var screenWidth: CGFloat {
@@ -120,6 +126,10 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     
     
     @IBAction func testTheCode(_ sender: UIButton) {
+
+        
+        UserDefaults.standard.set("", forKey: "name")
+        
     }
     
     
@@ -138,13 +148,21 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
 //        check we have data in core data and update if required
         CDAppHasLoaded{
 //            completed getting event data, now check for availability
-            self.CDAppHasLoadedAvailability()
-//            engage the listeners to detect event and availability notifications
+            self.CDAppHasLoadedAvailability{
+//            engage the listeners to detect event and availability notifications only if the app hasn't just loaded
+                if eventNotificationAppBackground == true{
+                }
+                else{
             self.eventChangeListener()
-            self.availabilityChangeListener()
+            self.availabilityChangeListener()}
+//                run consistency checks
+            self.dataConsistencyCheck()
+                
+                
             //        get todays events
             self.getDaysEventsIDCD{
                 self.tblViewEventList.reloadData()
+            }
             }
         }
 
@@ -170,8 +188,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
 //        hide code test button
         testTheCodeButton.isHidden = true
 
-        
-
+    
 //        show the tutorial for the front page
         showTutorial()
         
@@ -213,11 +230,10 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
 //        restrict the rotation of the device to portrait
         (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
         
-
-        checkNotificationStatus(){
-            
-            self.collectionViewMenu.reloadData()
-        }
+//        checkNotificationStatus(){
+//
+//            self.collectionViewMenu.reloadData()
+//        }
         
         
 //        end of viewDidLoad - note: viewWillDisappear is contained within the viewDidLoad, this allows for the removal of the listeners
@@ -324,7 +340,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
                             
                             //                load the required availability
                             currentUserSelectedAvailability = self.serialiseAvailability(eventID: eventIDChosen)
-                            self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability){
+                            self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
                             //                 set the view controller as root
                                                 self.performSegue(withIdentifier: "todaysEventsSegue", sender: self)
                                                 
@@ -335,7 +351,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
             let createEventCoachMarksCount = UserDefaults.standard.integer(forKey: "createEventCoachMarksCount")
             let createEventCoachMarksPermenant = UserDefaults.standard.bool(forKey: "permenantToolTips")
             
-            if summaryView == true && createEventCoachMarksCount < 3 || summaryView == true && createEventCoachMarksPermenant == true{
+            if summaryView == true && createEventCoachMarksCount < 2 || summaryView == true && createEventCoachMarksPermenant == true{
                 
             
             coachMarksController.start(in: .window(over: self))
@@ -357,7 +373,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     
     func showTutorial(){
         
-    let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpening") ?? ""
+    let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningv2.0001") ?? ""
     let createEventCoachMarksPermenant = UserDefaults.standard.bool(forKey: "permenantToolTips")
         
         
@@ -377,7 +393,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
        self.view.addSubview(popOverVC.view)
        popOverVC.didMove(toParent: self)
             
-            UserDefaults.standard.set("false", forKey: "firstTimeOpening")
+            UserDefaults.standard.set("false", forKey: "firstTimeOpeningv2.0001")
         
         }}
         else{
@@ -614,7 +630,7 @@ extension CreateEventViewController: UITableViewDelegate, UITableViewDataSource{
         }
         else{
             
-            let text = ("\(todaysEventsSearch[indexPath.row].eventStartTime) - \(todaysEventsSearch[indexPath.row].eventEndTime)")
+            let text = ("\(convertToLocalTime(inputTime: todaysEventsSearch[indexPath.row].eventStartTime)) - \(convertToLocalTime(inputTime: todaysEventsSearch[indexPath.row].eventEndTime))")
             
             cell.lblTableView.text = todaysEventsSearch[indexPath.row].eventDescription
             cell.lbl2TableView.text = text
@@ -640,7 +656,7 @@ extension CreateEventViewController: UITableViewDelegate, UITableViewDataSource{
         currentUserSelectedEvent = todaysEventsSearch[indexPath.row]
         
         currentUserSelectedAvailability = serialiseAvailability(eventID: todaysEventsSearch[indexPath.row].eventID)
-        self.prepareForEventDetailsPageCD(segueName: "todaysEventsSegue", isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+        self.prepareForEventDetailsPageCD(segueName: "todaysEventsSegue", isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
             print("selected \(indexPath.row) performing segue to summary page")
             tableView.deselectRow(at: indexPath, animated: true)
         }

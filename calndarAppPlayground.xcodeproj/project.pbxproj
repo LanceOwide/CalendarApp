@@ -89,6 +89,7 @@
 		24EE4580235E256400AD72C3 /* ManualAvailabilityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EE457F235E256400AD72C3 /* ManualAvailabilityViewController.swift */; };
 		24EE4582235E3A1700AD72C3 /* AvailabilityCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EE4581235E3A1700AD72C3 /* AvailabilityCollectionViewCell.swift */; };
 		24F1CE372369D4D30088EADC /* saveCalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F1CE362369D4D20088EADC /* saveCalendarViewController.swift */; };
+		24FDD3E22405EB8200C2A3C6 /* AutoRespondHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FDD3E12405EB8200C2A3C6 /* AutoRespondHelper.swift */; };
 		9E6C7750ADED8AF42AEAE304 /* Pods_calndarAppPlayground.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8C1BB8A5090A6DF176BD1A4 /* Pods_calndarAppPlayground.framework */; };
 /* End PBXBuildFile section */
 
@@ -178,6 +179,7 @@
 		24EE457F235E256400AD72C3 /* ManualAvailabilityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualAvailabilityViewController.swift; sourceTree = "<group>"; };
 		24EE4581235E3A1700AD72C3 /* AvailabilityCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailabilityCollectionViewCell.swift; sourceTree = "<group>"; };
 		24F1CE362369D4D20088EADC /* saveCalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = saveCalendarViewController.swift; sourceTree = "<group>"; };
+		24FDD3E12405EB8200C2A3C6 /* AutoRespondHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoRespondHelper.swift; sourceTree = "<group>"; };
 		6DE808CFB6469F98F03C23ED /* Pods-calndarAppPlayground.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-calndarAppPlayground.debug.xcconfig"; path = "Pods/Target Support Files/Pods-calndarAppPlayground/Pods-calndarAppPlayground.debug.xcconfig"; sourceTree = "<group>"; };
 		B8C1BB8A5090A6DF176BD1A4 /* Pods_calndarAppPlayground.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_calndarAppPlayground.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0FADD38AB95159CEC201075 /* Pods-calndarAppPlayground.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-calndarAppPlayground.release.xcconfig"; path = "Pods/Target Support Files/Pods-calndarAppPlayground/Pods-calndarAppPlayground.release.xcconfig"; sourceTree = "<group>"; };
@@ -324,6 +326,7 @@
 			children = (
 				24B82F9E2379F9E100302072 /* GlobalFunctions.swift */,
 				2421C7C5237A0E11008EBBCD /* FirebaseCode.swift */,
+				24FDD3E12405EB8200C2A3C6 /* AutoRespondHelper.swift */,
 				24593FF523E328E9003B57D9 /* CoreDataCode.swift */,
 			);
 			path = "Global Code";
@@ -648,6 +651,7 @@
 				246BF96922DCF369003ADB1B /* PhoneNumberCode.swift in Sources */,
 				244F12A523A3C6A90082D9F2 /* CollectionViewCellDates.swift in Sources */,
 				24C142612362679700410CC5 /* LogInViewController2.swift in Sources */,
+				24FDD3E22405EB8200C2A3C6 /* AutoRespondHelper.swift in Sources */,
 				2458E94222EF8E0800F38716 /* AccountSettings.swift in Sources */,
 				24593FF423E32070003B57D9 /* Model.xcdatamodeld in Sources */,
 				24F1CE372369D4D30088EADC /* saveCalendarViewController.swift in Sources */,
@@ -825,7 +829,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = calndarAppPlayground/calndarAppPlayground.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 3NU7T826VK;
 				INFOPLIST_FILE = calndarAppPlayground/Info.plist;
@@ -849,7 +853,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = calndarAppPlayground/calndarAppPlayground.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 3NU7T826VK;
 				INFOPLIST_FILE = calndarAppPlayground/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;

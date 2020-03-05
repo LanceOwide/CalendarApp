@@ -171,7 +171,7 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
             sectionUpcomingEvents = filteringEventsForDisplay(pending: true, createdByUser: false, pastEvents: false, serialisedEvents: serialisedEvents)
             
     //      filter the serilaised events for events not hosted by the user and in the pending status, but in the past
-            sectionPastEvents = filteringEventsForDisplay(pending: true, createdByUser: false, pastEvents: true, serialisedEvents: serialisedEvents)
+            sectionPastEvents = filteringEventsForDisplay(pending: true, createdByUser: false, pastEvents: true, serialisedEvents: serialisedEvents) + filteringEventsForDisplay(pending: true, createdByUser: true, pastEvents: true, serialisedEvents: serialisedEvents)
             
         }
 
@@ -455,7 +455,7 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
             }
             
             currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
-            self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+            self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
                 
                 loadingNotification.hide(animated: true)
             }
@@ -474,7 +474,7 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
             
             }
             currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
-            self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+            self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
                 
                 loadingNotification.hide(animated: true)
             }
@@ -491,7 +491,7 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
             }
             
            currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
-           self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+           self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
                
                loadingNotification.hide(animated: true)
            }
@@ -728,13 +728,13 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
 
                     }
                     else if collectionView.tag < 10000000000 && sectionUpcomingEvents.count != 0{
-                let nameArray = sectionUpcomingEvents[(collectionView.tag - 1)/10000000000].currentUserNames + sectionUpcomingEvents[(collectionView.tag - 1)/10000000000].nonUserNames
+                let nameArray = sectionUpcomingEvents[(collectionView.tag - 1)/100000000].currentUserNames + sectionUpcomingEvents[(collectionView.tag - 1)/100000000].nonUserNames
 
                         cell.lblInviteeNames.text = nameArray[indexPath.row]
 
                     }
                     else if collectionView.tag < 1000000000000 && sectionPastEvents.count != 0{
-                     let nameArray = sectionPastEvents[(collectionView.tag - 1)/1000000000000].currentUserNames + sectionPastEvents[(collectionView.tag - 1)/1000000000000].nonUserNames
+                     let nameArray = sectionPastEvents[(collectionView.tag - 1)/10000000000].currentUserNames + sectionPastEvents[(collectionView.tag - 1)/10000000000].nonUserNames
 
                         cell.lblInviteeNames.text = nameArray[indexPath.row]
                         

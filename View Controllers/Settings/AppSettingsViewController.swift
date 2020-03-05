@@ -30,6 +30,10 @@ class AppSettingsViewController: UIViewController {
         UserDefaults.standard.set("", forKey: "authVerificationID")
         
         authStatusListener = false
+
+//        when the user logs out we want to delete all their app data, otherwise logging in with another users credentials will not work
+        deleteAllRecords(entityName:"CoreDataAvailability")
+        deleteAllRecords(entityName:"CoreDataEvent")
         
             let firebaseAuth = Auth.auth()
         do {

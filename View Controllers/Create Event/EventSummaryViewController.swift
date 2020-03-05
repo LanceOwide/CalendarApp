@@ -96,7 +96,12 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
     
     @objc func doneSelected(){
         
+//        allows the user to choose the date for the event
         selectEventToggle = 1
+        
+//        set summaryView = false, this is used as an override to the prepareForEventDetailsPageCD function, because the implementation of the auto update results page to new events caused the update of summaryView through through the `prepareForEventDetailsPageCD function ot crash
+        
+        summaryView = true
 
 //        add the new event to the event store, add each users userEventStore and add the data to coreData
         addEventToEventStore(){ (eventID) in
@@ -106,7 +111,7 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
             
 //            set the current selected event to the one just created and added to CoreData
             currentUserSelectedEvent = self.serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: true)[0]
-            self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: true, performSegue: false, userAvailability:  self.serialiseAvailability(eventID: currentUserSelectedEvent.eventID)) {
+            self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: true, performSegue: false, userAvailability:  self.serialiseAvailability(eventID: currentUserSelectedEvent.eventID), triggerNotification: true) {
             }
         }
         }

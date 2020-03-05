@@ -134,8 +134,12 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
     
     @objc func updateTables(){
         
-        
-        resultsCollectionView.reloadData()
+        print("updated availability notification triggered")
+//        need to pull the new data from CoreData
+        currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+        self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: true, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
+            self.resultsCollectionView.reloadData()
+        }
     }
     
     @objc func editSelected(){
@@ -285,7 +289,21 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
     
     @IBAction func inviteNonUsersPressed(_ sender: UIButton) {
         
-        inviteFriendsPopUp(notExistingUserArray: eventResultsArrayDetails[11] as! [String], nonExistingNameArray: eventResultsArrayDetails[10]as! [String])
+//        get the nonusers mobile phone numbers from FB
+        
+        getNonUsers(eventID: currentUserSelectedEvent.eventID){
+           (usersName, usersNumbers) in
+    
+            self.inviteFriendsPopUp(notExistingUserArray: usersNumbers, nonExistingNameArray: usersName)
+        }
+    }
+    
+    
+    
+    @IBAction func btnAutoResponPressed(_ sender: Any) {
+        
+    
+        uploadCurrentUsersAvailability(eventID: currentUserSelectedEvent.eventID)
     }
     
     
@@ -473,7 +491,7 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
                 
                 let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
                 
-                let hintLabels = ["Your invitees have been notified of the event, their availability will automatically be visible here (this may take several minutes)","Once you've chosen the date for your event, select it and press save, we'll notify your invitees","Manually ammend your availability here","Each event has a dedicated chat channel"]
+                let hintLabels = ["Your friends have been notified of the event, thier availability will automatically be visible here","Once you've chosen the date for your event, select it and press save, we'll notify your friends","Your availability has been automatically determined from the events in your calendar, you can manually amend it here","Each event has a dedicated group chat (for arguing about where to go)"]
                 
                 let nextlabels = ["OK","OK","OK","OK","OK"]
                 

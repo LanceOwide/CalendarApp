@@ -179,7 +179,7 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
             let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
             
 
-            let hintLabels = ["Invitees availability status is displayed here","Have you chosen this as the date for your event? Select it to notify your invitees"]
+            let hintLabels = ["See your friends availability for this date","Have you chosen this as the date for your event? Select it to notify your friends"]
             
             let nextlabels = ["OK","OK"]
             

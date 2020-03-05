@@ -15,6 +15,7 @@ import AMPopTip
 import Alamofire
 import Fabric
 import Crashlytics
+import BackgroundTasks
 
 var chatNotificationPending = Bool()
 var chatNotificationDateChosen = Bool()
@@ -120,11 +121,18 @@ extension UIViewController{
         
     }
     
+//    functiont to check if the user has any new events or chat notifications, these are then displayed on the home page
     func checkNotificationStatus(completion: @escaping () -> Void){
         
         print("running func checkNotificationStatus")
+//        check to see if the user isnt nil
+        if user == nil{
+         print("running func checkNotificationStatus user is nil, stop running")
+        }
+        else{
         
-     let docRefEventRequest = dbStore.collection("userNotification").document(user ?? "")
+        
+     let docRefEventRequest = dbStore.collection("userNotification").document(user!)
         docRefEventRequest.getDocument { (document, error) in
             if let document = document, document.exists {
              
@@ -134,7 +142,7 @@ extension UIViewController{
                 completion()
                 
             }
-        }
+            }}
    
     }
     
@@ -142,20 +150,28 @@ extension UIViewController{
         
        chatNotificationPending = false
         
+        if user == nil{
+        }
+        else{
      let docRef = dbStore.collection("userNotification").document(user!)
         
       docRef.setData(["chatNotificationPending" : false], merge: true)
-        
+            
+        }
     }
     
     func updateDateChosenNotificationStatus(){
         
         chatNotificationDateChosen = false
         
+        if user == nil{
+        }
+        else{
+        
      let docRef = dbStore.collection("userNotification").document(user!)
         
       docRef.setData(["chatNotificationDateChosen" : false], merge: true)
-        
+        }
     }
     
     
@@ -250,7 +266,35 @@ extension UIViewController{
                 }}}}}}}
     
     
-    //    MARK: section get any events the user has already been invited to, moved them from temporary and adds them to permanant, it then deletes the temporary entries
+    
+//    MARK: section to retrieve the non-user who have been invited
+    
+    func getNonUsers(eventID: String, completion: @escaping(_ userNames: [String],_ userNumbers: [String]) -> Void){
+        print("running func getNonUsers inputs - eventID \(eventID)")
+        
+        var namesArray = [String]()
+        var numbersArray = [String]()
+        
+        dbStore.collection("temporaryUserEventStore").whereField("eventID", isEqualTo: eventID).getDocuments { (querySnapshot, error) in
+        if error != nil {
+            print("Error getting documents: \(error!)")
+        }
+        else {
+            for document in querySnapshot!.documents {
+                
+                namesArray.append(document.get("name") as! String)
+                numbersArray.append(document.get("phoneNumber") as! String)
+            }
+            print("output for func getNonUsers inputs - userNames: \(namesArray), userNumbers: \(numbersArray)")
+            completion (namesArray, numbersArray)
+            
+            }
+        }
+
+    }
+    
+    
+    //    MARK: section get any events the user has already been invited to, move them from temporary and adds them to permanant, it then deletes the temporary entries
     
     func checkForPhoneNumberInvited(phoneNumber: String, completion: @escaping () -> Void){
         
@@ -268,7 +312,6 @@ extension UIViewController{
                     let uid = Auth.auth().currentUser?.uid
                     
                     //                    add the required info to the userEventStore
-                    
                     fireStoreRef = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": uid!, "userName": registeredName]){
                         error in
                         if let error = error {
@@ -282,19 +325,29 @@ extension UIViewController{
                     
                     let docRef = dbStore.collection("eventRequests").document(eventID)
                     
-//                    add the new users userID to the event, add add the notifiction for everyone invited to update their event
+//                    add the new users userID to the event,  add the notifiction for everyone invited to update their event
                     docRef.getDocument { (document, error) in
                         if let document = document, document.exists {
                             
 //                            get the userIDs from the eventRequest table, post a new availability notification and event notification for the userIDs
-                            
-                            let userIDs = document.get("users") as! [String]
-                            
-                                self.eventAmendedNotification(userIDs: userIDs, eventID: eventID)
-                                self.availabilityAmendedNotification(userIDs: userIDs, availabilityDocumentID: availabilityID)
 
+                            var userIDs = document.get("users") as! [String]
+                            userIDs.append(uid!)
+                            var currentUsersNames = document.get("currentUserNames") as! [String]
+                            currentUsersNames.append(registeredName)
                             
+//                            debug
+//                            print("userIDs \(userIDs)")
+//                            print("currentUsersNames \(currentUsersNames)")
+
+//                            update the userIDs array
                             dbStore.collection("eventRequests").document(eventID).updateData(["users" : FieldValue.arrayUnion([uid!])])
+//                            update the current user names array
+                            dbStore.collection("eventRequests").document(eventID).updateData(["currentUserNames" : FieldValue.arrayUnion(currentUsersNames)])
+                            
+//                          notify the users that the information has been updated
+                            self.eventAmendedNotification(userIDs: userIDs, eventID: eventID)
+                            self.availabilityAmendedNotification(userIDs: userIDs, availabilityDocumentID: availabilityID)
                             
                         } else {
                             print("Document does not exist")

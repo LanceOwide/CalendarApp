@@ -98,14 +98,14 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
         //            DUMMY predicate
         let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
                         
-//      filter the serilaised events for events hosted by the user and in the pending status
+//      filter the serilaised events for events hosted by the user and not in the pending status
         sectionUserHostedEvents = filteringEventsForDisplay(pending: false, createdByUser: true, pastEvents: false, serialisedEvents: serialisedEvents)
                         
-//      filter the serilaised events for events not hosted by the user and in the pending status
+//      filter the serilaised events for events not hosted by the user and not in the pending status
         sectionUpcomingEvents = filteringEventsForDisplay(pending: false, createdByUser: false, pastEvents: false, serialisedEvents: serialisedEvents)
                         
-//      filter the serilaised events for events not hosted by the user and in the pending status, but in the past
-        sectionPastEvents = filteringEventsForDisplay(pending: false, createdByUser: false, pastEvents: true, serialisedEvents: serialisedEvents)
+//      filter the serilaised events for events not hosted by the user and not in the pending status, but in the past
+        sectionPastEvents = filteringEventsForDisplay(pending: false, createdByUser: false, pastEvents: true, serialisedEvents: serialisedEvents) + filteringEventsForDisplay(pending: false, createdByUser: true, pastEvents: true, serialisedEvents: serialisedEvents)
         
     }
 
@@ -159,35 +159,27 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
             
             if (sectionPastEvents.count + sectionUpcomingEvents.count + sectionUserHostedEvents.count) == 0{
                 
-                cell.userInvitedCellLabel2.text = "You haven't created any events"
-                cell.userInvitedCellLabel3.text = "Head to 'Create An Event' to get started"
-                
-                
-                
+                cell.userInvitedCellLabel2.text = "Here you'll see your confirmed events"
+                cell.userInvitedCellLabel3.text = ""
+                cell.userInvitedCellLabel4.text = "Create an event to get started"
                 cell.userInvitedCellLabel1.text = ""
-                cell.userInvitedCellLabel4.text = ""
                 cell.imgChatNotification.isHidden = true
             }
             else{
-                
                 cell.accessoryType = .none
                 cell.backgroundColor = UIColor.white
                 cell.layer.borderColor = UIColor.lightGray.cgColor
                 cell.layer.borderWidth = 0.5
                 cell.clipsToBounds = true
             
-                
                 if indexPath.section == 0{
                   
                     item = sectionUserHostedEvents[indexPath.row]
-                    
-                    
-                    
+
                             let eventTitleDescription = NSMutableAttributedString(string: item.eventDescription,
                                                                                       attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 20)])
                                 eventTitleDescription.append(NSMutableAttributedString(string: " by: \(item.eventOwnerName)",
                                                                                    attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]))
-                                
                                 
                             cell.userInvitedCellLabel1.attributedText = eventTitleDescription
                             cell.userInvitedCellLabel2.text =  item.eventLocation
@@ -203,10 +195,8 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                         cell.imgChatNotification.layer.borderWidth = 1.0
                         cell.imgChatNotification.layer.borderColor = UIColor.red.cgColor
                         cell.imgChatNotification.layer.masksToBounds = true
-                        
                     }
                     else{
-                        
                         cell.imgChatNotification.isHidden = true
                     }
                     
@@ -397,7 +387,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                 }
                 
                 currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
-                self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+                self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
                 
                     loadingNotification.hide(animated: true)
                     
@@ -416,7 +406,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                 newMessageNotification = false
                 }
                     currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
-                    self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+                    self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
                     
                         loadingNotification.hide(animated: true)
                         
@@ -437,7 +427,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                 }
                 
                 currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
-                self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability){
+                self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
                 
                     loadingNotification.hide(animated: true)
                     
@@ -554,7 +544,7 @@ extension UserInvitedEvents: UICollectionViewDataSource, UICollectionViewDelegat
             }
             else if collectionView.tag < 1000000 && sectionPastEvents.count != 0{
                 
-                let nameArray = sectionUpcomingEvents[(collectionView.tag - 1)/10000].currentUserNames + sectionUpcomingEvents[(collectionView.tag - 1)/10000].nonUserNames
+                let nameArray = sectionPastEvents[(collectionView.tag - 1)/10000].currentUserNames + sectionPastEvents[(collectionView.tag - 1)/10000].nonUserNames
                  
 
                 cell.lblCircledInvitees.text = nameArray[indexPath.row]

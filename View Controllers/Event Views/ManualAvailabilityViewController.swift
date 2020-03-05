@@ -86,7 +86,7 @@ class ManualAvailabilityViewController: UIViewController,CoachMarksControllerDat
         updateUsersAvailability(documentID: currentUserAvailability[0].documentID, eventID: eventID, uid: user!, userAvailability: temporaryCurrentUsersAvailability)
 
         currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
-        prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability){
+        prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: true){
             
             self.view.removeFromSuperview()
             
