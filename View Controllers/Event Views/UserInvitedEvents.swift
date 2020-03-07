@@ -94,6 +94,8 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
     
     //    MARK: code to pull down the events the user is invited to and display them
     @objc func getUsersInvtedEvents(){
+        
+        
 
         //            DUMMY predicate
         let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
@@ -260,11 +262,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                         
                         cell.imgChatNotification.isHidden = true
                     }
-  
                 }
-            
-            
-                
             }
             
             

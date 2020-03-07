@@ -992,12 +992,13 @@ func removeTheAvailabilityNotifications(){
             n.startDatesDisplay = CDNewEvent.startDatesDisplay!
             n.users = CDNewEvent.users ?? [""]
             
-//            adding the final date in the search array
+//            adding the final date in the search array - THIS LOOKS WRONG!!
             let finalSearchDate = dateFormatterSimple.date(from: CDNewEvent.endDateInput!)
             n.finalSearchDate = finalSearchDate!.addingTimeInterval(TimeInterval(secondsFromGMT))
             
-//            changing the event owner name to be you for those events the user is hosting
             
+            
+//            changing the event owner name to be you for those events the user is hosting
             if CDNewEvent.eventOwnerName! == user!{
                 n.eventOwnerName = "You"
             }
@@ -1080,6 +1081,13 @@ func removeTheAvailabilityNotifications(){
 //   filter events for the required in each section of the tableView controller, set createdByUser false when filtering for past events
     func filteringEventsForDisplay(pending: Bool, createdByUser: Bool, pastEvents: Bool, serialisedEvents: [eventSearch]) -> [eventSearch]{
         
+        
+        let dateFormatterTz = DateFormatter()
+        dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
+        dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
+        
+        
+        
         print("running func getEventsFromCD inputs - pending: \(pending) createdByUser \(createdByUser) pastEvents: \(pastEvents)")
         
 //        date for comparison to determine whether the event is occuring today.
@@ -1110,22 +1118,22 @@ func removeTheAvailabilityNotifications(){
             return events
             }
         else if createdByUser == true && pending == false && pastEvents == false{
-                let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate != "" && $0.finalSearchDate > dateFromComponents}
+            let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate != "" && dateFormatterTz.date(from:$0.startDateArray[$0.chosenDatePosition])! > dateFromComponents}
             print("events \(events)")
             return events
         }
         else if createdByUser == false && pending == false && pastEvents == false{
-                let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate != "" && $0.finalSearchDate > dateFromComponents}
+                let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate != "" && dateFormatterTz.date(from:$0.startDateArray[$0.chosenDatePosition])! > dateFromComponents}
             print("events \(events)")
             return events
         }
         else if createdByUser == false && pending == false && pastEvents == true{
-                let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate != "" && $0.finalSearchDate < dateFromComponents}
+                let events = serialisedEvents.filter(){ $0.eventOwnerID != user! && $0.chosenDate != "" && dateFormatterTz.date(from:$0.startDateArray[$0.chosenDatePosition])! < dateFromComponents}
             print("events \(events)")
             return events
         }
         else if createdByUser == true && pending == false && pastEvents == true{
-                    let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate != "" && $0.finalSearchDate < dateFromComponents}
+                    let events = serialisedEvents.filter(){ $0.eventOwnerID == user! && $0.chosenDate != "" && dateFormatterTz.date(from:$0.startDateArray[$0.chosenDatePosition])! < dateFromComponents}
                 print("events \(events)")
                 return events
             }

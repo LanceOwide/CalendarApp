@@ -90,8 +90,8 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
             
             navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
 
-            getMonthEventsID{
-                self.createEventArray{
+            getMonthEventsID{ (array) in
+                self.createEventArray(eventArray: array){
                 print("monthsEvents: \(self.monthsEvents)")
                 self.myCollectionView.reloadData()
                 self.myTableView.reloadData()
@@ -132,8 +132,8 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
             
             firstWeekDayOfMonth=getFirstWeekDay()
             
-            getMonthEventsID{
-                self.createEventArray{
+            getMonthEventsID{ (array) in
+                self.createEventArray(eventArray: array){
                     print("monthsEvents: \(self.monthsEvents)")
                     self.myCollectionView.reloadData()
                     self.myTableView.reloadData()
@@ -305,11 +305,11 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
             let cell = tableView.dequeueReusableCell(withIdentifier: "planrEventsCell") as! PlanEventsTableViewCell
             
             let tableID = tableView.tag
-            let endTime = eventDetailsArray[tableID][indexPath.row]?.eventEndTime
-            let startTime = eventDetailsArray[tableID][indexPath.row]?.eventStartTime
+            let endTime = convertToLocalTime(inputTime: eventDetailsArray[tableID][indexPath.row]!.eventEndTime)
+            let startTime = convertToLocalTime(inputTime: eventDetailsArray[tableID][indexPath.row]!.eventStartTime)
             let description = eventDetailsArray[tableID][indexPath.row]?.eventDescription
             
-            cell.lbl1.text = ("\(startTime!) - \(endTime!)")
+            cell.lbl1.text = ("\(startTime) - \(endTime)")
             cell.lbl1.adjustsFontSizeToFitWidth = true
             cell.lbl2.text = ("⊙ \(description!)")
             cell.lbl2.adjustsFontSizeToFitWidth = true
@@ -396,7 +396,7 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
 //CD extension
 extension PlanrViewController{
     
-    func getMonthEventsID(completion: @escaping () -> Void){
+    func getMonthEventsID(completion: @escaping ([eventSearch]) -> Void){
         
         planrEventsSearch.removeAll()
         let today = Date()
@@ -423,31 +423,35 @@ extension PlanrViewController{
         let dateFormatterTZ = DateFormatter()
         dateFormatterTZ.dateFormat = "yyyy-MM-dd HH:mm z"
         dateFormatterTZ.locale = Locale(identifier: "en_US_POSIX")
-        let todayMonth = Calendar.current.component(.month, from: today.addingTimeInterval(TimeInterval(secondsFromGMT)))
+        let todayMonth = currentMonthIndex
         
             for i in planrEventsSearch{
+                print("planrEventsSearch \(i)")
                 let startDates = i.startDateArray
                 let chosenDatePosition = i.chosenDatePosition
                 let eventChosenDateString = startDates[chosenDatePosition]
                 let eventChosenDateDate = dateFormatterTZ.date(from: eventChosenDateString)
                 let eventMonth = Calendar.current.component(.month, from: eventChosenDateDate!)
 
-        //        remove those events that dont occur today
+        //        remove those events that dont occur this month
                 if todayMonth != eventMonth{
                     planrEventsSearch.removeAll{$0.eventID == i.eventID}
                 }
 
             }
-        completion()
+        print("getMonthEventsID completion planrEventsSearch \(planrEventsSearch)")
+        completion(planrEventsSearch)
         }
     
 //    function to create an array for all dates in the chosen month
-    func createEventArray(completion: @escaping () -> Void){
+    func createEventArray(eventArray: [eventSearch],completion: @escaping () -> Void){
+        
+        print("running func createEventArray inputs - eventSearch: \(eventArray)")
             
             var emptyArray = [[eventSearch?]](repeating: [nil], count: numOfDaysInMonth[currentMonthIndex-1])
     //        print("emptyArray: \(emptyArray)")
             
-            let listOfEvents = planrEventsSearch
+            let listOfEvents = eventArray
             
             for events in listOfEvents{
                 

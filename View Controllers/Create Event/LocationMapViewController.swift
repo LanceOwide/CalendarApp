@@ -22,19 +22,13 @@ class LocationMapViewController: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
     
-    
-    
-    
      let locationManager = CLLocationManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        
-        
         if chosenMapItem.name == "" || chosenMapItemManual != ""{
-            
           self.view.removeFromSuperview()
         }
         
@@ -57,7 +51,6 @@ class LocationMapViewController: UIViewController {
         definesPresentationContext = true
         locationSearchTable.mapView = mapView
         locationSearchTable.handleMapSearchDelegate = self
-    
     }
     
     
