@@ -61,7 +61,7 @@ class PageViewController: UIPageViewController, UIPageViewControllerDelegate {
 //    create the exit button
     func exitButton(){
         
-        let button = UIButton(frame: CGRect(x: screenWidth/2 - 50, y: screenHeight - 100, width: 80, height: 30))
+        let button = UIButton(frame: CGRect(x: screenWidth/2 - 40, y: screenHeight - 100, width: 80, height: 30))
         button.backgroundColor = UIColor.gray
         button.titleLabel?.textColor = UIColor.black
         button.setTitle("Close", for: .normal)

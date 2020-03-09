@@ -9,8 +9,9 @@
 import UIKit
 import AVFoundation
 import Firebase
+import Instructions
 
-class PlanrViewController: UIViewController, MonthViewDelegate{
+class PlanrViewController: UIViewController, MonthViewDelegate, CoachMarksControllerDataSource, CoachMarksControllerDelegate{
 
     
     @IBOutlet weak var viewMonthPicker: UIView!
@@ -35,6 +36,7 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
     var monthsEvents = [eventSearch]()
     var eventDetailsArray = [[eventSearch?]]()
     var planrEventsSearch = [eventSearch]()
+    let coachMarksController = CoachMarksController()
     
     let monthView: MonthView = {
         let v=MonthView()
@@ -54,6 +56,11 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
            initialiseView()
 
             navigationItem.titleView = setAppHeader(colour: UIColor.black)
+        
+//        setup the coachmarks
+        coachMarksController.dataSource = self
+        coachMarksController.delegate = self
+        coachMarksController.overlay.allowTap = true
         
         }
 
@@ -144,6 +151,96 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
 //            self.myTableView.reloadData()
             monthView.btnLeft.isEnabled = !(currentMonthIndex == presentMonthIndex && currentYear == presentYear)
         }
+    
+    
+    //    MARK: - three mandatory methods for choach tips
+            
+            func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: CoachMarkBodyView, arrowView: CoachMarkArrowView?) {
+                
+                let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
+                
+                let hintLabels = ["Welcome to your Planr. Here you can view and manage all your confirmed events"]
+                
+                let nextlabels = ["OK"]
+                
+                coachViews.bodyView.hintLabel.text = hintLabels[index]
+                
+                coachViews.bodyView.nextLabel.text = nextlabels[index]
+    //            coachViews.bodyView.nextLabel.isEnabled = false
+                
+                return (bodyView: coachViews.bodyView, arrowView: coachViews.arrowView)
+                
+            }
+            
+
+        //    Defines where the coachmark will appear
+            var pointOfInterest = UIView()
+            
+            func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkAt index: Int) -> CoachMark {
+                
+                
+                let hintPositions = [CGRect(x: screenWidth/2 , y: screenHeight/2, width: 1, height: 1)]
+                pointOfInterest.frame = hintPositions[index]
+                
+                
+                return coachMarksController.helper.makeCoachMark(for: pointOfInterest)
+            }
+            
+            
+            
+            
+        //    The number of coach marks we wish to display
+            func numberOfCoachMarks(for coachMarksController: CoachMarksController) -> Int {
+                return 1
+            }
+        
+    //    When a coach mark appears
+        func coachMarksController(_ coachMarksController: CoachMarksController, willShow coachMark: CoachMark, at index: Int){
+            
+            print("Coach Index appeared \(index)")
+            
+            print("Coach Index disappeared \(index)")
+               
+        }
+        
+    //    when a coach mark dissapears
+        func coachMarksController(_ coachMarksController: CoachMarksController, willHide coachMark: CoachMark, at index: Int){
+               
+        }
+    
+    
+    //    The view coachmarks should be removed once the view is removed
+    override func viewWillDisappear( _ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        coachMarksController.stop(immediately: true)
+    }
+    
+    
+    //    The coach marks must be called from the viewDidAppear and not the ViewDidLoad.
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        //            positions on the screen for each hint
+        
+        let firstPlanrCoachMarksCount = UserDefaults.standard.integer(forKey: "firstPlanrCoachMarksCount")
+        let coachMarksPermenant = UserDefaults.standard.bool(forKey: "permenantToolTips")
+        
+        print("firstPlanrCoachMarksCount \(firstPlanrCoachMarksCount)")
+        
+        
+        if firstPlanrCoachMarksCount < 1 || coachMarksPermenant == true{
+        
+        coachMarksController.start(in: .window(over: self))
+            
+            UserDefaults.standard.set(firstPlanrCoachMarksCount + 1, forKey: "firstPlanrCoachMarksCount")
+            
+        }
+        else{
+            
+        }
+    }
+    
     }
 
 
@@ -166,6 +263,7 @@ class PlanrViewController: UIViewController, MonthViewDelegate{
             cell.backgroundColor=UIColor.clear
             cell.layer.cornerRadius=5
             cell.layer.masksToBounds=true
+            cell.lblBusy.adjustsFontSizeToFitWidth = true
             
             print("indexPath.item: \(indexPath.item) firstWeekDayOfMonth \(firstWeekDayOfMonth)")
 

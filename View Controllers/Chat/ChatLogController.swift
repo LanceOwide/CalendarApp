@@ -330,33 +330,30 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             
 //        we do not want to write a notification if we sent the message, this writes to the real time database for notifications
             if ids == user!{
-                
             }
             else{
             ref2.child(ids).updateChildValues(["notification": true])
-                
             }
-            
         }
                         
 //        This writes to the FireStore for our notification table
         for ids in userIDs{
-            
             //        we do not want to write a notification if we sent the message
             if ids == user!{
                 
             }
             else{
-            
-            if messageNotificationDateChosen == true{
-            
+//                adds true to the users userNotification field, this shows the chat icon on the homepage
+                if currentUserSelectedEvent.chosenDate != ""{
             dbStore.collection("userNotification").document(ids).setData(["chatNotificationDateChosen" : true], merge: true)
             }
             else{
-                
             dbStore.collection("userNotification").document(ids).setData(["chatNotificationPending" : true], merge: true)
-                   
-            }}}
+            }
+                
+             dbStore.collection("userNotification").document(ids).setData(["chatNotificationEventIDs" : [currentUserSelectedEvent.eventID]], merge: true)
+                
+            }}
         
 //        Posts the message into the RealTime DB, first we use getUserName to ensure we have the latest name for the user
         getUserName { (fromName) in

@@ -568,18 +568,12 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
          
      //    when a coach mark dissapears
          func coachMarksController(_ coachMarksController: CoachMarksController, willHide coachMark: CoachMark, at index: Int){
-             
-
             print("Coach Index disappeared \(index)")
-             
-             
              if index == 3 {
                  
      //            add non user invitees
                     if nonExistingUsers.count > 0{
-                        
                         self.inviteFriendsPopUp(notExistingUserArray: nonExistingNumbers, nonExistingNameArray: nonExistingUsers)
-                     
                      nonExistingUsers.removeAll()
                         
                     }

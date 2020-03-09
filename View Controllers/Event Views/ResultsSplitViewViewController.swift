@@ -105,18 +105,6 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
             navigationItem.hidesBackButton = true
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(doneSelected))
         }
-        
-        if newMessageNotification == true{
-            imgMessageNotification.isHidden = false
-            imgMessageNotification.layer.cornerRadius = 15
-            imgMessageNotification.layer.borderWidth = 1.0
-            imgMessageNotification.layer.borderColor = UIColor.red.cgColor
-            imgMessageNotification.layer.masksToBounds = true
-            
-        }
-        else{
-           imgMessageNotification.isHidden = true
-        }
                 
 //        MARK: listener to detect when the event availability has been udpated by the user
         NotificationCenter.default.addObserver(self, selector: #selector(updateTables), name: .availabilityUpdated, object: nil)
@@ -309,17 +297,21 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
     
     override func viewWillAppear(_ animated: Bool) {
         
-         if newMessageNotification == true{
-                   imgMessageNotification.isHidden = false
-                   imgMessageNotification.layer.cornerRadius = 15
-                   imgMessageNotification.layer.borderWidth = 1.0
-                   imgMessageNotification.layer.borderColor = UIColor.red.cgColor
-                   imgMessageNotification.layer.masksToBounds = true
-                   
-               }
-               else{
-                  imgMessageNotification.isHidden = true
-               }
+        //        check if we should be displaying a new chat notification
+                if chatNotificationiDs.contains(currentUserSelectedEvent.eventID) == true{
+                    imgMessageNotification.isHidden = false
+                    imgMessageNotification.layer.cornerRadius = 15
+                    imgMessageNotification.layer.borderWidth = 1.0
+                    imgMessageNotification.layer.borderColor = UIColor.red.cgColor
+                    imgMessageNotification.layer.masksToBounds = true
+                    
+        //        remove the event chat notifications for this event
+                    removeEventIDChatNotifications(eventID: currentUserSelectedEvent.eventID)
+                    
+                }
+                else{
+                   imgMessageNotification.isHidden = true
+                }
     }
     
 }
@@ -606,6 +598,15 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
 
             coachMarksController.stop(immediately: true)
         }
+    
+    
+//    function to remove the event from the list of events with chat notifications
+    
+    func removeEventIDChatNotifications(eventID: String){
+     
+        chatNotificationiDs.removeAll{$0 == eventID}
+        
+    }
     
 }
 

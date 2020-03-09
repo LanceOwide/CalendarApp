@@ -150,6 +150,10 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
 //        The end of the viewDidLoad
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        userCreatedEvents.reloadData()
+    }
+    
 
     
     //    function to get any updated data once the table is pulled down
@@ -255,15 +259,14 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
                 cell.userCreatedCellLabel3.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
                         
 //                        check if there is an outstanding chat message
-                if item.newChatMessage == true{
-                    
+                if chatNotificationiDs.contains(item.eventID) == true{
                     cell.imgChatNotification.isHidden = false
                     cell.imgChatNotification.layer.cornerRadius = 15
                     cell.imgChatNotification.layer.borderWidth = 1.0
                     cell.imgChatNotification.layer.borderColor = UIColor.red.cgColor
                     cell.imgChatNotification.layer.masksToBounds = true
                     
-                }
+                    }
                 else{
                     
                     cell.imgChatNotification.isHidden = true
@@ -292,7 +295,7 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
                         cell.userCreatedCellLabel3.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
                         
                 //                        check if there is an outstanding chat message
-                if item.newChatMessage == true{
+                if chatNotificationiDs.contains(item.eventID) == true{
                     
                     cell.imgChatNotification.isHidden = false
                     cell.imgChatNotification.layer.cornerRadius = 15
@@ -324,7 +327,7 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
                         cell.userCreatedCellLabel3.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
     
                 //                        check if there is an outstanding chat message
-                if item.newChatMessage == true{
+                if chatNotificationiDs.contains(item.eventID) == true{
                     
                     cell.imgChatNotification.isHidden = false
                     cell.imgChatNotification.layer.cornerRadius = 15

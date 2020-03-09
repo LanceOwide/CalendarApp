@@ -19,6 +19,7 @@ import BackgroundTasks
 
 var chatNotificationPending = Bool()
 var chatNotificationDateChosen = Bool()
+var chatNotificationiDs = [String]()
 
 
 class FirebaseCode: UIViewController {
@@ -138,14 +139,27 @@ extension UIViewController{
              
                  chatNotificationPending = document.get("chatNotificationPending") as? Bool ?? false
                  chatNotificationDateChosen = document.get("chatNotificationDateChosen") as? Bool ?? false
+                chatNotificationiDs.append(contentsOf: document.get("chatNotificationEventIDs") as? [String] ?? [""])
+                
+                print("chatNotificationiDs \(chatNotificationiDs)")
+                
+//                once we have pulled down the new notification eventID data we need to remove the field
+                dbStore.collection("userNotification").document(user!).updateData(["chatNotificationEventIDs" : FieldValue.delete()]){ err in
+                if let err = err {
+                    print("Error updating document: \(err)")
+                } else {
+                    print("Document successfully updated")
+                    }}
                 
                 completion()
-                
             }
             }}
-   
     }
+        
     
+    
+    
+//    fucntion to update the chat notificaiton pending
     func updatePendingNotificationStatus(){
         
        chatNotificationPending = false

@@ -80,6 +80,11 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
         //        The end of the viewDidLoad
     }
     
+//   reload data to ensure the chat notification dissapear
+    override func viewDidAppear(_ animated: Bool) {
+        userInvitedEvents.reloadData()
+    }
+    
     //    function to get any updated data once the table is pulled down
     @objc func refreshCreated(_ sender: Any) {
         
@@ -190,7 +195,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                     
                     
                     //                        check if there is an outstanding chat message
-                    if item.newChatMessage == true{
+                    if chatNotificationiDs.contains(item.eventID) == true{
                         
                         cell.imgChatNotification.isHidden = false
                         cell.imgChatNotification.layer.cornerRadius = 15
@@ -219,7 +224,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                     
                     
                     //                        check if there is an outstanding chat message
-                    if item.newChatMessage == true{
+                    if chatNotificationiDs.contains(item.eventID) == true{
                         
                         cell.imgChatNotification.isHidden = false
                         cell.imgChatNotification.layer.cornerRadius = 15
@@ -249,7 +254,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                             cell.userInvitedCellLabel3.text = dateTZToDisplayDate(date: item.chosenDate)
                     
                     //                        check if there is an outstanding chat message
-                    if item.newChatMessage == true{
+                    if chatNotificationiDs.contains(item.eventID) == true{
                         
                         cell.imgChatNotification.isHidden = false
                         cell.imgChatNotification.layer.cornerRadius = 15
