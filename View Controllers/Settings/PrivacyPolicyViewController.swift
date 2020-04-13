@@ -11,7 +11,8 @@ import UIKit
 class PrivacyPolicyViewController: UIViewController {
 
 
-    @IBOutlet weak var lblPrivacyPolicy: UILabel!
+    @IBOutlet weak var textView: UITextView!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,16 +21,12 @@ class PrivacyPolicyViewController: UIViewController {
         //        setup the navigation bar
         navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
         
-        let attributedString = NSMutableAttributedString(string: "View our privacy and data policy!")
-        attributedString.addAttribute(.link, value: "https://planr.me/Planr-App-Privacy-Policy/.com", range: NSRange(location: 0, length: 43))
+        let string = "View our privacy and data policy"
         
+        let attributedLinkString = NSMutableAttributedString(string: string, attributes:[NSAttributedString.Key.link: URL(string: "https://planr.me/Planr-App-Privacy-Policy/")!])
         
-        lblPrivacyPolicy.attributedText = attributedString
-        
-        
+        textView.isUserInteractionEnabled = true
+        textView.isEditable = false
+        textView.attributedText = attributedLinkString
     }
-    
-
-
-
 }

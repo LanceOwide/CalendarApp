@@ -229,7 +229,18 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ChatMessageCell
         
         let message = messagesChat[indexPath.item]
-        cell.textViewName.text = message.fromName
+//        convert the time interval to a display date
+        let dateFormatterDisplayDate = DateFormatter()
+        dateFormatterDisplayDate.dateFormat = "dd MMM HH:mm"
+        dateFormatterDisplayDate.locale = Locale(identifier: "en_US_POSIX")
+        
+        let timeInterval = Double(message.timestamp!)
+        // create NSDate from Double (NSTimeInterval)
+        let myNSDate = Date(timeIntervalSince1970: timeInterval)
+        
+        let displayDate = dateFormatterDisplayDate.string(from: myNSDate)
+        
+        cell.textViewName.text = message.fromName! + "  -  " + displayDate
         cell.textView.text = message.text
         
         setupCell(cell, message: message)

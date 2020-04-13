@@ -108,9 +108,6 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
         (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
         
 //        setting to allow the add event image to be used as a button
-        
-        
-        print(user!)
         userCreatedEvents.delegate = self
         userCreatedEvents.dataSource = self
         userCreatedEvents.rowHeight = 140

@@ -49,7 +49,6 @@ var currentUserAvailabilityDocID = String()
 var eventListenerRegistration: ListenerRegistration!
 var availabilityListenerRegistration: ListenerRegistration!
 
-
 //global variable for monitoring when the user has loaded the app from a new event notification, whilst the app is in the background
 var eventNotificationAppBackground: Bool = false
 
@@ -145,27 +144,27 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         checkCalendarStatus2()
         navigationItem.titleView = setAppHeader(colour: UIColor.black)
         
-//        check we have data in core data and update if required
-        CDAppHasLoaded{
-//            completed getting event data, now check for availability
-            self.CDAppHasLoadedAvailability{
-//            engage the listeners to detect event and availability notifications only if the app hasn't just loaded
-                if eventNotificationAppBackground == true{
+//        Prepare coreData for the app
+        if user == nil{
+//            delay for 15 seconds if the user isnt yet logged in
+            let seconds15 = 15.0
+            DispatchQueue.main.asyncAfter(deadline: .now() + seconds15) {
+                if user == nil{
+//                    delay for a further 15 seconds
+                    DispatchQueue.main.asyncAfter(deadline: .now() + seconds15) {
+                        self.prepareApp()
+                    }
+                
                 }
                 else{
-            self.eventChangeListener()
-            self.availabilityChangeListener()}
-//                run consistency checks
-            self.dataConsistencyCheck()
-                
-                
-            //        get todays events
-            self.getDaysEventsIDCD{
-                self.tblViewEventList.reloadData()
-            }
+                    self.prepareApp()}
             }
         }
-
+        else{
+        prepareApp()
+        }
+        
+        
 //        print the directory the SQL database is saved to
         print("data save location: \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
         
@@ -403,6 +402,36 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         }
     }
     
+//    function to check for new events and activate the listeners when the user logs in
+    
+    func prepareApp(){
+        
+        print("running func prepareApp")
+        
+        //        check we have data in core data and update if required
+        CDAppHasLoaded{
+        //            completed getting event data, now check for availability
+                    self.CDAppHasLoadedAvailability{
+        //            engage the listeners to detect event and availability notifications only if the app hasn't just loaded
+                        print("prepareApp: eventNotificationAppBackground \(eventNotificationAppBackground)")
+                        if eventNotificationAppBackground == true{
+                        }
+                        else{
+                    self.eventChangeListener()
+                    self.availabilityChangeListener()}
+        //                run consistency checks
+                    self.dataConsistencyCheck()
+                        
+                        
+                    //        get todays events
+                    self.getDaysEventsIDCD{
+                        self.tblViewEventList.reloadData()
+                    }
+                    }
+                }
+        
+    }
+    
     
     //    MARK: CollectionView Setup
     
@@ -504,6 +533,8 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         }
         else{
             
+//            perform the data consistency checks before we show the user the events
+            dataConsistencyCheck()
             
         performSegue(withIdentifier: segueIdentifiers[indexPath.section][indexPath.row], sender: Any.self)
             

@@ -516,8 +516,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         //            used to remove all the non digit characters within the phone numbers
         let phoneNumberClean = phoneNumbers.components(separatedBy:CharacterSet.decimalDigits.inverted).joined(separator: "")
         
-        
-        
+            
         //        If the phone number starts with a + we assume it is in the correct format
     
     if phoneNumberLen > 10 && phoneNumbers[0] == "+" {
@@ -1045,7 +1044,6 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             print("No access to the calendar")
             showNoAccessToCalendarAlert()
 
-            
         case .restricted:
             print("Access denied to the calendar")
         }
@@ -1088,9 +1086,6 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             
                                         self.present(alertEventComplete, animated: true, completion: {
                                         })
-            
-            
-            
             }}
         
         
@@ -1283,7 +1278,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             else{
                 
                 alertTitle = "Event Updated"
-               alertText = ("\(eventOwnerName) has changed the date of event \( description!), now on \(displayDate), would you like to add it to your phone calendar?")
+               alertText = ("\(eventOwnerName) has changed the date of event \( description!), now on \(displayDate), would you like to update it in your phone calendar?")
             }
     
         
@@ -2008,37 +2003,42 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
     
     
     func loadCalendars2(){
-        
         var calendars: [EKCalendar]!
-         
             calendars = eventStore.calendars(for: EKEntityType.event)
-        
-        
             
     //        If the calendar array hasnt been created previously then then the function creates a new array
             if SelectedCalendarsStruct.calendarsStruct.count == 0 {
                 
                 SelectedCalendarsStruct.calendarsStruct = calendars!
                 
-                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "US Holidays"})
-                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "UK Holidays"})
-                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "Birthdays"})
-                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "South Korean Holidays"})
-                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "Hong Kong Holidays"})
-                SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == "Holidays in United Kingdom"})
+//                BUG: we loop through the list of calendars we don't want to use - this should be made a struct
                 
-                    print("SelectedCalendarsStruct: \(SelectedCalendarsStruct.calendarsStruct)")
+                if let index = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "US Holidays"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index)
+                }
+                if let index1 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "UK Holidays"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index1)
+                }
+                if let index2 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Birthdays"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index2)
+                }
+                if let index3 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "South Korean Holidays"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index3)
+                }
+                if let index4 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Hong Kong Holidays"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index4)
+                }
+                if let index5 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Holidays in United Kingdom"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index5)
+                }
+                
+                print("SelectedCalendarsStruct: \(SelectedCalendarsStruct.calendarsStruct)")
    
             }
                 else{
                     
                     
-                    
                 }
-        
-        
-        
-
             }
     
     
@@ -2095,18 +2095,64 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         
     }
     
-
+// function to check if the users exists in the user database, if not we log them out and send back to the homepage
     func checkUserInUserDatabase(){
+        print("running func checkUserInUserDatabase existingUserLoggedIn: \(existingUserLoggedIn) userJustRegistered: \(userJustRegistered)")
         
-        
-        if existingUserLoggedIn == false{
+//        flag used to notify if the user has just registered, as want to avoid checking if they are in the DB as this may not have been written yet
+        if userJustRegistered == true{
             
         }
         else{
         
+        if existingUserLoggedIn == false{
+          
+            if let userID = Auth.auth().currentUser?.uid{
+            
+            dbStore.collection("users").whereField("uid", isEqualTo: userID).getDocuments { (querySnapshot, error) in
+            
+                            print("querySnapshot from user check \(String(describing: querySnapshot))")
+            
+                            if error != nil {
+                                print("there was an error")
+                            }
+                            else {
+                                print("querySnapshot!.isEmpty: \(querySnapshot!.isEmpty)")
+            
+                                if querySnapshot!.isEmpty {
+            
+                                    print("Empty: querysnapshot: \(String(describing: querySnapshot)), isEmpty: \(String(describing: querySnapshot!.isEmpty))")
+            
+                                        let alertEventComplete = UIAlertController(title: "Phone number not registered", message: "This phone number isn't linked to an account, please register", preferredStyle: UIAlertController.Style.alert)
+            
+                                        alertEventComplete.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: { action in
+            
+                                            print("User Selected OK on event creation alert")
+            
+                                            print("performing notAUserSegue segue")
+                                            
+                                            self.signOut()
+            
+                                            self.performSegue(withIdentifier: "userNotInDatabase", sender: self)
+            
+                                        }))
+                                        self.present(alertEventComplete, animated: true, completion: {
+                                        })
+                                    }
+                                else {
+                                    
+                                    for documents in querySnapshot!.documents{
+                                        
+                                        let name = documents.get("name")
+                                        
+                                        UserDefaults.standard.set(name, forKey: "name")
+                                        
+                                        print("user is in the database")
+                                        
+                                    }}}}}}
+        else{
+//        since the user has just tried to register/login with mobile number we use phone number to check thier authentication
         let phoneNumber = UserDefaults.standard.value(forKey: "userPhoneNumber")
-        
-        
         dbStore.collection("users").whereField("phoneNumber", isEqualTo: phoneNumber!).getDocuments { (querySnapshot, error) in
         
                         print("querySnapshot from user check \(String(describing: querySnapshot))")
@@ -2148,10 +2194,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                                     print("user is in the database")
                                     
                                 }
-                                
-                                
-
-                            }}}}
+                            }}}}}
         }
         
 //        function to get the user name from defaults, confirm it is populated and if not get it from the web
@@ -2162,6 +2205,11 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
 //        print("userName \(userName)")
         
         if userName == "" {
+            
+            if user == nil{
+              completion("")
+            }
+            else{
             
             dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments { (querySnapshot, error) in
             
@@ -2179,8 +2227,8 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                                     
                                     completion(name)
                                 }
-                }}
-        }
+                } }}
+            }
         else{
             completion(userName)
         }}
@@ -2408,6 +2456,31 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             return navLabel
             
         }
+        
+        func loginNotWorking(){
+            
+            print("running func loginNotWorking")
+            
+            let alertEventComplete = UIAlertController(title: "We are having issues signing you in", message: "Please try again in an hour. If the issue persists please email contact@planr.me", preferredStyle: UIAlertController.Style.alert)
+            
+            alertEventComplete.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: { action in
+                
+                self.performSegue(withIdentifier: "notAUserSegue", sender: self)
+                print("loginNotWorking ok selected")
+            }))
+            
+            if self.presentedViewController == nil {
+                self.present(alertEventComplete, animated: true, completion: nil)
+            }
+            else {
+                self.dismiss(animated: false, completion: nil)
+                self.present(alertEventComplete, animated: true, completion: nil)
+            }
+            }
+        
+        
+        
+
         
     //    end of globally available functions
     

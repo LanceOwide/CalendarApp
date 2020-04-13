@@ -54,7 +54,7 @@ class AboutViewController: UIViewController,UITableViewDelegate,UITableViewDataS
         
         cell.textLabel?.text = aboutList[indexPath.row]
         
-        cell.detailTextLabel?.text =  "View our privacy and data policy!"
+        cell.detailTextLabel?.text =  "View our privacy and data policy"
         
         
 

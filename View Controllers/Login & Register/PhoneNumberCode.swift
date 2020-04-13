@@ -10,6 +10,8 @@ import UIKit
 import Firebase
 import MBProgressHUD
 
+var userJustRegistered  = false
+
 class PhoneNumberCode: UIViewController {
     
     var myAddedUserID = ""
@@ -33,19 +35,17 @@ class PhoneNumberCode: UIViewController {
         PhoneAuthProvider.provider().verifyPhoneNumber(registeredPhoneNumber, uiDelegate: nil) { (verificationID, error) in
             if let error = error {
                 print(error)
+                
+                self.handleError(error)
+                
                 return
             }
             UserDefaults.standard.set(verificationID, forKey: "authVerificationID")
         }
-        
-        
-        
     }
     
  
     @IBAction func btnCompletePressed(_ sender: UIButton) {
-
-
         print(registeredPhoneNumber)
         print(registeredEmail)
         print(registeredName)
@@ -53,7 +53,7 @@ class PhoneNumberCode: UIViewController {
         if textCodeInput.text != "" {
             
             let loadingNotification = MBProgressHUD.showAdded(to: view, animated: false)
-            loadingNotification.label.text = "Loading"
+            loadingNotification.label.text = "Logging you in"
             loadingNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
             loadingNotification.mode = MBProgressHUDMode.customView
             
@@ -61,6 +61,8 @@ class PhoneNumberCode: UIViewController {
         let verificationID = UserDefaults.standard.string(forKey: "authVerificationID")
 
         print(verificationID!)
+            
+        userJustRegistered = true
 
         let credential = PhoneAuthProvider.provider().credential(
             withVerificationID: verificationID!,
@@ -70,10 +72,13 @@ class PhoneNumberCode: UIViewController {
             if error != nil {
                 print(error!)
                 
+                print(error!._code)
+                
                 loadingNotification.hide(animated: true)
 
-                self.showProgressHUD(notificationMessage: "Verification code did not match, please retry", imageName: "Unavailable", delay: 2)
-
+//                show the user the error message
+                self.handleError(error!)
+                
                 return
 
             }
@@ -97,8 +102,8 @@ class PhoneNumberCode: UIViewController {
                 }
                 else {
                     if querySnapshot!.isEmpty {
-                        
-                        
+//                        use this global variable to stop the immediate check of whether the user is the database
+                        userJustRegistered = true
                         print("user not in the DB")
                         
                         //        LO: this says what we are going to be saving down to the DB
@@ -131,6 +136,7 @@ class PhoneNumberCode: UIViewController {
                                         }
 
                                     }
+                         
                                     print("signed in")
                                     print("Segue to homepage")
                                         
@@ -204,7 +210,5 @@ class PhoneNumberCode: UIViewController {
     @objc func showResendButton() {
         resendButton.isHidden = false
     }
-    
-
     
 }

@@ -101,14 +101,12 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
         defineVisibleButtons()
 
         if summaryView == true{
-            
             navigationItem.hidesBackButton = true
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(doneSelected))
         }
                 
 //        MARK: listener to detect when the event availability has been udpated by the user
         NotificationCenter.default.addObserver(self, selector: #selector(updateTables), name: .availabilityUpdated, object: nil)
-     
 //        end of viewDidLoad
     }
     
@@ -122,7 +120,7 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
     
     @objc func updateTables(){
         
-        print("updated availability notification triggered")
+        print("results page - updated availability notification triggered")
 //        need to pull the new data from CoreData
         currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
         self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: true, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
@@ -130,19 +128,31 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
         }
     }
     
+//    edit the event selected
     @objc func editSelected(){
+//        create a list of the users currently invited to the event
+        inviteesNames = currentUserSelectedEvent.currentUserNames
+        inviteesUserIDs = currentUserSelectedEvent.users
+//        if non user invitees = none, we need to show nothing
+        if currentUserSelectedEvent.nonUserNames.count != 0{
+            print("there is some data in currentUserSelectedEvent")
+            nonUserInviteeNames = currentUserSelectedEvent.nonUserNames
+        }
+        else{
+            nonUserInviteeNames.removeAll()
+        }
         
-//        performSegue(withIdentifier: "chatSegue", sender: self)
+//        remove the lists being stored with the new invitees in them - we add this here to ensure each time the user selects the edit button these get reset
+        contactsSelected.removeAll()
+        inviteesNamesNew.removeAll()
+
     
         newEventLongitude = 0.0
         newEventLatitude = 0.0
         chosenMapItemManual = ""
         
 //        let vc = EventEditViewController()
-        
         performSegue(withIdentifier: "splitEditButtonSegue", sender: self)
-        
-        
     }
     
     
@@ -165,12 +175,9 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
                 lblInviteNonUsers.isHidden = true
             }
             else{
-                
                 btnInviteNonUsers.isHidden = false
                 lblInviteNonUsers.isHidden = false
-                
             }
-            
         }
         
         else{
@@ -180,7 +187,6 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
             lblEditEvent.isHidden = false
         }
     }
-    
     
     func getPositionOfAllAvailable(array: [Float]) -> (allAvailablePositionsArray: [Int], someAvailablePositionsArray: [Int]){
         
@@ -196,7 +202,6 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
             
         }
         else{
-            
             someAvailablePositionsArray.append(n)
             
         }
@@ -204,7 +209,7 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
    
         }while n <= array.count - 1
         
-        print("allAvailablePositionsArray: \(allAvailablePositionsArray) someAvailablePositionsArray: \(someAvailablePositionsArray)")
+//        print("allAvailablePositionsArray: \(allAvailablePositionsArray) someAvailablePositionsArray: \(someAvailablePositionsArray)")
         return (allAvailablePositionsArray, someAvailablePositionsArray)
     }
     

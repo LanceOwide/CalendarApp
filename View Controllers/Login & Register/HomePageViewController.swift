@@ -26,6 +26,9 @@ class HomePageViewController: UIViewController {
     @IBOutlet weak var oldUserButton: UIButton!
     
     
+    @IBOutlet weak var txtPrivacy: UITextView!
+    
+    
 
     @IBAction func oldUserButtonPressed(_ sender: UIButton) {
         
@@ -68,6 +71,11 @@ class HomePageViewController: UIViewController {
         
         
             navigationItem.hidesBackButton = true
+        
+        
+//        setup the privacy policy statement
+        
+        setupPrivacyStatement(UITextView: txtPrivacy)
         
         
 //        only check the users authentication state if they haven't just logged out, the check should log in the user in automatically
@@ -123,9 +131,23 @@ class HomePageViewController: UIViewController {
 //                we should probably log out the user here and return to home page
                 
 
-            }
-            }
-        }
+            }}}}
+    
+    
+    func setupPrivacyStatement(UITextView: UITextView){
+      
+       let string = "View our privacy and data policy"
+       
+       let attributedLinkString = NSMutableAttributedString(string: string, attributes:[NSAttributedString.Key.link: URL(string: "https://planr.me/Planr-App-Privacy-Policy/")!])
+       
+       UITextView.isUserInteractionEnabled = true
+       UITextView.isEditable = false
+        UITextView.textColor = UIColor.white
+        
+        UITextView.backgroundColor = UIColor(red: 0, green: 176, blue: 156)
+        UITextView.linkTextAttributes = [ .foregroundColor: UIColor.white ]
+       UITextView.attributedText = attributedLinkString
+        
         
     }
     

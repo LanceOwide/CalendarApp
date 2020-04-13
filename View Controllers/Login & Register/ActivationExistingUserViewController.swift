@@ -23,9 +23,6 @@ class ActivationExistingUserViewController: UIViewController {
     
     @IBOutlet weak var loginButtonOldUserSettings: UIButton!
     
-    
-     
-    
     @IBAction func loginButtonOldUser(_ sender: UIButton) {
         
         let loadingNotification = MBProgressHUD.showAdded(to: view, animated: false)
@@ -57,13 +54,7 @@ class ActivationExistingUserViewController: UIViewController {
                         UserDefaults.standard.set(loginPhoneNumber, forKey: "userPhoneNumber")
                         
 //                        self.performSegue(withIdentifier: "existingUserLoggedIn", sender: self)
-        
-    }
-        
-        
-    }
-    
-    }
+        }}}
 
     
     
@@ -72,6 +63,9 @@ class ActivationExistingUserViewController: UIViewController {
     PhoneAuthProvider.provider().verifyPhoneNumber(loginPhoneNumber, uiDelegate: nil) { (verificationID, error) in
         if let error = error {
             print(error)
+            
+            self.loginNotWorking()
+            
             return
         }
         UserDefaults.standard.set(verificationID, forKey: "authVerificationID")

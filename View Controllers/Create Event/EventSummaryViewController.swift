@@ -181,6 +181,26 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
         loadingNotification.label.text = "Creating Event"
         loadingNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
         loadingNotification.mode = MBProgressHUDMode.customView
+        
+        
+        guard let currentUseID = Auth.auth().currentUser?.uid else{
+           
+            loadingNotification.hide(animated: true)
+            
+            //       start message that we have an issue
+            let issueNotification = MBProgressHUD.showAdded(to: view, animated: false)
+            issueNotification.label.text = "Issue contacting server, please try again in a few minutes"
+            issueNotification.label.numberOfLines = 3
+            issueNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
+            issueNotification.mode = MBProgressHUDMode.customView
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                
+                issueNotification.hide(animated: true)
+            }
+            
+            return
+        }
 
             eventQuery { (eventID,startDates,endDates) in
                 print("event commited to the database")
@@ -290,6 +310,8 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
             
             let timestamp = NSDate().timeIntervalSince1970
             let eventOwnerName = UserDefaults.standard.string(forKey: "name")
+        
+        
             
             getStartAndEndDates3(startDate: newEventStartDate, endDate: newEventEndDate, startTime: newEventStartTimeLocal, endTime: newEventEndTimeLocal, daysOfTheWeek: daysOfTheWeekNewEvent){(startDates,endDates) in
                 

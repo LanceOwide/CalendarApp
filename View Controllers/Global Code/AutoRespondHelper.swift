@@ -571,7 +571,7 @@ class AutoRespondHelper {
             nextAvailability.userAvailability = i.userAvailability ?? [99]
             nextAvailability.userName = i.userName ?? ""
             nextAvailability.calendarEventID = i.calendarEventID ?? ""
-            print("nextAvailability \(nextAvailability)")
+//            print("nextAvailability \(nextAvailability)")
             serialisedAvailability.append(nextAvailability)
         }
         return serialisedAvailability
@@ -767,5 +767,6 @@ class AutoRespondHelper {
         }
         return formattedDates
     }
+    
     
 }

@@ -321,22 +321,20 @@ extension UIViewController{
             }
             else {
                 for document in querySnapshot!.documents {
-                    
                     let eventID = document.get("eventID") as! String
+//                    pull down the users name as it is shown in the temporaryUserEventStore, we need to remove this from the details list
+                    let userCreatedName = document.get("name") as! String
                     let uid = Auth.auth().currentUser?.uid
-                    
                     //                    add the required info to the userEventStore
                     fireStoreRef = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": uid!, "userName": registeredName]){
                         error in
                         if let error = error {
                             print("Error adding document: \(error)")
                         } else {
-                            //                print("Document added with ID: \(ref!.documentID)")
-                            
-                            let availabilityID = fireStoreRef!.documentID
+//                print("Document added with ID: \(ref!.documentID)")
+                    let availabilityID = fireStoreRef!.documentID
 
-                    //                    adds the uid to the eventRequests
-                    
+//                    adds the uid to the eventRequests
                     let docRef = dbStore.collection("eventRequests").document(eventID)
                     
 //                    add the new users userID to the event,  add the notifiction for everyone invited to update their event
@@ -344,13 +342,18 @@ extension UIViewController{
                         if let document = document, document.exists {
                             
 //                            get the userIDs from the eventRequest table, post a new availability notification and event notification for the userIDs
-
                             var userIDs = document.get("users") as! [String]
                             userIDs.append(uid!)
                             var currentUsersNames = document.get("currentUserNames") as! [String]
                             currentUsersNames.append(registeredName)
                             
-//                            debug
+//                            get the nonUserNames and remove the current users name
+                            var nonUserNames = document.get("nonUserNames") as! [String]
+                            if let index = nonUserNames.index(of: userCreatedName){
+                                nonUserNames.remove(at: index)
+                            }
+                            
+//                            debug only
 //                            print("userIDs \(userIDs)")
 //                            print("currentUsersNames \(currentUsersNames)")
 
@@ -358,6 +361,8 @@ extension UIViewController{
                             dbStore.collection("eventRequests").document(eventID).updateData(["users" : FieldValue.arrayUnion([uid!])])
 //                            update the current user names array
                             dbStore.collection("eventRequests").document(eventID).updateData(["currentUserNames" : FieldValue.arrayUnion(currentUsersNames)])
+//                            update the nonUsersName array names array
+                            dbStore.collection("eventRequests").document(eventID).updateData(["nonUserNames" : nonUserNames])
                             
 //                          notify the users that the information has been updated
                             self.eventAmendedNotification(userIDs: userIDs, eventID: eventID)

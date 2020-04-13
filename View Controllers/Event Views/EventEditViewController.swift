@@ -104,16 +104,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         invitees.dataSource = self
         self.invitees.separatorStyle = UITableViewCell.SeparatorStyle.none
         
-//        set the values for the invitees names, used in the tableview
-        inviteesNames = currentUserSelectedEvent.currentUserNames
-        inviteesUserIDs = currentUserSelectedEvent.users
         
-//        if non user invitees = none, we need to show nothing
-        if currentUserSelectedEvent.nonUserNames.count != 0{
-            print("there is some data in currentUserSelectedEvent")
-            nonUserInviteeNames = currentUserSelectedEvent.nonUserNames
-
-        }
 
         //Looks for single or multiple taps.
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
@@ -644,34 +635,34 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     
     
     
-//    removing the invitees button, part of the tableview cell
+//    removing the invitees button tapped, part of the tableview cell
     func buttonTapped(cell: EditTableViewCell) {
         guard let indexPath = self.invitees.indexPath(for: cell) else {
             // Note, this shouldn't happen - how did the user tap on a button that wasn't on screen?
             return
         }
         
-//        check to ensure the user isnt trying to remove themselves from the event
+//        check to ensure the user isnt trying to remove themselves from the event and show a message is they are
         if indexPath.row == 0{
          showProgressHUD(notificationMessage: "You can't delete yourself from the event", imageName: "Unavailable", delay: 1)
         }
         else{
         
-        //  Do whatever you need to do with the indexPath
-        
+        //  which row was the button tapped on
         print("Button tapped on row \(indexPath.row)")
         
-//        we remove the users name and ID from our array
+//        number of invitees already invited who are alrady users
         let originalInvitees = inviteesNames.count - 1
         print("originalInvitees: \(originalInvitees)")
+//        the position of the start of the non user names that have been invited
         let nonUserInvitees = nonUserInviteeNames.count + originalInvitees
         print("nonUserInvitees: \(nonUserInvitees)")
+//        total number of invitees
         let combinedInvitees = inviteesNames + nonUserInviteeNames + inviteesNamesNew
         print("combinedInvitees: \(combinedInvitees)")
         
+//            if the index path is less than or euqal to the position of the user invitees than we know the user had removed a user invitee
         if indexPath.row <= originalInvitees {
-        
-        
         deletedInviteeNames.append(inviteesNames[indexPath.row])
         print("deleted invitee: \(inviteesNames[indexPath.row])")
 
@@ -689,13 +680,10 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         print("new invitee names \(inviteesNames)")
         print("new invitee uid \(inviteesUserIDs)")
         invitees.reloadData()
-            
-            
 //        remove the selected status of the user
-   
         }
         
-        
+//        if the index path is greater than the original invitees but less the non user invitees, the user removed a non user invitee
         if originalInvitees < indexPath.row && indexPath.row  <= nonUserInvitees{
             
             
@@ -708,6 +696,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             
         }
         
+//            the user has removed a one of the newly added users
         if indexPath.row > nonUserInvitees{
             
           inviteesNamesNew.remove(at: indexPath.row - (nonUserInvitees + 1))

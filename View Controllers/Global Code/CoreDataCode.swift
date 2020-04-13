@@ -34,6 +34,8 @@ extension UIViewController{
 // MARK: prepare for results pages
     func prepareForEventDetailsPageCD(segueName: String, isSummaryView: Bool, performSegue: Bool, userAvailability: [AvailabilityStruct], triggerNotification: Bool, completion: @escaping () -> Void){
         
+        writeLog(string: "running func prepareForEventDetailsPageCD inputs - segueName: \(segueName), isSummaryView: \(isSummaryView), performSegue: \(performSegue), userAvailability: \(userAvailability)")
+        
         print("running func prepareForEventDetailsPageCD inputs - segueName: \(segueName), isSummaryView: \(isSummaryView), performSegue: \(performSegue), userAvailability: \(userAvailability)")
             
 //        globally selected current event
@@ -107,19 +109,30 @@ extension UIViewController{
     func CDAppHasLoaded(completion: @escaping () -> Void){
 //        fetch the core data currently saved, returns true if we didn't recieve an error
         if CDFetchEventDataFromDB() == true{
-            print("we contacted CoreData")
+            print("CDAppHasLoaded: we contacted CoreData")
          
             if CDEevents.count == 0{
-                print("there were no events in CoreData")
-//            if there were no event returned from CoreData then we must pull down all events
+                print("CDAppHasLoaded: there were no events in CoreData")
+//            if there were no event returned from CoreData then we must pull down all events, add a check to ensure we the user has been set
+                
+                if user == nil {
+//                    delay the running of the function by 60 seconds
+                    print("CDAppHasLoaded user == nil, delaying CDRetrieveAllEventsFB")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 60) { // Change `2.0` to the desired number of seconds.
+                        self.CDRetrieveAllEventsFB(){
+                       //                we collect the availability for these events throught the competion block
+                                           self.removeTheEventNotifications()
+                                       completion()
+                                           }}}
+                else{
                 CDRetrieveAllEventsFB(){
 //                we collect the availability for these events throught the competion block
                     self.removeTheEventNotifications()
                 completion()
-                }
+                    }}
             }
             else{
-                print("there were events in CoreData")
+                print("CDAppHasLoaded: there were events in CoreData")
 //             if events were returned, we only want to retrieve the events for which we have a notification
                 CDRetrieveUpdatedEventCheck{(eventIDs) in
                     
@@ -127,7 +140,7 @@ extension UIViewController{
                     completion()
                     }}}
         else{
-            print("there was an issue contacting core data")
+            print("CDAppHasLoaded: there was an issue contacting core data")
             completion()
         }
     }
@@ -135,6 +148,7 @@ extension UIViewController{
     
 //    first function we call when the app opens, this itterates through all other functions
         func CDAppHasLoadedAvailability(completion: @escaping () -> Void){
+            print("running func CDAppHasLoadedAvailability")
 //        fetch the core data saved for availability
             var eventIDs = [String]()
             var eventNumberOfDates = [Int]()
@@ -177,7 +191,6 @@ extension UIViewController{
 
 //    check for events with updated flags in the userEventsUpdate table
     func CDRetrieveUpdatedEventCheck(completion: @escaping (_ eventIDString: [String:Any]) -> Void){
-        
         print("running func CDRetrieveUpdatedEventCheck")
         
         var eventIDString = [String: Any]()
@@ -566,25 +579,25 @@ extension UIViewController{
 //    function to retrieve all the events from Firebase the user has been invited to, this should only be used if the coredata is currently empty
     func CDRetrieveAllEventsFB(completion: @escaping () -> Void){
         
-        print("running func CDRetrieveAllEvents with user: \(user ?? "")")
+        print("running func CDRetrieveAllEventsFB with user: \(user ?? "")")
         
         //        we unwrap user, hence we must confirm it is has a value
         if user == nil{
-            print("user is equal to nil")
+            print("CDRetrieveAllEventsFB: user is equal to nil")
         }
         else{
-        
        dbStore.collection("eventRequests").whereField("users", arrayContains: user!).getDocuments { (querySnapshot, error) in
                if error != nil {
-                   print("Error getting documents: \(error!)")
+                   print("CDRetrieveAllEventsFB: Error getting documents: \(error!)")
+                completion()
                }
                else {
                    
                    if querySnapshot!.isEmpty == true{
                      
        //                the user doesn't have any  event data to retrieve
-                       print("no event data to retrieve")
-                       
+                       print("CDRetrieveAllEventsFB: no event data to retrieve")
+                       completion()
                    }
                    else{
                     
@@ -636,6 +649,8 @@ extension UIViewController{
         
         if eventIDs.count == 0{
             
+            completion()
+            
         }
         else{
         
@@ -656,7 +671,7 @@ extension UIViewController{
                        
                        if querySnapshot!.isEmpty == true{
            //                the user doesn't have any  event data to retrieve
-                           print("no event data to retrieve")
+                           print("no availability data to retrieve")
                         completion()
                        }
                        else{
@@ -742,13 +757,16 @@ extension UIViewController{
         dbStore.collection("userEventStore").document(availabilityID).getDocument{ (querySnapshot, error) in
                    if error != nil {
                        print("Error getting documents: \(error!)")
+                    completion()
                    }
                    else {
                        
                     if querySnapshot!.exists == false{
                          
            //                the user doesn't have any  event data to retrieve
-                           print("no availability data to retrieve")}
+                           print("no availability data to retrieve")
+                        completion()
+                    }
                        else{
                         
                         //                            before we commit anything to the DB we should check if it alredy exists and remove it if it does
@@ -1031,7 +1049,7 @@ func removeTheAvailabilityNotifications(){
             nextAvailability.userAvailability = i.userAvailability ?? [99]
             nextAvailability.userName = i.userName ?? ""
             nextAvailability.calendarEventID = i.calendarEventID ?? ""
-            print("nextAvailability \(nextAvailability)")
+//            print("nextAvailability \(nextAvailability)")
             serialisedAvailability.append(nextAvailability)
         }
         return serialisedAvailability
@@ -1237,6 +1255,7 @@ func removeTheAvailabilityNotifications(){
             eventListenerEngaged = true
             
             if user == nil{
+             print("eventChangeListener = nil")
             }
             else{
         
@@ -1314,8 +1333,6 @@ func removeTheAvailabilityNotifications(){
     
     
 //    MARK: Misc functions
-    
-    
     func uploadCurrentUsersAvailability(eventID: String){
         print("running func uploadCurrentUsersAvailability inputs - eventID: \(eventID)")
         
@@ -1368,24 +1385,26 @@ func removeTheAvailabilityNotifications(){
 //        find events where the availability for our user ID = [99]
         print("running func nonRespondedEvents")
         
-        if user! == ""{
-            
+        if user == nil{
         }
         else{
-        
         let request : NSFetchRequest<CoreDataAvailability> = CoreDataAvailability.fetchRequest()
-            request.predicate = NSPredicate(format: "uid == %@ && (userAvailability == %@ || userAvailability == %@)", argumentArray:[user!, [99], []])
+            request.predicate = NSPredicate(format: "uid == %@ && (userAvailability == %@ || userAvailability == %@)", argumentArray:[user ?? "", [99], []])
         let filteredAvailability = CDFetchFilteredAvailabilityDataFromDB(with: request)
         print("nonRespondedEvents filteredAvailability \(filteredAvailability)")
+            
+//            adding a catch in case nothing is returned from the request
+            if filteredAvailability.count == 0{
+                
+            }
+            else{
 //            filter through each empty availability and respond
             for i in filteredAvailability{
                 uploadCurrentUsersAvailability(eventID: i.eventID!)
-   
+            }
             }
         }
-        
     }
-    
     
 //    show the user the datechosen  notificaton and let them add it to their calendar
     func dateChosenNotification(eventID: String){
@@ -1412,9 +1431,7 @@ func removeTheAvailabilityNotifications(){
             
             //                    Adds the event to the users calendar
             self.addEventToCalendar(title: eventData.eventDescription, description: eventData.eventDescription, startDate: eventData.startDateArray[chosenDatePosition], endDate: eventData.endDateArray[chosenDatePosition], location: eventData.eventLocation, eventOwner: eventData.eventOwnerName, startDateDisplay: eventData.startDatesDisplay[chosenDatePosition], eventOwnerID: eventData.eventOwnerID, locationLongitude: eventData.locationLongitude, locationLatitude: eventData.locationLatitue, userEventStoreID: availabilityData.documentID!, calendarEventIDInput: calendarEventIDInput)
-        }
-        
-    }
+        }}
     
     
 //    save an item to the availability CD
@@ -1437,9 +1454,7 @@ func removeTheAvailabilityNotifications(){
             catch{
                 print("error saving data to core data with error \(error)")
             }
-            
         }
-        
     }
     
 //    function to handle any errors with the data for an event
@@ -1453,7 +1468,6 @@ func removeTheAvailabilityNotifications(){
    
         }
     }
-    
     
 //    this function runs everytime the user opens the app, it checks that the data in our database appears consistent, if not corrective measures are preformed. This runs as part of the homepage opening and should be run last after all the data has been loaded into CoreData checks are as follows:
 //    1. A list of key attributes that can't be missing from our database
@@ -1469,7 +1483,6 @@ func removeTheAvailabilityNotifications(){
         
 //        2. check availability validity
 //        2.1 itterate through the list of events to check the number of invitees
-        
         for event in CDEevents{
 //            count the number of invitees
             let inviteeCount = event.currentUserNames!.count
@@ -1510,7 +1523,7 @@ func removeTheAvailabilityNotifications(){
                                 }
                             }
                             else{
-//                2.12 if the event does exist inthe database, retreive the correct event data
+//                2.12 if the event does exist in the database, retreive the correct event data
                                 self.CDRetrieveAllAvailabilityFB(eventIDs: [event.eventID!], eventNumberOfDates: [event.startDates!.count]){
                                     print("issue event now corrected: \(event.eventID ?? "")")
                                 }
@@ -1546,6 +1559,13 @@ func removeTheAvailabilityNotifications(){
             print ("There was an error")
         }
     }
+    
+//    function to write logs for crashLytics
+    func writeLog(string: String) {
+        CLSLogv("%@", getVaList([string]))
+    }
+    
+
     
     }
 
