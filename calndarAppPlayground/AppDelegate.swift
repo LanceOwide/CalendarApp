@@ -10,6 +10,8 @@
 
 ///Users/lanceowide/Dropbox/CalendarApp/Calendar\ App/Calendar\ App\ -\ Code/App1/calndarAppPlayground/Pods/FirebaseCrashlytics/upload-symbols -gsp /Users/lanceowide/Dropbox/CalendarApp/Calendar\ App/Calendar\ App\ -\ Code/App1/calndarAppPlayground/calndarAppPlayground/GoogleService-Info.plist -p ios /Users/lanceowide/Downloads/appDsyms
 
+//testing the merge
+
 import UIKit
 import EventKitUI
 import EventKit
