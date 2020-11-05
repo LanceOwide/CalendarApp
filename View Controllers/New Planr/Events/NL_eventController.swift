@@ -529,6 +529,8 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
             AutoRespondHelper.deleteTemporaryUserEventStore(eventID: currentUserSelectedEvent.eventID)
             AutoRespondHelper.deleteRealTimeDatabaseEventInfo(eventID: currentUserSelectedEvent.eventID)
             AutoRespondHelper.deleteRealTimeDatabaseUserEventLink(eventID: currentUserSelectedEvent.eventID)
+            AutoRespondHelper.deleteMessageNotification(eventID: currentUserSelectedEvent.eventID)
+            AutoRespondHelper.deleteMessages(eventID: currentUserSelectedEvent.eventID)
             self.eventDeletedNotification(userIDs: currentUserSelectedEvent.users, eventID: currentUserSelectedEvent.eventID)
             
 //            post a notification to say there is new data

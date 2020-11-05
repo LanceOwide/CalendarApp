@@ -821,11 +821,10 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                 print("contactsSelected: \(contactsSelected)")
                 
 //            MARK: loop through a series of checks to update the users invited to the event and save down the event
-                    
         //        0. if the user didn't make any change to users so the event we can save down the new event information
                     if deletedUserIDs.count == 0 && deletedNonUserInviteeNames.count == 0 && contactsSelected.count == 0{
                         print("user didn't change the invitees")
-                        commitDataToDB(deletedUsers: false, deletedNonUser: false, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: currentUserSelectedEvent.users)
+                        commitDataToDB(deletedUsers: false, deletedNonUser: false, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: currentUserSelectedEvent.users, deletedUserIDs: deletedUserIDs)
                     }
                     else{
         //        1. Did the user delete users and non users and not add anyone?
@@ -840,7 +839,7 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                                     currentUsers.remove(at: index)
                                 }
                             }
-                    self.commitDataToDB(deletedUsers: true, deletedNonUser: true, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: currentUsers)
+                            self.commitDataToDB(deletedUsers: true, deletedNonUser: true, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: currentUsers, deletedUserIDs: deletedUserIDs)
 //            5. reset the tracking array
                                         deletedUserIDs.removeAll()
                         }
@@ -857,7 +856,7 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                                             currentUsers.remove(at: index)
                                                 }
                                     }
-                                self.commitDataToDB(deletedUsers: true, deletedNonUser: false, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: currentUsers)
+                                self.commitDataToDB(deletedUsers: true, deletedNonUser: false, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: currentUsers, deletedUserIDs: deletedUserIDs)
 //            5. reset the tracking array
                                     deletedUserIDs.removeAll()
                             }
@@ -866,7 +865,7 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
         //        3. Did the user delete non users and not add anyone?
                         if deletedNonUserInviteeNames.count != 0 && contactsSelected.count == 0{
                             deletedNonUsers {
-                                self.commitDataToDB(deletedUsers: false, deletedNonUser: true, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: currentUserSelectedEvent.users)
+                                self.commitDataToDB(deletedUsers: false, deletedNonUser: true, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: currentUserSelectedEvent.users, deletedUserIDs: deletedUserIDs)
                             }
                         }
         //        4. Did the user add somone new to the event?
@@ -899,7 +898,7 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                                                             
                                                         }
 //           5. Add the new user names and IDs to the database
-                                            self.commitDataToDB(deletedUsers: false, deletedNonUser: false, addedNewInvitees: true, nonUserNames: nonUserInviteeNames + nonExistentNameArray, userNames: inviteesNames + userNameArray, userIDs: inviteesUserIDs + existentArray)
+                                    self.commitDataToDB(deletedUsers: false, deletedNonUser: false, addedNewInvitees: true, nonUserNames: nonUserInviteeNames + nonExistentNameArray, userNames: inviteesNames + userNameArray, userIDs: inviteesUserIDs + existentArray, deletedUserIDs: deletedUserIDs)
                                     
 //                                    post a notification to tell the new users to download the userAvailability Arrays
                                     for avail in currentUserSelectedAvailability{
@@ -921,7 +920,7 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
     }
     
     //    fucntion to commit data to the database
-        func commitDataToDB(deletedUsers: Bool, deletedNonUser: Bool, addedNewInvitees: Bool, nonUserNames: [String], userNames: [String], userIDs: [String]){
+    func commitDataToDB(deletedUsers: Bool, deletedNonUser: Bool, addedNewInvitees: Bool, nonUserNames: [String], userNames: [String], userIDs: [String], deletedUserIDs: [String]){
             print("running func commitDataToDB - inputs: deletedUsers: \(deletedUsers) deletedNonUser: \(deletedNonUser) nonUserNames: \(nonUserNames) addedNewInvitees:\(addedNewInvitees) userNames:\(userNames) userIDs \(userIDs)")
             
 //            variable to hold the userIDs of the users we need to send notifications to
@@ -931,6 +930,7 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
 //           1. we save down the new list of users, we have to do this first to avoid any issues with data being pulled before we have updated the database
             //                            did the user delete users
                 if deletedUsers == true{
+//                    remove the users from the event request
                 dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["users": inviteesUserIDs, "currentUserNames": inviteesNames], merge: true)
                                             
                             }
@@ -1102,7 +1102,9 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
 //                                        we also need to tell the deleted user to remove the availability for the event
                                         deleteRemoveUserAvailabilityNotification(userID: i)
                                         
-                                        
+//                                        delete the users ID in the messages tree of the DB
+                                        let ref = Database.database().reference()
+                                        ref.child("messageNotifications/\(currentUserSelectedEvent.eventID)/\(i)").removeValue()   
                                     }
             completion()
             

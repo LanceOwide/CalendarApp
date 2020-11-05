@@ -18,8 +18,6 @@ import CoreData
 import ContactsUI
 
 
-
-
 class AutoRespondHelper {
     
     
@@ -1470,7 +1468,8 @@ class AutoRespondHelper {
         
     }
     
-    static func getUserContacts(completion: @escaping () -> Void){
+//    get access to the users contacts
+    static func getUserContacts(viewController: UIViewController, completion: @escaping () -> Void){
              print("Attempting to fetch the contacts")
              
              contacts.removeAll()
@@ -1483,7 +1482,7 @@ class AutoRespondHelper {
                      
                      print("Access Denied")
                      
-                     let alert = UIAlertController(title: "Acess to Contacts Denied", message: "Please go to setting to enable Planr access", preferredStyle: UIAlertController.Style.alert)
+                     let alert = UIAlertController(title: "Acess to Contacts Denied", message: "Without access to contacts you can't create an event", preferredStyle: UIAlertController.Style.alert)
                      
                      // add the actions (buttons)
                      alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel, handler: { action in
@@ -1494,6 +1493,7 @@ class AutoRespondHelper {
                      
                      alert.addAction(UIAlertAction(title: "Settings", style: UIAlertAction.Style.default, handler: { action in
                          
+//                        MARK:  when the user changes the settings the app restarts, this is apple intended behaviour, we need to code around this
                          guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
                              return
                          }
@@ -1509,7 +1509,7 @@ class AutoRespondHelper {
                      }))
                      
                      // show the alert
-                     NL_AddInvitees().present(alert, animated: true, completion: nil)
+                    viewController.present(alert, animated: true, completion: nil)
 
                  }
                  if granted{
@@ -1557,33 +1557,33 @@ class AutoRespondHelper {
                  else{
                      print("Access Denied")
                      
-                     let alert = UIAlertController(title: "Acess to Contacts Denied", message: "Please go to setting to enable Planr access", preferredStyle: UIAlertController.Style.alert)
-                     
-                     // add the actions (buttons)
-                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel, handler: { action in
-                         
-                         print("User selected OK")
-                         
-                     }))
-                     
-                     alert.addAction(UIAlertAction(title: "Settings", style: UIAlertAction.Style.default, handler: { action in
-                         
-                         guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-                             return
-                         }
-                         
-                         if UIApplication.shared.canOpenURL(settingsUrl) {
-                         UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
-                             print("Settings opened: \(success)") // Prints true
-                         })}
-                         
-                         
-                         print("User selected Settings")
-                         
-                     }))
-                     
-                     // show the alert
-                    NL_AddInvitees().present(alert, animated: true, completion: nil)
+                    let alert = UIAlertController(title: "Acess to Contacts Denied", message: "Without access to contacts you can't create an event", preferredStyle: UIAlertController.Style.alert)
+                    
+                    // add the actions (buttons)
+                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel, handler: { action in
+                        
+                        print("User selected OK")
+                        
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: "Settings", style: UIAlertAction.Style.default, handler: { action in
+                        
+                        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                            return
+                        }
+                        
+                        if UIApplication.shared.canOpenURL(settingsUrl) {
+                        UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                            print("Settings opened: \(success)") // Prints true
+                        })}
+                        
+                        
+                        print("User selected Settings")
+                        
+                    }))
+                    
+                    // show the alert
+                   viewController.present(alert, animated: true, completion: nil)
         
                  }
              }
@@ -1623,6 +1623,22 @@ class AutoRespondHelper {
             ref.child("events/\(eventID)").removeValue()
        
         }
+//    delete the message notification in the realtime database
+    static func deleteMessageNotification(eventID: String){
+        let ref = Database.database().reference()
+        
+        ref.child("messageNotifications/\(eventID)").removeValue()
+        
+    }
+    
+//    delete all messages stored for the event
+    static func deleteMessages(eventID: String){
+        let ref = Database.database().reference()
+        
+        ref.child("messages/\(eventID)").removeValue()
+        
+        
+    }
         
     //    function to delete the new event notification
     static   func deleteRealTimeDatabaseUserEventLink(eventID: String){

@@ -656,6 +656,7 @@ class NL_createEventDetail: UIViewController, UIPopoverPresentationControllerDel
     @objc func doneClickedTime(){
         
         dateFormatter.dateFormat = "HH:mm"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         if startTimeInput.isFirstResponder{
             startTimeInput.text = dateFormatter.string(from: timePicker!.date)
             newEventStartTimeLocal = startTimeInput.text!

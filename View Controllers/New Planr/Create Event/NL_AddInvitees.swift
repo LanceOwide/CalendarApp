@@ -67,7 +67,7 @@ class NL_AddInvitees: UIViewController, UISearchResultsUpdating{
         createNextButton()
         
 //        access the users contacts
-        AutoRespondHelper.getUserContacts{
+        AutoRespondHelper.getUserContacts(viewController: self){
           DispatchQueue.main.async {
             self.tableViewContacts.reloadData()
             }
