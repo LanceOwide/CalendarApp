@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19C57" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="19H2" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CoreDataAvailability" representedClassName=".CoreDataAvailability" syncable="YES" codeGenerationType="class">
         <attribute name="calendarEventID" optional="YES" attributeType="String"/>
         <attribute name="documentID" optional="YES" attributeType="String"/>
         <attribute name="eventID" optional="YES" attributeType="String"/>
         <attribute name="uid" optional="YES" attributeType="String"/>
-        <attribute name="userAvailability" optional="YES" attributeType="Transformable" customClassName=".[Int]"/>
+        <attribute name="userAvailability" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[Int]"/>
         <attribute name="userName" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="CoreDataChatMessages" representedClassName="CoreDataChatMessages" syncable="YES" codeGenerationType="class">
+        <attribute name="eventID" optional="YES" attributeType="String"/>
+        <attribute name="fromId" optional="YES" attributeType="String"/>
+        <attribute name="fromName" optional="YES" attributeType="String"/>
+        <attribute name="messageID" optional="YES" attributeType="String"/>
+        <attribute name="text" optional="YES" attributeType="String"/>
+        <attribute name="timestamp" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="toId" optional="YES" attributeType="String"/>
     </entity>
     <entity name="CoreDataEvent" representedClassName=".CoreDataEvent" syncable="YES" codeGenerationType="class">
         <attribute name="chosenDate" optional="YES" attributeType="String"/>
@@ -14,30 +23,37 @@
         <attribute name="chosenDateMonth" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="chosenDatePosition" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="chosenDateYear" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="currentUserNames" optional="YES" attributeType="Transformable" customClassName="[String]"/>
-        <attribute name="daysOfTheWeek" optional="YES" attributeType="Transformable" customClassName="[Int]"/>
+        <attribute name="currentUserNames" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
+        <attribute name="daysOfTheWeek" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Int]"/>
         <attribute name="endDateInput" optional="YES" attributeType="String"/>
-        <attribute name="endDates" optional="YES" attributeType="Transformable" customClassName="[String]"/>
+        <attribute name="endDates" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
         <attribute name="endTimeInput" optional="YES" attributeType="String"/>
         <attribute name="eventDescription" optional="YES" attributeType="String"/>
         <attribute name="eventID" optional="YES" attributeType="String"/>
         <attribute name="eventOwner" optional="YES" attributeType="String"/>
         <attribute name="eventOwnerName" optional="YES" attributeType="String"/>
+        <attribute name="eventType" optional="YES" attributeType="String"/>
         <attribute name="isAllDay" optional="YES" attributeType="String"/>
         <attribute name="location" optional="YES" attributeType="String"/>
         <attribute name="locationLatitue" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="locationLongitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="nonUserNames" optional="YES" attributeType="Transformable" customClassName="[String]"/>
+        <attribute name="nonUserNames" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
         <attribute name="secondsFromGMT" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="startDateInput" optional="YES" attributeType="String"/>
-        <attribute name="startDates" optional="YES" attributeType="Transformable" customClassName="[String]"/>
-        <attribute name="startDatesDisplay" optional="YES" attributeType="Transformable" customClassName="[String]"/>
+        <attribute name="startDates" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
+        <attribute name="startDatesDisplay" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
         <attribute name="startTimeInput" optional="YES" attributeType="String"/>
         <attribute name="timestamp" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="users" optional="YES" attributeType="Transformable" customClassName="[String]"/>
+        <attribute name="users" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
+    </entity>
+    <entity name="CoreDataUser" representedClassName="CoreDataUser" syncable="YES" codeGenerationType="class">
+        <attribute name="uid" optional="YES" attributeType="String"/>
+        <attribute name="userImage" optional="YES" attributeType="Binary"/>
     </entity>
     <elements>
         <element name="CoreDataAvailability" positionX="-63" positionY="135" width="128" height="133"/>
-        <element name="CoreDataEvent" positionX="-63" positionY="-18" width="128" height="433"/>
+        <element name="CoreDataChatMessages" positionX="292.26953125" positionY="64.9375" width="128" height="148"/>
+        <element name="CoreDataEvent" positionX="-63" positionY="-18" width="128" height="448"/>
+        <element name="CoreDataUser" positionX="117" positionY="135" width="128" height="73"/>
     </elements>
 </model>

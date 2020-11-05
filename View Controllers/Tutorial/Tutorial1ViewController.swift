@@ -30,9 +30,15 @@ class Tutorial1ViewController: UIViewController {
         super.viewDidLoad()
 
         self.view.backgroundColor = UIColor.black.withAlphaComponent(0.8)
+        uiView.backgroundColor = .clear
+
         
         
 //        set view constraints
+        
+        print("screenwidth \(screenWidth)")
+        
+        
         
         uiView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -40,11 +46,12 @@ class Tutorial1ViewController: UIViewController {
         
             let verticalConstraint = NSLayoutConstraint(item: uiView, attribute: NSLayoutConstraint.Attribute.centerY, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerY, multiplier: 1, constant: 0 + 15)
         
-            let widthConstraint = NSLayoutConstraint(item: uiView, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: screenWidth - 100)
+            let widthConstraint = NSLayoutConstraint(item: uiView, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: screenWidth - screenWidth/4)
         
             let heightConstraint = NSLayoutConstraint(item: uiView, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: screenHeight - topDistance - 100)
         
             view.addConstraints([horizontalConstraint, verticalConstraint, widthConstraint, heightConstraint])
+        
         
     }
     

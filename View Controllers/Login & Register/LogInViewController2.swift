@@ -46,26 +46,16 @@ class LogInViewController2: UIViewController {
         else{
             
                self.performSegue(withIdentifier: "existingUserActivationSegue", sender: self)
-            
-            
         }
-                    
-                    
                 }
         
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = UIColor(red: 0, green: 176, blue: 156)
-        
-        
+        view.backgroundColor = .white
         //        setup the navigation bar
-        navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
-        
-        //        move the view up when the keyboard is active
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: MyVariables.colourPlanrGreen)
         
         phoneNumberTextField.delegate = self
         
@@ -73,7 +63,7 @@ class LogInViewController2: UIViewController {
                 phoneNumberTextField.borderStyle = .roundedRect
                 
                 // Comment this line to not have access to the country list
-                phoneNumberTextField.parentViewController = self
+//                phoneNumberTextField.parentViewController = self
 //                phoneNumberTextField.delegate = self
                 
                 phoneNumberTextField.font = UIFont.systemFont(ofSize: 14)
@@ -86,11 +76,7 @@ class LogInViewController2: UIViewController {
                 phoneNumberTextField.hasPhoneNumberExample = true
                 view.addSubview(phoneNumberTextField)
         
-        
-        
             buttonSettings(uiButton: getActivationCodeButton)
-        
-        
     }
     
     
@@ -118,6 +104,13 @@ class LogInViewController2: UIViewController {
 }
 
 extension LogInViewController2: FPNTextFieldDelegate {
+    
+    /// The place to present/push the listController if you choosen displayMode = .list
+    func fpnDisplayCountryList() {
+//       let navigationViewController = UINavigationController(rootViewController: listController)
+//
+//       present(navigationViewController, animated: true, completion: nil)
+    }
     
     func fpnDidValidatePhoneNumber(textField: FPNTextField, isValid: Bool) {
         textField.rightViewMode = .always

@@ -209,14 +209,14 @@ func buttonTapped2(cell: CollectionViewCellAddFriends) {
         selectedContacts.removeAll()
         
         getCurrentUsersPhoneNumber {
-            
-            
             for contact in contactsSelected{
                 if contact.selectedContact == true {
                     
                     let phoneNumber = contact.phoneNumber
                     
-                    let cleanPhoneNumber = self.cleanPhoneNumbers(phoneNumbers: phoneNumber)
+//                    let cleanPhoneNumber = self.cleanPhoneNumbers(phoneNumbers: phoneNumber)
+                    
+                    let cleanPhoneNumber = ""
                     
                         selectedContacts.append(cleanPhoneNumber)
                     }}
@@ -231,7 +231,7 @@ func buttonTapped2(cell: CollectionViewCellAddFriends) {
 //    get the current users phone number
     func getCurrentUsersPhoneNumber( completion: @escaping () -> Void){
         
-        dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments{ (querySnapshot, error) in
+        dbStore.collection("users").whereField("uid", isEqualTo: user).getDocuments{ (querySnapshot, error) in
             if error != nil {
                 print("Error getting documents: \(error!)")
             }

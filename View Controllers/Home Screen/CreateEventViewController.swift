@@ -13,8 +13,6 @@ import Firebase
 import EventKit
 import AMPopTip
 import Alamofire
-import Fabric
-import Crashlytics
 import Instructions
 import CoreData
 
@@ -44,6 +42,7 @@ var selectedContactNames = [String]()
 var datesToChooseFrom = Array<Any>()
 var countedResultArrayFraction = [Float]()
 var currentUserAvailabilityDocID = String()
+var cdAppHasLoaded = Bool()
 
 //global variables for listeners - allows us to remove them from anyhwere
 var eventListenerRegistration: ListenerRegistration!
@@ -83,6 +82,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
 //    variables for setting menu items and segues
     var menuLabels = [["Create An Event","Pending Events"],["Confirmed Events","Your Planr"]]
     var chatNotification = [["","chatNotificationPending"],["chatNotificationDateChosen",""]]
+    var eventNotification = [["","eventNotificationPending"],["",""]]
     var pictureNames = [["PlusCircleCloud","Person"],["Meeting","icons8-planner-500"],["Camera",""]]
     var segueIdentifiers = [["createEventSegue","viewYourCreatedEventsSegue"],["userInvitedEventsSegue","planrSegue"],["",""]]
     
@@ -125,9 +125,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     
     
     @IBAction func testTheCode(_ sender: UIButton) {
-
         
-        UserDefaults.standard.set("", forKey: "name")
         
     }
     
@@ -139,10 +137,20 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     override func viewDidLoad() {
         super.viewDidLoad()
         
+//        set the badge number to 0
+        UIApplication.shared.applicationIconBadgeNumber = 0
+
+        
+//        set user default to log that the user isnt new
+        UserDefaults.standard.set(true, forKey: "newUser")
+        
 //      check that the user is in our user database, or log them out
         checkUserInUserDatabase()
-        checkCalendarStatus2()
+        
+//        checks if we have access to the users calendar
+//        checkCalendarStatus2()
         navigationItem.titleView = setAppHeader(colour: UIColor.black)
+        
         
 //        Prepare coreData for the app
         if user == nil{
@@ -152,17 +160,22 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
                 if user == nil{
 //                    delay for a further 15 seconds
                     DispatchQueue.main.asyncAfter(deadline: .now() + seconds15) {
-                        self.prepareApp()
+//                        self.prepareApp()
                     }
                 
                 }
                 else{
-                    self.prepareApp()}
+//                    self.prepareApp()
+                    
+                }
             }
         }
         else{
-        prepareApp()
+//        prepareApp()
         }
+        
+//        trigger for the new user explanation
+        NotificationCenter.default.addObserver(self, selector: #selector(userJustRegisteredIntro), name: .tutorialClosed, object: nil)
         
         
 //        print the directory the SQL database is saved to
@@ -188,15 +201,15 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         testTheCodeButton.isHidden = true
 
     
-//        show the tutorial for the front page
+//        show the tutorial for the front page and the new user intro
         showTutorial()
+        
         
 //        view settings
 
         view.backgroundColor = UIColor.white
         collectionViewMenu.backgroundColor = UIColor.white
-//        get users push notification token
-//        registerForPushNotifications()
+
         
 //        setup for the collectionview
         collectionViewMenu.delegate = self
@@ -224,19 +237,22 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         //        ***For coachMarks
         coachMarksController.dataSource = self
         coachMarksController.delegate = self
-        coachMarksController.overlay.allowTap = true
+        coachMarksController.overlay.isUserInteractionEnabled = true
         
 //        restrict the rotation of the device to portrait
         (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
         
-//        checkNotificationStatus(){
-//
-//            self.collectionViewMenu.reloadData()
-//        }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateTable), name: .notificationsReloaded, object: nil)
         
         
-//        end of viewDidLoad - note: viewWillDisappear is contained within the viewDidLoad, this allows for the removal of the listeners
+//        end of viewDidLoad
         
+    }
+
+    
+    @objc func updateTable(){
+        collectionViewMenu.reloadData()
     }
     
     
@@ -259,13 +275,9 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     
     override func viewWillAppear(_ animated: Bool) {
         
-        checkNotificationStatus(){
-            
-            self.collectionViewMenu.reloadData()
-        }
+
     }
 
-  
     override func viewDidAppear(_ animated: Bool) {
         
 //        MARK: here we run th code to check if the user opened the app from a notification and we determine which notification they opened it from and run the desired code for that page
@@ -290,49 +302,82 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
             UserDefaults.standard.set("", forKey: "notificationSent3")
                 
                 //                we need to retrieve the event the user has just received a message for from CoreData
-                                let predicate = NSPredicate(format: "eventID == %@", argumentArray: [eventIDChosen])
-                                let filteredEvents = CoreDataCode().serialiseEvents(predicate: predicate, usePredicate: true)
+                let predicate = NSPredicate(format: "eventID == %@", argumentArray: [eventIDChosen])
+                let filteredEvents = CoreDataCode().serialiseEvents(predicate: predicate, usePredicate: true)
                                 
-                                if filteredEvents.count == 0{
-                                    print("something went wrong")
-                                }
-                                else{
-                                    currentUserSelectedEvent = filteredEvents[0]
-                                    // set the view controller as root
-                                    performSegue(withIdentifier: "newMessageNotification", sender: self)
+                if filteredEvents.count == 0{
+                        print("something went wrong")
+                    }
+                else{
+                    currentUserSelectedEvent = filteredEvents[0]
+                        // set the view controller as root
+                        performSegue(withIdentifier: "newMessageNotification", sender: self)
                         }
               }
           }
           else if category == "newEvent"{
             summaryView = false
             
+//            we turn off the listeners, this ensures the code below functions correctly, we then turn the listeners back on at the event page
+            if availabilityListenerEngaged == true{ availabilityListenerRegistration.remove()
+                 availabilityListenerEngaged = false
+                print("removing the event availability listener")
+            }
+            if eventListenerEngaged == true{ eventListenerRegistration.remove()
+                 eventListenerEngaged = false
+                print("removing the event event listener")
+            }
+            
             if eventIDChosen == ""{
              print("eventIDChosen not set - aborting")
-                
              UserDefaults.standard.set("", forKey: "notificationSent3")
-                
             }
             else{
+//            show the user a loading sign
+                let loadingNotification = MBProgressHUD.showAdded(to: view, animated: false)
+                loadingNotification.label.text = "Loading event"
+                loadingNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
+                loadingNotification.mode = MBProgressHUDMode.customView
                 
                 print("segue to event page")
             
               UserDefaults.standard.set("", forKey: "notificationSent3")
-                
-//                need to ensure we retrieve the data for the new event from FB
-                CDRetrieveUpdatedEventCheck{(eventIDs) in
-                self.CDRetrieveUpdatedEvents(eventIDs: eventIDs)
-//                    we also need to retrieve the new availability data for the event
-                    self.CDRetrieveUpdatedAvailabilityCheck{(availabilityIDs) in
-                        
-                        self.CDRetrieveUpdatedAvailability(availabilityID: availabilityIDs)
                         
 //              retrieve the event data from CD
                         let predicate = NSPredicate(format: "eventID = %@", eventIDChosen)
                         let predicateReturned = self.serialiseEvents(predicate: predicate, usePredicate: true)
                         if predicateReturned.count == 0{
-                            print("something went wrong")
+                            print("something went wrong we will check again")
                             
+                            let seconds3 = 3.0
+                            DispatchQueue.main.asyncAfter(deadline: .now() + seconds3) {
+                                
+                                let predicate = NSPredicate(format: "eventID = %@", eventIDChosen)
+                                let predicateReturned = self.serialiseEvents(predicate: predicate, usePredicate: true)
+                                if predicateReturned.count == 0{
+                                    
+                                  loadingNotification.label.text = "We're having trouble loading the event, please try again later"
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + seconds3){
+                                        loadingNotification.hide(animated: true)
+                                    }
+ 
+                                }
+                                else{
+                                                                currentUserSelectedEvent = predicateReturned[0]
+                                                                
+                                                                //                load the required availability
+                                                                currentUserSelectedAvailability = self.serialiseAvailability(eventID: eventIDChosen)
+                                                                self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
+                                                                    //                 set the view controller as root
+                                                                    loadingNotification.hide(animated: true)
+                                    //                                set the userdefault back so that we don't interfere with other newer notifications
+                                                                    UserDefaults.standard.set("", forKey: "notificationSent3")
+                                                                self.performSegue(withIdentifier: "todaysEventsSegue", sender: self)
+                                                                }
+                                }
+                            }
                         }
+//                            the first predicate returned the event
                         else{
                             
                             currentUserSelectedEvent = predicateReturned[0]
@@ -341,29 +386,29 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
                             currentUserSelectedAvailability = self.serialiseAvailability(eventID: eventIDChosen)
                             self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
                             //                 set the view controller as root
-                                                self.performSegue(withIdentifier: "todaysEventsSegue", sender: self)
+                                loadingNotification.hide(animated: true)
+//                                set the userdefault back so that we don't interfere with other newer notifications
+                                UserDefaults.standard.set("", forKey: "notificationSent3")
+                            self.performSegue(withIdentifier: "todaysEventsSegue", sender: self)
                                                 
-                            }}}}}}
+                            }}}}
+                    
+//                }}}
+//            the app was not opened from a notification
           else{
             print("category not set for app opening")
             
             let createEventCoachMarksCount = UserDefaults.standard.integer(forKey: "createEventCoachMarksCount")
             let createEventCoachMarksPermenant = UserDefaults.standard.bool(forKey: "permenantToolTips")
             
+            print("coachmark test summaryView: \(summaryView) createEventCoachMarksCount: \(createEventCoachMarksCount) createEventCoachMarksPermenant: \(createEventCoachMarksPermenant)")
+            
             if summaryView == true && createEventCoachMarksCount < 2 || summaryView == true && createEventCoachMarksPermenant == true{
-                
-            
             coachMarksController.start(in: .window(over: self))
-                
                 UserDefaults.standard.set(createEventCoachMarksCount + 1, forKey: "createEventCoachMarksCount")
-                
                 summaryView = false
-                
             }
-            
-  
             else{
-                
             }
 
           }
@@ -372,7 +417,7 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     
     func showTutorial(){
         
-    let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningv2.0001") ?? ""
+    let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningv2.19") ?? ""
     let createEventCoachMarksPermenant = UserDefaults.standard.bool(forKey: "permenantToolTips")
         
         
@@ -391,8 +436,6 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
        popOverVC.view.frame = self.view.frame
        self.view.addSubview(popOverVC.view)
        popOverVC.didMove(toParent: self)
-            
-            UserDefaults.standard.set("false", forKey: "firstTimeOpeningv2.0001")
         
         }}
         else{
@@ -403,12 +446,27 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     }
     
 //    function to check for new events and activate the listeners when the user logs in
-    
     func prepareApp(){
-        
         print("running func prepareApp")
-        
-        //        check we have data in core data and update if required
+        //        check we have data in core data and download all data if not is in CD. We check to see if the cdAppHasLoaded flag is set, we do this becuase we do not want CDAppHasLoaded running at the same time as the eventListener
+        if cdAppHasLoaded == true{
+            print("prepareApp cdAppHasLoaded = true, we end only check the current dates")
+            //        get todays events
+            getDaysEventsIDCD{
+                self.tblViewEventList.reloadData()
+            }
+        }
+        else{
+            print("cdAppHasLoaded = false")
+//            before continuning we ensure the listeners are not engaged, we re-engage them once done.
+            if availabilityListenerEngaged == true{availabilityListenerRegistration.remove()
+             print("userNotificationCenter - disabling availabilityListenerRegistration")
+                availabilityListenerEngaged = false
+            }
+            if eventListenerEngaged == true{eventListenerRegistration.remove()
+                print("userNotificationCenter - disabling eventListenerRegistration")
+                eventListenerEngaged = false
+            }
         CDAppHasLoaded{
         //            completed getting event data, now check for availability
                     self.CDAppHasLoadedAvailability{
@@ -417,19 +475,50 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
                         if eventNotificationAppBackground == true{
                         }
                         else{
-                    self.eventChangeListener()
-                    self.availabilityChangeListener()}
+                            CoreDataCode().eventChangeListener()
+                            CoreDataCode().availabilityChangeListener()
+                        }
         //                run consistency checks
                     self.dataConsistencyCheck()
-                        
+                        cdAppHasLoaded = true
                         
                     //        get todays events
                     self.getDaysEventsIDCD{
                         self.tblViewEventList.reloadData()
                     }
                     }
-                }
+            }}}
+    
+    
+//    run some specific intro processes for a new user - userJustRegistered global bool
+   @objc func userJustRegisteredIntro(){
+    print("running func userJustRegisteredIntro")
+//        check if this is a new user
+         let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningv2.19") ?? ""
         
+//        want to check if the user has an invite already, if so we set the pending even notification and show the instructions
+        if firstTimeUser == ""{
+        
+//        retrieve the events to check if they are pending, if they are not pending we will do nothing for now
+        let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
+//      filter the serilaised events for pending status
+        let events = filteringEventsForDisplay(pending: true, createdByUser: false, pastEvents: false, serialisedEvents: serialisedEvents)
+        
+        
+        if events.count != 0{
+        print("the user has events")
+//            turn on the pending event notificaiton
+           eventNotificationPending = true
+//            reload the data now we've updated the notification
+            collectionViewMenu.reloadData()
+//            start the coachmarks
+            coachMarksController.start(in: .window(over: self))
+        }
+        else{
+            
+            UserDefaults.standard.set("nope", forKey: "firstTimeOpeningv2.19")
+            }
+        }
     }
     
     
@@ -484,6 +573,29 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         cell.imgNewMessage.layer.borderColor = UIColor.red.cgColor
         cell.imgNewMessage.layer.masksToBounds = true
         
+        cell.imgNewEvent.layer.cornerRadius = 20
+        cell.imgNewEvent.layer.borderWidth = 1.0
+        cell.imgNewEvent.layer.borderColor = UIColor.red.cgColor
+        cell.imgNewEvent.layer.masksToBounds = true
+        
+        
+//        checking to see if the event notification should be displayed
+        
+        if eventNotification[indexPath.section][indexPath.row] == ""{
+         cell.imgNewEvent.isHidden = true
+        }
+        else{
+          
+            if eventNotificationPending == true{
+               cell.imgNewEvent.isHidden = false
+            }
+            else{
+               cell.imgNewEvent.isHidden = true
+            }
+            
+        }
+        
+//        checking to see if the chat notification should be displayed
         if chatNotification[indexPath.section][indexPath.row] == ""{
             
             cell.imgNewMessage.isHidden = true
@@ -506,11 +618,8 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
                     
                 }
                 else{
-                    cell.imgNewMessage.isHidden = true
-                    
-                }
-                
-            }
+                    cell.imgNewMessage.isHidden = true}
+        }
             
                
         return cell
@@ -546,22 +655,39 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
         
     }
     //    MARK: - three mandatory methods for choach tips
-             
-             func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: CoachMarkBodyView, arrowView: CoachMarkArrowView?) {
+    
+    func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: (UIView & CoachMarkBodyView), arrowView: (UIView & CoachMarkArrowView)?){
                  
                  let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
                 
-                 
-                 let hintLabels = ["Congratulations! You created your first event. Your newly created event can be viewed in Pending Events"]
-                 
-                 let nextlabels = ["OK"]
+                var hintLabels = [String]()
+                var nextlabels = [String]()
+                
+                let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningv2.19") ?? ""
+                
+//        if this is the first time the user has logged in and they have event invites we show them the following instructions
+                if firstTimeUser == "" && eventNotificationPending == true{
+                    
+                     hintLabels = ["You've been invited to an event!","Planr automatically responds with your availability based on the events in your calendar, Planr will even respond in the background, lookout for new invite notifications", "You'll find the calendars Planr uses in settings"]
+                     nextlabels = ["OK","OK","OK","OK","OK"]
+                    
+                    coachViews.bodyView.hintLabel.text = hintLabels[index]
+                    coachViews.bodyView.nextLabel.text = nextlabels[index]
+                    
+                }
+//                    The only other time the instructions are called is after the user has created an event
+                    else{
+                
+                  hintLabels = ["Congratulations! You created your first event. Your newly created event can be viewed in Pending Events"]
+                  nextlabels = ["OK"]
                  
                  coachViews.bodyView.hintLabel.text = hintLabels[index]
-                 
                  coachViews.bodyView.nextLabel.text = nextlabels[index]
                     
      //            coachViews.bodyView.nextLabel.isEnabled = false
                     
+                    
+                    }
                  
                  return (bodyView: coachViews.bodyView, arrowView: coachViews.arrowView)
                  
@@ -569,17 +695,21 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
              
              
              func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkAt index: Int) -> CoachMark {
-                 
-                 
                  //    Defines where the coachmark will appear
-                 let pointOfInterest = UIView()
-                 
-                 
+                var pointOfInterest = UIView()
+                let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningv2.19") ?? ""
+                
+                if firstTimeUser == ""{
+                   
+                    let hintPositions = [CGRect(x: screenWidth/2 + 20, y: topDistance + 75, width: screenWidth/2 - 50, height: screenWidth/2 - 53),CGRect(x: screenWidth/2 + 20, y: topDistance + 75, width: screenWidth/2 - 50, height: screenWidth/2 - 53),CGRect(x: screenWidth - 60, y: topDistance - 40, width: 40, height: 40)]
+                    
+                    pointOfInterest.frame = hintPositions[index]
+                }
+                else{
                  let hintPositions = [CGRect(x: screenWidth/2 + 20, y: topDistance + 75, width: screenWidth/2 - 50, height: screenWidth/2 - 53)]
                  
                  pointOfInterest.frame = hintPositions[index]
-                 
-                 
+                }
                  return coachMarksController.helper.makeCoachMark(for: pointOfInterest)
              }
              
@@ -587,7 +717,19 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
              
          //    The number of coach marks we wish to display
              func numberOfCoachMarks(for coachMarksController: CoachMarksController) -> Int {
-                 return 1
+                
+                var numberOfCoachMarks = Int()
+                let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningv2.19") ?? ""
+                
+                if firstTimeUser == ""{
+                    
+                   numberOfCoachMarks = 3 
+                }
+                else{
+                    numberOfCoachMarks = 1
+                }
+                
+                 return numberOfCoachMarks
              }
          
      //    When a coach mark appears
@@ -600,20 +742,12 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
      //    when a coach mark dissapears
          func coachMarksController(_ coachMarksController: CoachMarksController, willHide coachMark: CoachMark, at index: Int){
             print("Coach Index disappeared \(index)")
-             if index == 3 {
-                 
-     //            add non user invitees
-                    if nonExistingUsers.count > 0{
-                        self.inviteFriendsPopUp(notExistingUserArray: nonExistingNumbers, nonExistingNameArray: nonExistingUsers)
-                     nonExistingUsers.removeAll()
-                        
-                    }
-                    else{}}
-             
-             else{
-                 print("coachmarks still to present")
-             }
-             
+            
+//            set the user default so we do not show this again
+            if index == 2{
+                UserDefaults.standard.set("false", forKey: "firstTimeOpeningv2.19")
+            }
+   
          }
     
 }
@@ -744,9 +878,7 @@ func getDaysEventsIDCD(completion: @escaping () -> Void){
 
     }
     completion()
-       }
-
-    
+       }  
 }
 
 
@@ -855,3 +987,6 @@ extension Date {
         return (min(date1, date2) ... max(date1, date2)).contains(self)
     }
 }
+
+
+

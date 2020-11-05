@@ -136,14 +136,7 @@ class  CalendarListView: UIViewController, UITableViewDataSource, UITableViewDel
                     y = y + 1
                     }
    
-                }
-                 
-
-
-            }
-        
-
-        }
+                }}}
     
     
     
@@ -174,8 +167,6 @@ class  CalendarListView: UIViewController, UITableViewDataSource, UITableViewDel
         else {
             cell.accessoryType = .none
         }
-        
-        
         return cell
         
     }

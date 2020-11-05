@@ -17,6 +17,7 @@ class ChatMessageCell: UICollectionViewCell {
         tv.font = UIFont.systemFont(ofSize: 16)
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = UIColor.clear
+        tv.isEditable = false
         tv.textColor = .white
         return tv
     }()
@@ -27,6 +28,7 @@ class ChatMessageCell: UICollectionViewCell {
         tv.font = UIFont.systemFont(ofSize: 10)
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = UIColor.clear
+        tv.isEditable = false
         tv.textColor = .white
         return tv
     }()
@@ -71,7 +73,7 @@ class ChatMessageCell: UICollectionViewCell {
         profileImageView.heightAnchor.constraint(equalToConstant: 32).isActive = true
         
         //x,y,w,h
-        bubbleViewRightAnchor = bubbleView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -8)
+        bubbleViewRightAnchor = bubbleView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0)
         bubbleViewRightAnchor?.isActive = true
         bubbleViewLeftAnchor = bubbleView.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8)
 //        bubbleViewLeftAnchor?.active = false
@@ -84,17 +86,15 @@ class ChatMessageCell: UICollectionViewCell {
         //x,y,w,h
 //        textView.rightAnchor.constraintEqualToAnchor(self.rightAnchor).active = true
         
-                textViewName.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 8).isActive = true
-                textViewName.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-                textViewName.rightAnchor.constraint(equalTo: bubbleView.rightAnchor).isActive = true
-        //        textView.widthAnchor.constraintEqualToConstant(200).active = true
-                textViewName.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        textViewName.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 8).isActive = true
+        textViewName.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        textViewName.rightAnchor.constraint(equalTo: bubbleView.rightAnchor).isActive = true
+        textViewName.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
         
         textView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 8).isActive = true
         textView.topAnchor.constraint(equalTo: textViewName.bottomAnchor).isActive = true
         textView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor).isActive = true
-//        textView.widthAnchor.constraintEqualToConstant(200).active = true
         textView.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true
     }
     

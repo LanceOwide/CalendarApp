@@ -17,12 +17,14 @@ class Message: NSObject {
     var fromName: String?
     var timestamp: NSNumber?
     var toId: String?
+    var messageID: String?
     
     init(dictionary: [String: Any]) {
         self.fromId = dictionary["fromId"] as? String
         self.text = dictionary["text"] as? String
         self.fromName = dictionary["fromName"] as? String
         self.timestamp = dictionary["timestamp"] as? NSNumber
+        self.messageID = dictionary["messageID"] as? String
     }
     
     func chatPartnerId() -> String? {

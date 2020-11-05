@@ -24,6 +24,7 @@ class PhoneNumberCode: UIViewController {
     @IBOutlet weak var btnCompleteSettings: UIButton!
     
     
+    @IBOutlet weak var txtTermsOfService: UITextView!
     
     @IBOutlet weak var resendButton: UIButton!
     
@@ -87,15 +88,14 @@ class PhoneNumberCode: UIViewController {
                 existingUserLoggedIn = false
 
             let uid = Auth.auth().currentUser?.uid
+                user = uid
                 
-            user = Auth.auth().currentUser?.uid
 
             let dbStore = Firestore.firestore()
                 
                 self.getUserPushTokenGlobal()
                 
 //            check if the users phonenumber already exists in our database
-                
                 dbStore.collection("users").whereField("phoneNumber", isEqualTo: Auth.auth().currentUser?.phoneNumber! as Any).getDocuments { (querySnapshot, error) in
                 if error != nil {
                     print("Error getting documents: \(error!)")
@@ -181,15 +181,18 @@ class PhoneNumberCode: UIViewController {
         super.viewDidLoad()
         
         //        setup the navigation bar
-        navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
+        navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: MyVariables.colourPlanrGreen)
         
-
+        
+//        setup the terms of service link
+        
+        setupTermsOfService(UITextView: txtTermsOfService)
         
         
         //        restrict the rotation of the device to portrait
         (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
 
-        view.backgroundColor = UIColor(red: 0, green: 176, blue: 156)
+        view.backgroundColor = .white
         
         //        setup next button
         
@@ -209,6 +212,26 @@ class PhoneNumberCode: UIViewController {
     
     @objc func showResendButton() {
         resendButton.isHidden = false
+    }
+    
+    
+    func setupTermsOfService(UITextView: UITextView){
+
+      //        eventListenerEngaged = false
+      //        availabilityListenerEngaged = false
+       let string = "By registering you agree to our Terms of Service"
+       
+       let attributedLinkString = NSMutableAttributedString(string: string, attributes:[NSAttributedString.Key.link: URL(string: "https://planr.me/terms-of-service/")!])
+       
+       UITextView.isUserInteractionEnabled = true
+       UITextView.isEditable = false
+        UITextView.textColor = UIColor.white
+        
+        UITextView.backgroundColor = .white
+        UITextView.linkTextAttributes = [ .foregroundColor: MyVariables.colourPlanrGreen ]
+       UITextView.attributedText = attributedLinkString
+        
+        
     }
     
 }

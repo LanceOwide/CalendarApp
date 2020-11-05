@@ -47,12 +47,12 @@ class AccountSettings: UIViewController {
         
         
         //Looks for single or multiple taps.
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+//        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         
         //Uncomment the line below if you want the tap not not interfere and cancel other interactions.
         //tap.cancelsTouchesInView = false
         
-        view.addGestureRecognizer(tap)
+//        view.addGestureRecognizer(tap)
         
         
         
@@ -60,7 +60,7 @@ class AccountSettings: UIViewController {
                 primaryPhoneNumber.borderStyle = .roundedRect
                 
                 // Comment this line to not have access to the country list
-                primaryPhoneNumber.parentViewController = self
+//                primaryPhoneNumber.parentViewController = self
                 primaryPhoneNumber.delegate = self
                 
                 primaryPhoneNumber.font = UIFont.systemFont(ofSize: 14)
@@ -78,7 +78,7 @@ class AccountSettings: UIViewController {
                 secondaryPhoneNumber.borderStyle = .roundedRect
                 
                 // Comment this line to not have access to the country list
-                secondaryPhoneNumber.parentViewController = self
+//                secondaryPhoneNumber.parentViewController = self
                 secondaryPhoneNumber.delegate = self
                 
                 secondaryPhoneNumber.font = UIFont.systemFont(ofSize: 14)
@@ -94,19 +94,28 @@ class AccountSettings: UIViewController {
         
     }
     
-    @objc func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
-        view.endEditing(true)
-    }
+//    @objc func dismissKeyboard() {
+//        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+//        view.endEditing(true)
+//    }
     
     
 //    function to pull down the current email and name of the user
     func getCurrentDetails(){
         
         print("Getting current user settings")
-        print("user: \(user!)")
-        
-        dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments { (querySnapshot, error) in
+        if user == nil{
+         print("user ID isnt available")
+//        send the user back to the home screen
+        let sampleStoryBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+        let homeView  = sampleStoryBoard.instantiateViewController(withIdentifier: "NL_HomePage") as! NL_HomePage
+        self.navigationController?.pushViewController(homeView, animated: true)
+            
+            showProgressHUD(notificationMessage: "We are having an issue contacting the server, please try again later", imageName: "Refresh-100", delay: 1.0)
+            
+        }
+        else{
+            dbStore.collection("users").whereField("uid", isEqualTo: user).getDocuments { (querySnapshot, error) in
             if error != nil {
                 print("Error getting documents: \(error!)")
             }
@@ -138,10 +147,7 @@ class AccountSettings: UIViewController {
                         self.secondaryPhoneNumber.set(phoneNumber: phoneNumbers[1])
                 
                     }
-                    
-
-    
-                }}}}
+                }}}}}
     
 //    function udpates the user information in the users table and n the eventRequest table
     func updateUserInformation(){
@@ -181,7 +187,7 @@ class AccountSettings: UIViewController {
         
         
 
-        dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments { (querySnapshot, error) in
+            dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments { (querySnapshot, error) in
             if error != nil {
                 print("Error getting documents: \(error!)")
             }
@@ -237,6 +243,19 @@ class AccountSettings: UIViewController {
 
 extension AccountSettings: FPNTextFieldDelegate {
     
+    /// The place to present/push the listController if you choosen displayMode = .list
+    func fpnDisplayCountryList() {
+//       let navigationViewController = UINavigationController(rootViewController: listController)
+//
+//       present(navigationViewController, animated: true, completion: nil)
+    }
+
+    /// Lets you know when a country is selected
+    func fpnDidSelectCountry(name: String, dialCode: String, code: String) {
+       print(name, dialCode, code) // Output "France", "+33", "FR"
+    }
+
+    /// Lets you know when the phone number is valid or not. Once a phone number is valid, you can get it in severals formats (E164, International, National, RFC3966)
     func fpnDidValidatePhoneNumber(textField: FPNTextField, isValid: Bool) {
         textField.rightViewMode = .always
         textField.rightView = UIImageView(image: isValid ? #imageLiteral(resourceName: "Available") : #imageLiteral(resourceName: "Unavailable"))
@@ -251,8 +270,5 @@ extension AccountSettings: FPNTextFieldDelegate {
         )
     }
     
-    func fpnDidSelectCountry(name: String, dialCode: String, code: String) {
-        print(name, dialCode, code)
-    }
 
 }

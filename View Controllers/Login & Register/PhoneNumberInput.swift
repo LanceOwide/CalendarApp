@@ -71,9 +71,9 @@ class PhoneNumberInput: UIViewController {
         super.viewDidLoad()
         
 //        setup the navigation bar
-        navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
+        navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: MyVariables.colourPlanrGreen)
         
-        view.backgroundColor = UIColor(red: 0, green: 176, blue: 156)
+        view.backgroundColor = .white
         
         //        restrict the rotation of the device to portrait
         (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
@@ -83,7 +83,7 @@ class PhoneNumberInput: UIViewController {
         phoneNumberTextField.borderStyle = .roundedRect
         
         // Comment this line to not have access to the country list
-        phoneNumberTextField.parentViewController = self
+//        phoneNumberTextField.parentViewController = self
         phoneNumberTextField.delegate = self
         
         phoneNumberTextField.font = UIFont.systemFont(ofSize: 14)
@@ -100,7 +100,7 @@ class PhoneNumberInput: UIViewController {
         additionalPhoneNumberTextField.borderStyle = .roundedRect
                 
                 // Comment this line to not have access to the country list
-                additionalPhoneNumberTextField.parentViewController = self
+//                additionalPhoneNumberTextField.parentViewController = self
                 additionalPhoneNumberTextField.delegate = self
                 
                 additionalPhoneNumberTextField.font = UIFont.systemFont(ofSize: 14)
@@ -200,6 +200,13 @@ class PhoneNumberInput: UIViewController {
 }
 
 extension PhoneNumberInput: FPNTextFieldDelegate {
+    
+    /// The place to present/push the listController if you choosen displayMode = .list
+    func fpnDisplayCountryList() {
+//       let navigationViewController = UINavigationController(rootViewController: listController)
+//       
+//       present(navigationViewController, animated: true, completion: nil)
+    }
     
     func fpnDidValidatePhoneNumber(textField: FPNTextField, isValid: Bool) {
         textField.rightViewMode = .always

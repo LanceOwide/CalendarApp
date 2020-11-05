@@ -13,12 +13,7 @@ import Firebase
 import AMPopTip
 import Instructions
 
-var newEventDescription = String()
-var newEventLocation = String()
-var newEventStartTime = "06:00"
-var newEventEndTime = "06:00"
-var newEventStartTimeLocal = "06:00"
-var newEventEndTimeLocal = "06:00"
+
 var secondsFromGMT: Int { return TimeZone.current.secondsFromGMT() }
 var circleColour = UIColor(red: 0, green: 176, blue: 156)
 var locationPassed = String()
@@ -49,14 +44,13 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
     let popTip = PopTip()
     
 //    selection choices for the default events
-    var userEventChoices = ["Dinner","Drinks","Lunch","Coffee","Party","Custom"]
-    var userEventChoicesLocations = ["Restaurant","Bar","Restaurant","Cafe","My Place","Anywhere"]
-    var userEventChoicesStartTime = ["19:00","20:00","12:00","10:00","19:00","10:00"]
-    var userEventChoicesEndTime = ["21:00","23:00","13:30","11:00","23:59","16:00"]
-    var userEventChoicesimages = ["Dinner500","Drinks500","Lunch500","Coffee500","Party500","Meeting"]
-    var selectedArray = [0,0,0,0,0,0]
-//    var userEventChoicesimages = ["RP - Dinner","RP - Drinks","Lunch","RP - Coffee","Meeting"]
-    
+    var userEventChoices = ["Dinner","Drinks","Lunch","Coffee","Party","Workout","Conference","Custom"]
+    var userEventChoicesLocations = ["Restaurant","Bar","Restaurant","Cafe","My Place","Gym","Call/Video","Anywhere"]
+    var userEventChoicesStartTime = ["19:00","20:00","12:00","10:00","19:00","10:00","10:00","10:00"]
+    var userEventChoicesEndTime = ["21:00","23:00","13:30","11:00","23:59","11:00","11:00","16:00"]
+    var userEventChoicesimages = ["Dinner500","Drinks500","Lunch500","Coffee500","Party500","icons8-exercise-500","icons8-office-phone-500","Meeting"]
+    var selectedArray = [0,0,0,0,0,0,0,0]
+   
     
     @IBOutlet weak var collectionViewEventType: UICollectionView!
     
@@ -172,17 +166,17 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
         
         
         //Looks for single or multiple taps.
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+//        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         
         
-        //Uncomment the line below if you want the tap not not interfere and cancel other interactions.
-        tap.cancelsTouchesInView = false
-        
-        view.addGestureRecognizer(tap)
-        
+//        //Uncomment the line below if you want the tap not not interfere and cancel other interactions.
+//        tap.cancelsTouchesInView = false
+//        
+//        view.addGestureRecognizer(tap)
+//        
         coachMarksController.dataSource = self
         coachMarksController.delegate = self
-        coachMarksController.overlay.allowTap = true
+        coachMarksController.overlay.isUserInteractionEnabled = true
         
         
         
@@ -207,7 +201,7 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
 //    function to call show popover when location selected
     @objc func myTargetFunction(textField: UITextField) {
         
-        let popController = storyboard?.instantiateViewController(withIdentifier: "locationMapNavigation") as! UINavigationController
+        let popController = storyboard?.instantiateViewController(withIdentifier: "locationSearchTableNavigation") as! UINavigationController
 
         // set the presentation style
         popController.modalPresentationStyle = UIModalPresentationStyle.popover
@@ -234,11 +228,11 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
     
     
     //Calls this function when the tap is recognized.
-    @objc func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
-        view.endEditing(true)
-    }
-    
+//    @objc func dismissKeyboard() {
+//        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+//        view.endEditing(true)
+//    }
+//    
     
     @objc func nextSelected(){
         
@@ -305,25 +299,19 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
     
     func createTimePicker(){
         //        assign date picker to our text input
-        
         eventStartTime.inputView = timePicker
         eventEndTime.inputView = timePicker
-        
-        
         //        add a toolbar to the datepicker
         let toolBar = UIToolbar()
         toolBar.sizeToFit()
 
-        
         //        add a done button to the toolbar
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: #selector(doneClickedTime))
-        
         
 //        Adds space to the left of the done button, pushing the button to the right
         let flexSpace = UIBarButtonItem(barButtonSystemItem:    .flexibleSpace, target: nil, action: nil)
         toolBar.setItems([flexSpace, doneButton], animated: false)
     
-        
         eventStartTime.inputAccessoryView = toolBar
         eventEndTime.inputAccessoryView = toolBar
     }
@@ -379,9 +367,8 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
             
         }
         else{
-            
+
             cell.backgroundColor = UIColor.lightGray
-            
         }
         
         
@@ -404,7 +391,7 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 //        what to do once the user selects a cell in the collectionview
         
-        selectedArray = [0,0,0,0,0,0]
+        selectedArray = [0,0,0,0,0,0,0,0]
         
         
         print("user selected row: \(indexPath.row)")
@@ -433,7 +420,7 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
     
     //    MARK: - three mandatory methods for choach tips
             
-            func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: CoachMarkBodyView, arrowView: CoachMarkArrowView?) {
+            func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: (UIView & CoachMarkBodyView), arrowView: (UIView & CoachMarkArrowView)?) {
                 
                 let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
                 
@@ -478,10 +465,7 @@ class EventCreation___Page_1: UIViewController, UICollectionViewDelegate, UIColl
             print("Coach Index appeared \(index)")
             
             print("Coach Index disappeared \(index)")
-            
-            
-
-            
+               
         }
         
     //    when a coach mark dissapears
@@ -541,8 +525,11 @@ extension EventCreation___Page_1 : UICollectionViewDelegateFlowLayout {
 }
 
 extension Notification.Name {
-     static let locationSet = Notification.Name("locationSet")
+    static let locationSet = Notification.Name("locationSet")
     static let availabilityUpdated = Notification.Name("availabilityUpdated")
+    static let inviteSelected = Notification.Name("inviteSelected")
+    static let notificationTapped = Notification.Name("notificationTapped")
+    static let reminderSelected = Notification.Name("reminderSelected")
 
 }
 

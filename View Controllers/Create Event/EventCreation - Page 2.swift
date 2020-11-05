@@ -121,9 +121,7 @@ class EventCreation___Page_2: UIViewController, UICollectionViewDataSource, UICo
         }
         else if updateProposedDatesTable() == false{
             
-            showProgressHUD(notificationMessage: "The days of the week chosen are not contained within the dates chosen, select 'Any' day of the week", imageName: "Unavailable", delay: 2)
-     
-            
+            showProgressHUD(notificationMessage: "No dates in search period, select 'Any' day of the week", imageName: "Unavailable", delay: 2)
         }
         
         else{
@@ -256,13 +254,13 @@ class EventCreation___Page_2: UIViewController, UICollectionViewDataSource, UICo
         
         
         //Looks for single or multiple taps.
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+//        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         
         
         //Uncomment the line below if you want the tap not not interfere and cancel other interactions.
-        tap.cancelsTouchesInView = false
-        
-        view.addGestureRecognizer(tap)
+//        tap.cancelsTouchesInView = false
+//        
+//        view.addGestureRecognizer(tap)
         
 //        setup the tableview
         
@@ -274,7 +272,7 @@ class EventCreation___Page_2: UIViewController, UICollectionViewDataSource, UICo
         
         coachMarksController.dataSource = self
         coachMarksController.delegate = self
-        coachMarksController.overlay.allowTap = true
+        coachMarksController.overlay.isUserInteractionEnabled = true
         
 //        hide tooltips
         
@@ -292,11 +290,11 @@ class EventCreation___Page_2: UIViewController, UICollectionViewDataSource, UICo
     }
     
     //Calls this function when the tap is recognized.
-    @objc func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
-        view.endEditing(true)
-        print("view tapped")
-    }
+//    @objc func dismissKeyboard() {
+//        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+//        view.endEditing(true)
+//        print("view tapped")
+//    }
     
 
 func createDatePicker(){
@@ -340,14 +338,11 @@ func createDatePicker(){
     }
     
     if eventEndDate.isFirstResponder{
-        
         eventEndDate.text = dateFormatter.string(from: datePicker!.date)
         newEventEndDate = dateFormatterString.string(from: datePicker!.date)
         self.view.endEditing(true)
 //        updateProposedDatesTable()
-        
     }
-    
 }
     
     func updateProposedDatesTable() -> Bool{
@@ -559,7 +554,7 @@ func createDatePicker(){
     
         //    MARK: - three mandatory methods for choach tips
                 
-                func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: CoachMarkBodyView, arrowView: CoachMarkArrowView?) {
+                func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: (UIView & CoachMarkBodyView), arrowView: (UIView & CoachMarkArrowView)?) {
                     
                     let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
                     

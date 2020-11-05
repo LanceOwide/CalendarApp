@@ -48,7 +48,7 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
         super.viewDidLoad()
         let vc = splitViewController
         
-        vc?.title = selectedDate
+//        vc?.title = selectedDate
         
         
         //        setup the navigation bar
@@ -58,7 +58,7 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
         selectDateTableView.delegate = self
         coachMarksController.dataSource = self
         coachMarksController.delegate = self
-        coachMarksController.overlay.allowTap = true
+        coachMarksController.overlay.isUserInteractionEnabled = true
         
         self.view.backgroundColor = UIColor.black.withAlphaComponent(0.8)
         
@@ -95,7 +95,7 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
 @objc func saveDateSelected() {
     
 //    need to find the position of the date in the dates array, to upload to FB
-    dateChosenPosition = currentUserSelectedEvent.startDatesDisplay.index(of: selectedDate) ?? 999
+//    dateChosenPosition = currentUserSelectedEvent.startDatesDisplay.index(of: selectedDate) ?? 999
     
 //    need to convert the selected date from the display format into a fomrat without the time
 //    1. get the date from the start dates list and convert to the required YYYY-MM-DD format
@@ -131,7 +131,6 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
                 print("date submitted to the eventRequest table: \(self.dateChosen)")
                     
 //            Adds the chosen date to each individuals user event store + add a notification for each user that the date for the event has been chosen
-
                 for i in currentUserSelectedAvailability{
                     
                     dbStore.collection("userEventStore").document(i.documentID).setData(["chosenDate" : self.dateChosen, "chosenDateMonth" : chosenDateMonthInt, "chosenDateYear" : chosenDateYearInt, "chosenDateDay": chosenDateDayInt, "chosenDateSeen": false], merge: true)
@@ -147,7 +146,6 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
             }))
             
             // show the alert
-            
             self.present(alert, animated: true, completion: nil)
     }
     
@@ -173,13 +171,13 @@ class SelectDateViewController: UIViewController, CoachMarksControllerDataSource
         var pointOfInterest = UIView()
         let coachMarksController = CoachMarksController()
         
-        func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: CoachMarkBodyView, arrowView: CoachMarkArrowView?) {
+        func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: (UIView & CoachMarkBodyView), arrowView: (UIView & CoachMarkArrowView)?) {
             
             
             let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
             
 
-            let hintLabels = ["See your friends availability for this date","Have you chosen this as the date for your event? Select it to notify your friends"]
+            let hintLabels = ["Here are your friends availabilities for this date","Have you chosen this as the date for your event? Select it to notify your friends"]
             
             let nextlabels = ["OK","OK"]
             
@@ -292,11 +290,9 @@ extension SelectDateViewController:UITableViewDelegate, UITableViewDataSource{
         
         let currentDate = selectedDate
         
-        
         let headersListStatic = ["Available - \(currentDate)","Unavailable - \(currentDate)","Not Responded - \(currentDate)","Non User - \(currentDate)"]
         
-        
-        
+
         if availableUserArray.count > 0 {
             
             headersList.append(headersListStatic[0])

@@ -39,4 +39,5 @@ struct eventSearch: Equatable {
     var nonUserNames = [String]()
     var startDatesDisplay = [String]()
     var users = [String]()
+    var eventType = String()
 }

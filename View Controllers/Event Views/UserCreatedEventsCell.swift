@@ -21,10 +21,12 @@ class UserCreatedEventsCell: UITableViewCell {
     @IBOutlet weak var userCreatedCollectionViewNames: UICollectionView!
     
     
+    @IBOutlet weak var txtEventOwner: UILabel!
     
     @IBOutlet weak var imgChatNotification: UIImageView!
     
     
+    @IBOutlet weak var imgEventNotification: UIImageView!
     
     
     @IBOutlet var userCreatedCellLabel1: UILabel!

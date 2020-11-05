@@ -31,12 +31,40 @@ class ActivationExistingUserViewController: UIViewController {
         loadingNotification.mode = MBProgressHUDMode.customView
         
         let verificationID = UserDefaults.standard.string(forKey: "authVerificationID")
-                let credential = PhoneAuthProvider.provider().credential(
+        
+//        we need to check if the verificationID was not returned then we should show an error message
+        if verificationID == nil{
+//            if there was no verification message, we show a message and send the user back to the homePage
+            
+            loadingNotification.hide(animated: true)
+            
+//            initialise utils
+            let utils = Utils()
+//            we only show an OK button
+            let button = AlertButton(title: "OK", action: {
+                print("OK clicked")
+                if let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "HomePageViewController") as? HomePageViewController {
+                    if let navigator = self.navigationController {
+                    navigator.pushViewController(viewController, animated: true)
+                }}
+            }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
+                
+            let alertPayload = AlertPayload(title: "Login Issue!", titleColor: UIColor.red, message: "We are having issues logging you in. Please ensure, you have entered the correct text code, your phone number is correct and that you have signal, then pease try again. If this continues, please contact issues@planr.me", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                
+            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+                        
+        }
+        else{
+        
+        let credential = PhoneAuthProvider.provider().credential(
                 withVerificationID: verificationID!,
                 verificationCode: textCodeInput.text!)
+        
                Auth.auth().signIn(with: credential) { (authResult, error) in
                        if error != nil {
-                           print(error!)
+                        let authError = error! as NSError
+                        
+                           print("there was an error logging in \(authError)")
                         
                         loadingNotification.hide(animated: true)
                         
@@ -45,7 +73,10 @@ class ActivationExistingUserViewController: UIViewController {
                            return
                        }
                        else{
-                        print("Logging in")
+                        print("Logging in with authResult \(authResult.debugDescription) user credentials - \(String(describing: authResult?.credential))")
+                        
+                        user = Auth.auth().currentUser?.uid
+                        print("user - \(String(describing: user))")
                         
                         existingUserLoggedIn = true
                         
@@ -53,8 +84,14 @@ class ActivationExistingUserViewController: UIViewController {
                         
                         UserDefaults.standard.set(loginPhoneNumber, forKey: "userPhoneNumber")
                         
-//                        self.performSegue(withIdentifier: "existingUserLoggedIn", sender: self)
+//                        instantiate the home page
+                        if let viewController = UIStoryboard(name: "NL_HomePage", bundle: nil).instantiateViewController(withIdentifier: "NL_HomePage") as? NL_HomePage {
+                            if let navigator = self.navigationController {
+                                print("user logged in, pushing them to the hom page")
+                            navigator.pushViewController(viewController, animated: true)
+                        }}
         }}}
+    }
 
     
     
@@ -70,24 +107,19 @@ class ActivationExistingUserViewController: UIViewController {
         }
         UserDefaults.standard.set(verificationID, forKey: "authVerificationID")
     }
-    
     }
     
-    
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
         
         
-        view.backgroundColor = UIColor(red: 0, green: 176, blue: 156)
+        view.backgroundColor = .white
         
         //        setup the navigation bar
-        navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
+        navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: MyVariables.colourPlanrGreen)
         
-        //        move the view up when the keyboard is active
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+
         
         buttonSettings(uiButton: loginButtonOldUserSettings)
         buttonSettings(uiButton: resendCodeButton)

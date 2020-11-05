@@ -24,7 +24,7 @@ var numberOfNonInviteeUsers = Int()
 var currentAvailability = [AvailabilityStruct]()
 var allAvailablePositions = [Int]()
 var someAvailablePositions = [Int]()
-var selectedDate = String()
+//var selectedDate = String()
 
 
 class ResultsSplitViewViewController: UIViewController, CoachMarksControllerDataSource, CoachMarksControllerDelegate{
@@ -65,12 +65,26 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
     let appColour = UIColor(red: 0, green: 176, blue: 156)
     let orangeColour = UIColor.orange
     var chosenDateForLabel = String()
+    var coachMarkHelper = String()
     
     
     let coachMarksController = CoachMarksController()
     
+//    setup for the menu
+    var transparentView = UIView()
+    var tableView = UITableView()
+    var settingArray = ["Respond Now","Edit Event"]
+    let height: CGFloat = 110
+    
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //        set the badge number to 0
+        UIApplication.shared.applicationIconBadgeNumber = 0
+        
 //        set delegate for the collectionView
         resultsCollectionView.dataSource = self
         resultsCollectionView.delegate = self
@@ -80,7 +94,52 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
         //        ***For coachMarks
         coachMarksController.dataSource = self
         coachMarksController.delegate = self
-        coachMarksController.overlay.allowTap = true
+        coachMarksController.overlay.isUserInteractionEnabled = true
+        
+//        set the image of the availability based on user has responded
+        checkIfUserHasResponded()
+        
+//        set the labels
+        setTheLabels()
+
+//        defines visible buttons based on whether the user created the event
+        defineVisibleButtons()
+
+        if summaryView == true{
+            navigationItem.hidesBackButton = true
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(doneSelected))
+        }
+                
+//        MARK: listener to detect when the event availability has been udpated by the user
+        NotificationCenter.default.addObserver(self, selector: #selector(updateTables), name: .availabilityUpdated, object: nil)
+        
+//        Listen for any updates to the DB and update the tables
+        NotificationCenter.default.addObserver(self, selector: #selector(updateTables), name: .newDataLoaded, object: nil)
+        
+//        remove the event notifications
+        updatePendingNotificationStatus(eventBool: false, eventID: currentUserSelectedEvent.eventID, eventNewNotification: true)
+        
+//        setup for the menu
+        tableView.isScrollEnabled = true
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(MenuForResultsView.self, forCellReuseIdentifier: "Cell")
+        
+//        reload the tables after 3 seconds twice, THIS IS BAD!!
+        let seconds3 = 3.0
+        let seconds6 = 6.0
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds3) {
+            self.updateTables()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds6) {
+            self.updateTables()
+        }
+        
+        
+//        end of viewDidLoad
+    }
+    
+    func setTheLabels(){
         
         //        set label details
         let startTime = convertToLocalTime(inputTime: currentUserSelectedEvent.eventStartTime)
@@ -96,18 +155,6 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
         lblEventChosenDate.text = chosenDateForLabel
         lblEventChosenDate.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.gray, thickness: 0.5)
         lblInviteNonUsers.text = "Invite non-users (\(currentUserSelectedEvent.nonUserNames.count))"
-
-//        defines visible buttons based on whether the user created the event
-        defineVisibleButtons()
-
-        if summaryView == true{
-            navigationItem.hidesBackButton = true
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(doneSelected))
-        }
-                
-//        MARK: listener to detect when the event availability has been udpated by the user
-        NotificationCenter.default.addObserver(self, selector: #selector(updateTables), name: .availabilityUpdated, object: nil)
-//        end of viewDidLoad
     }
     
 //    defines the visible buttons when the event owner or invitee select the event
@@ -115,44 +162,26 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
 //    Segue to edit the event page
         @objc func doneSelected(){
             performSegue(withIdentifier: "issueWithArraySegue", sender: (Any).self)
-  
+
         }
     
     @objc func updateTables(){
-        
-        print("results page - updated availability notification triggered")
-//        need to pull the new data from CoreData
-        currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
-        self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: true, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
-            self.resultsCollectionView.reloadData()
-        }
-    }
-    
-//    edit the event selected
-    @objc func editSelected(){
-//        create a list of the users currently invited to the event
-        inviteesNames = currentUserSelectedEvent.currentUserNames
-        inviteesUserIDs = currentUserSelectedEvent.users
-//        if non user invitees = none, we need to show nothing
-        if currentUserSelectedEvent.nonUserNames.count != 0{
-            print("there is some data in currentUserSelectedEvent")
-            nonUserInviteeNames = currentUserSelectedEvent.nonUserNames
+        print("results page func updateTables - updated availability notification triggered - eventIDChosen: \(currentUserSelectedEvent.eventID)")
+//        need to refresh the event data, we can also check if the user has deleted the event
+        let predicate = NSPredicate(format: "eventID = %@", currentUserSelectedEvent.eventID)
+        let predicateReturned = self.serialiseEvents(predicate: predicate, usePredicate: true)
+        if predicateReturned.count == 0{
+            print("something went wrong")
         }
         else{
-            nonUserInviteeNames.removeAll()
-        }
-        
-//        remove the lists being stored with the new invitees in them - we add this here to ensure each time the user selects the edit button these get reset
-        contactsSelected.removeAll()
-        inviteesNamesNew.removeAll()
-
-    
-        newEventLongitude = 0.0
-        newEventLatitude = 0.0
-        chosenMapItemManual = ""
-        
-//        let vc = EventEditViewController()
-        performSegue(withIdentifier: "splitEditButtonSegue", sender: self)
+            currentUserSelectedEvent = predicateReturned[0]
+//        need to pull the new availability data from CoreData
+        currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+        self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: summaryView, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
+            self.resultsCollectionView.reloadData()
+//            check of the user has responded and adjust the image accordingly
+            self.checkIfUserHasResponded()
+            }}
     }
     
     
@@ -164,8 +193,8 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
             lblInviteNonUsers.isHidden = false
             lblEditEvent.isHidden = false
             
-            //        setup the navigation bar chat icon
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editSelected))
+//            //        setup the navigation bar chat icon
+//            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editSelected))
             
             //        get user names for those events where we are owner
             
@@ -186,6 +215,44 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
             lblInviteNonUsers.isHidden = true
             lblEditEvent.isHidden = false
         }
+    }
+    
+//    check that the user has responded, if they have not then we change the picture on the Edit Your Availability button
+    func checkIfUserHasResponded(){
+        print("running func checkIfUserHasResponded")
+//        get the current event availability
+        let availabilityResults = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+//        get this users availability
+        let filter = availabilityResults.filter {$0.uid == user!}
+//        determine if the user has responded
+        if filter.count == 0{
+          print("user doesnt have an availability")
+            btnEditAvailability.setImage(UIImage(named: "icons8-unavailable-500"), for: .normal)
+            AutoRespondHelper.nonRespondedEventsAuto()
+        }
+        else if filter[0].userAvailability.count == 0{
+          print("user hasnt responded")
+            btnEditAvailability.setImage(UIImage(named: "icons8-unavailable-500"), for: .normal)
+            AutoRespondHelper.nonRespondedEventsAuto()
+        }
+//            99 is used as a fill factor is the user hasn't responded yet
+        else if filter[0].userAvailability[0] == 99 {
+           print("user hasnt responded")
+            btnEditAvailability.setImage(UIImage(named: "icons8-unavailable-500"), for: .normal)
+            AutoRespondHelper.nonRespondedEventsAuto()
+        }
+//            if all the elements in the array meet certain criteria then we want to show no response
+        else if filter[0].userAvailability.allSatisfy({$0 == 10}){
+           print("user hasnt responded")
+            btnEditAvailability.setImage(UIImage(named: "icons8-unavailable-500"), for: .normal)
+            AutoRespondHelper.nonRespondedEventsAuto()
+            
+        }
+        else{
+           print("user has responded - filter[0].userAvailability[0] - \(filter[0].userAvailability)")
+            btnEditAvailability.setImage(UIImage(named: "icons8-double-tick-200"), for: .normal)
+        }
+        
     }
     
     func getPositionOfAllAvailable(array: [Float]) -> (allAvailablePositionsArray: [Int], someAvailablePositionsArray: [Int]){
@@ -283,7 +350,6 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
     @IBAction func inviteNonUsersPressed(_ sender: UIButton) {
         
 //        get the nonusers mobile phone numbers from FB
-        
         getNonUsers(eventID: currentUserSelectedEvent.eventID){
            (usersName, usersNumbers) in
     
@@ -292,11 +358,38 @@ class ResultsSplitViewViewController: UIViewController, CoachMarksControllerData
     }
     
     
-    
+//    seetup for the menue
     @IBAction func btnAutoResponPressed(_ sender: Any) {
         
-    
-        uploadCurrentUsersAvailability(eventID: currentUserSelectedEvent.eventID)
+        let window = UIApplication.shared.keyWindow
+        transparentView.backgroundColor = UIColor.black.withAlphaComponent(0.9)
+        transparentView.frame = self.view.frame
+        window?.addSubview(transparentView)
+        
+        let screenSize = UIScreen.main.bounds.size
+        tableView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: height)
+        window?.addSubview(tableView)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(onClickTransparentView))
+        transparentView.addGestureRecognizer(tapGesture)
+        
+        transparentView.alpha = 0
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseInOut, animations: {
+            self.transparentView.alpha = 0.5
+            self.tableView.frame = CGRect(x: 0, y: screenSize.height - self.height, width: screenSize.width , height: self.height)
+        }, completion: nil)
+        
+         
+    }
+//    setup for the menu button
+    @objc func onClickTransparentView() {
+        let screenSize = UIScreen.main.bounds.size
+
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseInOut, animations: {
+            self.transparentView.alpha = 0
+            self.tableView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: self.height)
+        }, completion: nil)
     }
     
     
@@ -452,7 +545,7 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
         if indexPath.section == 0{
             
 //            set the selected date to the display date of cell the user selected
-            selectedDate = ("\(arrayForEventResultsPageFinal[0][allAvailablePositions[indexPath.row] + 1] as! String)")
+//            selectedDate = ("\(arrayForEventResultsPageFinal[0][allAvailablePositions[indexPath.row] + 1] as! String)")
             print("selected Date \(selectedDate)")
 //            get index of the selected date
 //            let index = arrayForEventResultsPageFinal[0].index(of: selectedDate)
@@ -462,7 +555,7 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
         }
         else if indexPath.section == 1{
 //            set the selected date to the display date of cell the user selected
-            selectedDate = ("\(arrayForEventResultsPageFinal[0][someAvailablePositions[indexPath.row] + 1] as! String)")
+//            selectedDate = ("\(arrayForEventResultsPageFinal[0][someAvailablePositions[indexPath.row] + 1] as! String)")
             print("selected Date \(selectedDate)")
             getUserAvailabilityArrays(position: someAvailablePositions[indexPath.row] + 1)
         }
@@ -484,20 +577,35 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
     
         //    MARK: - three mandatory methods for choach tips
             
-            func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: CoachMarkBodyView, arrowView: CoachMarkArrowView?) {
+            func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: (UIView & CoachMarkBodyView), arrowView: (UIView & CoachMarkArrowView)?) {
                 
                 let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
+                var hintLabels = [String]()
+                var nextlabels = [String]()
                 
-                let hintLabels = ["Your friends have been notified of the event, thier availability will automatically be visible here","Once you've chosen the date for your event, select it and press save, we'll notify your friends","Your availability has been automatically determined from the events in your calendar, you can manually amend it here","Each event has a dedicated group chat (for arguing about where to go)"]
+//                 user just created an event
+                if coachMarkHelper == "createEvent" {
                 
-                let nextlabels = ["OK","OK","OK","OK","OK"]
-                
+                hintLabels = ["Your friends have been notified of the event, thier availability will automatically be visible here","Once you've chosen the date for your event, select it and press save, Planr will notify your friends","The double tick means your availability has been automatically determined from the events in your calendar, you can manually amend it by clicking here","Each event has a dedicated group chat"]
+                nextlabels = ["OK","OK","OK","OK","OK"]
                 coachViews.bodyView.hintLabel.text = hintLabels[index]
-                
                 coachViews.bodyView.nextLabel.text = nextlabels[index]
     //            coachViews.bodyView.nextLabel.isEnabled = false
-                
                 return (bodyView: coachViews.bodyView, arrowView: coachViews.arrowView)
+                }
+//                    since the user didnt just create an event it must be the fist time they are viewing an event
+                else{
+                 
+                hintLabels = ["Welcome to your first event","The double tick indicates Planr has automatically collected your availability from the events in your calendar, you can also manually override it","You can refresh your availability here","Each event has a dedicated group chat"]
+                nextlabels = ["OK","OK","OK","OK","OK"]
+                    
+                    
+                coachViews.bodyView.hintLabel.text = hintLabels[index]
+                coachViews.bodyView.nextLabel.text = nextlabels[index]
+//            coachViews.bodyView.nextLabel.isEnabled = false
+                return (bodyView: coachViews.bodyView, arrowView: coachViews.arrowView)
+   
+                }
                 
             }
             
@@ -508,13 +616,25 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
                 //    Defines where the coachmark will appear
                 let pointOfInterest = UIView()
                 
+                if coachMarkHelper == "createEvent" {
                 
-                let hintPositions = [CGRect(x: 0, y: topDistance + 195, width: screenWidth, height: screenHeight - topDistance - screenHeight/2),CGRect(x: 0, y: topDistance + 195, width: screenWidth, height: screenHeight - topDistance - screenHeight/2),CGRect(x: screenWidth/2 - 45, y: topDistance + 105, width: 90, height: 80),CGRect(x: screenWidth/2 - 165, y: topDistance + 105, width: 90, height: 80)]
+                
+                let hintPositions = [CGRect(x: 0, y: topDistance + 195, width: screenWidth, height: screenHeight - topDistance - screenHeight/2),CGRect(x: 0, y: topDistance + 195, width: screenWidth, height: screenHeight - topDistance - screenHeight/2),CGRect(x: screenWidth/2 - 45, y: topDistance + 100, width: 90, height: 90),CGRect(x: screenWidth/2 - 165, y: topDistance + 103, width: 90, height: 90)]
                 
                 pointOfInterest.frame = hintPositions[index]
                 
                 
                 return coachMarksController.helper.makeCoachMark(for: pointOfInterest)
+                }
+                else{
+                    
+                    let hintPositions = [CGRect(x: 0, y: topDistance + 195, width: screenWidth, height: screenHeight - topDistance - screenHeight/2),CGRect(x: screenWidth/2 - 45, y: topDistance + 105, width: 90, height: 90),CGRect(x: screenWidth - 60, y: topDistance + 5, width: 50, height: 50),CGRect(x: screenWidth/2 - 165, y: topDistance + 100, width: 90, height: 90)]
+                    
+                    pointOfInterest.frame = hintPositions[index]
+                    
+                    
+                    return coachMarksController.helper.makeCoachMark(for: pointOfInterest)
+                    }
             }
             
             
@@ -538,7 +658,7 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
            print("Coach Index disappeared \(index)")
             
             
-            if index == 3 {
+            if index == 3 && coachMarkHelper == "createEvent" {
                 
     //            add non user invitees
                    if nonExistingUsers.count > 0{
@@ -565,31 +685,38 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
             
             //    The coach marks must be called from the viewDidAppear and not the ViewDidLoad.
             override func viewDidAppear(_ animated: Bool) {
-                super.viewDidAppear(animated)
-                            
                 
+                super.viewDidAppear(animated)
+                
+                //        set the labels
+                setTheLabels()
+                            
+//                we want to show the tutorial when the user creates an event for the first time and when the user sees an event for the first time
                 let createEventCoachMarksCount = UserDefaults.standard.integer(forKey: "createEventCoachMarksCount")
                 let createEventCoachMarksPermenant = UserDefaults.standard.bool(forKey: "permenantToolTips")
+                let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningEventsv2.13") ?? ""
                 
-                print("createEventCoachMarksCount \(createEventCoachMarksCount)")
-                
-                
-                if summaryView == true && createEventCoachMarksCount < 2 || createEventCoachMarksPermenant == true{
-                
+//                check to see if the user just created the event
+                if summaryView == true && createEventCoachMarksCount < 1 || createEventCoachMarksPermenant == true{
+                    coachMarkHelper = "createEvent"
                 coachMarksController.start(in: .window(over: self))
-                    
                     UserDefaults.standard.set(createEventCoachMarksCount + 1, forKey: "createEventCoachMarksCount")
+//                    if the user has already created an event we don't want to show then the first event tips
+                    UserDefaults.standard.set("false", forKey: "firstTimeOpeningEventsv2.13")
+                }
+//                    check to see if the user is seeing an event for the first time
+                else if firstTimeUser == ""{
+                    coachMarkHelper = "firstEvent"
+                 coachMarksController.start(in: .window(over: self))
+                UserDefaults.standard.set("false", forKey: "firstTimeOpeningEventsv2.13")
                     
                 }
-
                 else{
-                    
     //                add non user invitees
                     if nonExistingUsers.count > 0{
                         
                         self.inviteFriendsPopUp(notExistingUserArray: nonExistingNumbers, nonExistingNameArray: nonExistingUsers)
-                        
-                        
+
                         nonExistingUsers.removeAll()
                     }
                     
@@ -599,14 +726,18 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
         
         //    The view coachmarks should be removed once the view is removed
         override func viewWillDisappear( _ animated: Bool) {
+            print("resultsSplitViewController - running func viewWillDisappear")
             super.viewWillDisappear(animated)
+            
+//            we should remove all the observers when the view disapears, this ensures these do not get triggered when the view is not visible (cuases threading issue)
+            NotificationCenter.default.removeObserver(self, name:  .newDataLoaded, object: nil)
+            NotificationCenter.default.removeObserver(self, name:  .availabilityUpdated, object: nil)
 
             coachMarksController.stop(immediately: true)
         }
     
     
 //    function to remove the event from the list of events with chat notifications
-    
     func removeEventIDChatNotifications(eventID: String){
      
         chatNotificationiDs.removeAll{$0 == eventID}
@@ -614,6 +745,97 @@ extension ResultsSplitViewViewController: UICollectionViewDataSource, UICollecti
     }
     
 }
+
+//extension for the menu button
+extension ResultsSplitViewViewController: UITableViewDataSource, UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return settingArray.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? MenuForResultsView else {fatalError("Unable to deque cell")}
+        cell.lbl.text = settingArray[indexPath.row]
+//        cell.settingImage.image = UIImage(named: settingArray[indexPath.row])!
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 50
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+//        deselect the row currently selected
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+//     list of menu items, for reference = ["Respond Now","Edit Event","Notification","Change Password","Logout"]
+        
+//        first menu item is respnd now
+        if indexPath.row == 0{
+            AutoRespondHelper.uploadCurrentUsersAvailabilityAuto(eventID: currentUserSelectedEvent.eventID)
+//            remove the menu from the screen
+            let screenSize = UIScreen.main.bounds.size
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseInOut, animations: {
+                self.transparentView.alpha = 0
+                self.tableView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: self.height)
+            }, completion: nil)
+//            show notification that the users availability has been updated
+            showProgressHUD(notificationMessage: "Your availability has been updated", imageName: "icons8-double-tick-100", delay: 1.0)
+        }
+//    second menu item is edit
+        if indexPath.row == 1{
+            
+            if selectEventToggle == 1{
+            
+            //        create a list of the users currently invited to the event
+                    inviteesNames = currentUserSelectedEvent.currentUserNames
+                    inviteesUserIDs = currentUserSelectedEvent.users
+            //        if non user invitees = none, we need to show nothing
+                    if currentUserSelectedEvent.nonUserNames.count != 0{
+                        print("there is some data in currentUserSelectedEvent")
+                        nonUserInviteeNames = currentUserSelectedEvent.nonUserNames
+                    }
+                    else{
+                        nonUserInviteeNames.removeAll()
+                    }
+                    
+            //        remove the lists being stored with the new invitees in them - we add this here to ensure each time the user selects the edit button these get reset
+                    contactsSelected.removeAll()
+                    inviteesNamesNew.removeAll()
+
+                
+                    newEventLongitude = 0.0
+                    newEventLatitude = 0.0
+                    chosenMapItemManual = ""
+                    
+            //        let vc = EventEditViewController()
+                    performSegue(withIdentifier: "splitEditButtonSegue", sender: self)
+            //            remove the menu from the screen
+            let screenSize = UIScreen.main.bounds.size
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseInOut, animations: {
+                self.transparentView.alpha = 0
+                self.tableView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: self.height)
+            }, completion: nil)
+            }else{
+//                remove the menu
+                let screenSize = UIScreen.main.bounds.size
+                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseInOut, animations: {
+                    self.transparentView.alpha = 0
+                    self.tableView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: self.height)
+                }, completion: nil)
+                
+//            show notification that the only the event organiser can edit
+                showProgressHUD(notificationMessage: "Only the event organiser can edit", imageName: "unavailable", delay: 2.0)
+            }
+        }
+        
+
+    }
+    
+    
+}
+
 
 
 

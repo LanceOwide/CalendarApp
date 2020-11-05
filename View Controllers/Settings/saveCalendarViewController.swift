@@ -176,14 +176,7 @@ class saveCalendarViewController: UIViewController,UITableViewDelegate, UITableV
                 
                 print("calendar not allowing modifications")
                 
-            }
-            
-            
-        }
-        
-        
-        
-    }
+            }}}
     
 
 }

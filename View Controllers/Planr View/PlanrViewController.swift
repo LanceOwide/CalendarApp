@@ -14,6 +14,8 @@ import Instructions
 class PlanrViewController: UIViewController, MonthViewDelegate, CoachMarksControllerDataSource, CoachMarksControllerDelegate{
 
     
+
+    
     @IBOutlet weak var viewMonthPicker: UIView!
     
     @IBOutlet weak var myTableView: UITableView!
@@ -60,7 +62,7 @@ class PlanrViewController: UIViewController, MonthViewDelegate, CoachMarksContro
 //        setup the coachmarks
         coachMarksController.dataSource = self
         coachMarksController.delegate = self
-        coachMarksController.overlay.allowTap = true
+        coachMarksController.overlay.isUserInteractionEnabled = true
         
         }
 
@@ -155,21 +157,21 @@ class PlanrViewController: UIViewController, MonthViewDelegate, CoachMarksContro
     
     //    MARK: - three mandatory methods for choach tips
             
-            func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: CoachMarkBodyView, arrowView: CoachMarkArrowView?) {
-                
+            func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: (UIView & CoachMarkBodyView), arrowView: (UIView & CoachMarkArrowView)?) {
+
                 let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
-                
+
                 let hintLabels = ["Welcome to your Planr. Here you can view and manage all your confirmed events"]
-                
+
                 let nextlabels = ["OK"]
-                
+
                 coachViews.bodyView.hintLabel.text = hintLabels[index]
-                
+
                 coachViews.bodyView.nextLabel.text = nextlabels[index]
     //            coachViews.bodyView.nextLabel.isEnabled = false
-                
+
                 return (bodyView: coachViews.bodyView, arrowView: coachViews.arrowView)
-                
+
             }
             
 
@@ -543,7 +545,6 @@ extension PlanrViewController{
     
 //    function to create an array for all dates in the chosen month
     func createEventArray(eventArray: [eventSearch],completion: @escaping () -> Void){
-        
         print("running func createEventArray inputs - eventSearch: \(eventArray)")
             
             var emptyArray = [[eventSearch?]](repeating: [nil], count: numOfDaysInMonth[currentMonthIndex-1])
@@ -556,7 +557,6 @@ extension PlanrViewController{
                 if emptyArray[events.chosenDateDay - 1] == [nil]{
                     
                     emptyArray[events.chosenDateDay - 1] = [events]
-                    
                 }
                 else{
                     

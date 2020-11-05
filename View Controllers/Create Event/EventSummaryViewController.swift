@@ -13,7 +13,7 @@ import Firebase
 import Alamofire
 
 
-var summaryView = Bool()
+var summaryView = false
 
 class EventSummaryViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
@@ -107,7 +107,7 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
         addEventToEventStore(){ (eventID) in
             
 //            adds the current users availability to the userEventStore
-            self.uploadCurrentUsersAvailability(eventID: eventID)
+            AutoRespondHelper.uploadCurrentUsersAvailabilityAuto(eventID: eventID)
             
 //            set the current selected event to the one just created and added to CoreData
             currentUserSelectedEvent = self.serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: true)[0]
@@ -208,8 +208,8 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
                 
                 eventIDChosen = eventID
             
-            selectedPhoneNumbers = self.getSelectedContactsPhoneNumbers2().phoneNumbers
-            selectedNames = self.getSelectedContactsPhoneNumbers2().names
+            selectedPhoneNumbers = ["",""]
+            selectedNames = ["",""]
             
             self.createUserIDArrays(phoneNumbers: selectedPhoneNumbers, names: selectedNames) { (nonExistentArray, existentArray, userNameArray, nonExistentNameArray) in
                 
@@ -229,8 +229,17 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
                 self.eventCreatedNotification(userIDs: existentArray, eventID: eventID)
                 
 //                add event to this users CoreData, this allows us to show the results page immediately
-                self.commitSingleEventDB(chosenDate: "", chosenDateDay: 999, chosenDateMonth: 999, chosenDatePosition: 999, chosenDateYear: 999, daysOfTheWeek: daysOfTheWeekNewEvent, endDates: endDates, endTimeInput: newEventEndTime, endDateInput: newEventEndDate, eventDescription: newEventDescription, eventID: eventID, eventOwner: user!, eventOwnerName: eventOwnerName ?? "", isAllDay: "0", location: newEventLocation, locationLatitue: newEventLatitude, locationLongitude: newEventLongitude, startDates: startDates, startDateInput: newEventStartDate, startTimeInput: newEventStartTime, currentUserNames: [eventOwnerName ?? ""] + userNameArray, nonUserNames: nonExistentNameArray, users: [user!] + existentArray)
+                    self.commitSingleEventDB(chosenDate: "", chosenDateDay: 999, chosenDateMonth: 999, chosenDatePosition: 999, chosenDateYear: 999, daysOfTheWeek: daysOfTheWeekNewEvent, endDates: endDates, endTimeInput: newEventEndTime, endDateInput: newEventEndDate, eventDescription: newEventDescription, eventID: eventID, eventOwner: user!, eventOwnerName: eventOwnerName ?? "", isAllDay: "0", location: newEventLocation, locationLatitue: newEventLatitude, locationLongitude: newEventLongitude, startDates: startDates, startDateInput: newEventStartDate, startTimeInput: newEventStartTime, currentUserNames: [eventOwnerName ?? ""] + userNameArray, nonUserNames: nonExistentNameArray, users: [user!] + existentArray, eventType: eventType)
                 
+//                    we need to set the currentUserSelectedEvent
+                    
+                    //        1. retrieve the event data, eventSearch
+                    let predicate = NSPredicate(format: "eventID = %@", eventID)
+                    let predicateReturned = self.serialiseEvents(predicate: predicate, usePredicate: true)
+                    if predicateReturned.count != 0{
+                        print("predicateReturned wasn't nul")
+                        currentUserSelectedEvent = predicateReturned[0]
+                    }
                     
 //              we need to back to the main queue to show the progress HUD and alert
                 DispatchQueue.main.async {
@@ -264,28 +273,27 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
         
     //    get the phone numbers of the users selected for the event
         func getSelectedContactsPhoneNumbers( completion: @escaping () -> Void){
+            print("running func getSelectedContactsPhoneNumbers")
             selectedContacts.removeAll()
             
             getCurrentUsersPhoneNumber {
-                
-                
                 for contact in contactsSelected{
                     if contact.selectedContact == true {
+                        print("getSelectedContactsPhoneNumbers selectedContact = true")
                         
                         let phoneNumber = contact.phoneNumber
                         
-                        let cleanPhoneNumber = self.cleanPhoneNumbers(phoneNumbers: phoneNumber)
-                        
+                        self.cleanPhoneNumbers(phoneNumbers: phoneNumber){ (cleanPhoneNumber) in
+                        print("getSelectedContactsPhoneNumbers selectedContacts \(selectedContacts)")
                             selectedContacts.append(cleanPhoneNumber)
                         }}
-                print("Selected Contacts Phone Numbers \(selectedContacts)")
-                completion()
-                
-            }}
+                }
+            }
+            print("Selected Contacts Phone Numbers \(selectedContacts)")
+            completion()
+        }
         
-        
-
-        
+ 
     //    get the current users phone number
         func getCurrentUsersPhoneNumber( completion: @escaping () -> Void){
             
@@ -315,7 +323,7 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
             
             getStartAndEndDates3(startDate: newEventStartDate, endDate: newEventEndDate, startTime: newEventStartTimeLocal, endTime: newEventEndTimeLocal, daysOfTheWeek: daysOfTheWeekNewEvent){(startDates,endDates) in
                 
-                let eventSearchArray: [String:Any] = ["startDateInput": newEventStartDate,"endDateInput": newEventEndDate,"startTimeInput": newEventStartTime,"endTimeInput": newEventEndTime,"daysOfTheWeek": daysOfTheWeekNewEvent,"isAllDay": "0","users": self.userIDArray, "eventOwner": user!, "location": newEventLocation, "eventDescription": newEventDescription, "timeStamp": timestamp, "eventOwnerName":  eventOwnerName ?? "", "secondsFromGMT": self.secondsFromGMT/3600, "startDates": startDates, "endDates": endDates, "locationLongitude": newEventLongitude, "locationLatitude": newEventLatitude]
+                let eventSearchArray: [String:Any] = ["startDateInput": newEventStartDate,"endDateInput": newEventEndDate,"startTimeInput": newEventStartTime,"endTimeInput": newEventEndTime,"daysOfTheWeek": daysOfTheWeekNewEvent,"isAllDay": "0","users": self.userIDArray, "eventOwner": user, "location": newEventLocation, "eventDescription": newEventDescription, "timeStamp": timestamp, "eventOwnerName":  eventOwnerName ?? "", "secondsFromGMT": self.secondsFromGMT/3600, "startDates": startDates, "endDates": endDates, "locationLongitude": newEventLongitude, "locationLatitude": newEventLatitude]
                 
                 print("days of the week eventQuery \(daysOfTheWeek)")
                 
@@ -336,6 +344,7 @@ class EventSummaryViewController: UIViewController, UITableViewDataSource, UITab
                     let ref = Database.database().reference().child("events").child(eventCreationID)
                     ref.child("eventDescription").setValue(newEventDescription)
                     ref.child("eventOwnerName").setValue(eventOwnerName ?? "")
+                    ref.child("eventOwnerID").setValue(user)
                     ref.child("invitedUsers").setValue(self.userIDArray)
                     
                     print("eventID from eventQuery \(eventCreationID)")

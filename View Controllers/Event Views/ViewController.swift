@@ -21,8 +21,10 @@ var fractionResults = [[Any]]()
 var noResultsArrayGlobal = [Int]()
 var sectionUpcomingEvents = [eventSearch]()
 var sectionPastEvents = [eventSearch]()
+var sectionPastEventsTrans = [eventSearch]()
 var sectionUserHostedEvents = [eventSearch]()
 var newMessageNotification = Bool()
+var noListeners = false
 
 
 class  ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
@@ -67,6 +69,7 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
     var eventLocation = ""
     var eventDescription = ""
     var eventOwnerName = ""
+
     
 
     
@@ -91,10 +94,17 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //        set the badge number to 0
+        UIApplication.shared.applicationIconBadgeNumber = 0
+        
+//        set user default to log that the user isnt new
+
+        UserDefaults.standard.set(true, forKey: "newUser")
 
         navigationItem.titleView = setAppHeader(colour: UIColor.black)
         
-        updatePendingNotificationStatus()
+        updatePendingNotificationStatus(eventBool: false, eventID: "eventID", eventNewNotification: false)
         
 //        function to populate any non populated availability
         nonRespondedEvents()
@@ -143,12 +153,25 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
         refreshControlCreated.attributedTitle = NSAttributedString(string: "Pull to refresh")
         refreshControlCreated.addTarget(self, action: #selector(refreshCreated), for: .valueChanged)
         self.userCreatedEvents.addSubview(refreshControlCreated)
-
+        
+//        trigger for updating when new notifications are recieved
+        NotificationCenter.default.addObserver(self, selector: #selector(updateTable), name: .notificationsReloaded, object: nil)
+        
+//        refresh when new data is saved down
+        NotificationCenter.default.addObserver(self, selector: #selector(updateTable), name: .newDataLoaded, object: nil)
 //        The end of the viewDidLoad
     }
     
     override func viewDidAppear(_ animated: Bool) {
         userCreatedEvents.reloadData()
+    }
+    
+    
+    @objc func updateTable(){
+        print("viewController running func updateTable")
+        getUsersCreatedEvents()
+        DispatchQueue.main.async {
+            self.userCreatedEvents.reloadData()}
     }
     
 
@@ -162,6 +185,11 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
 //    MARK: code to pull down all events and then display them
         func getUsersCreatedEvents(){
             
+            //        we unwrap user, hence we must confirm it is has a value
+            if user == nil{
+            }
+            else{
+            
 //            DUMMY predicate
             let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
             
@@ -173,6 +201,8 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
             
     //      filter the serilaised events for events not hosted by the user and in the pending status, but in the past
             sectionPastEvents = filteringEventsForDisplay(pending: true, createdByUser: false, pastEvents: true, serialisedEvents: serialisedEvents) + filteringEventsForDisplay(pending: true, createdByUser: true, pastEvents: true, serialisedEvents: serialisedEvents)
+                
+            }
             
         }
 
@@ -181,13 +211,14 @@ class  ViewController: UIViewController, UITableViewDataSource, UITableViewDeleg
             getUsersCreatedEvents()
             userCreatedEvents.reloadData()
         }
+    
 
     
     
 func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let sectionUpcomingRows = sectionUpcomingEvents.count
         let sectionUserHostedEventsRows = sectionUserHostedEvents.count
-        let sectionPastRows = sectionPastEvents.count
+        let sectionPastRows = sectionPastEventsTrans.count
         var numberOfRows = [Int]()
         
         if (sectionUpcomingRows + sectionPastRows + sectionUserHostedEventsRows) == 0 {
@@ -216,19 +247,22 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
                     fatalError("failed to create user created events cell")
         }
         
-        cell.userCreatedCellLabel1.adjustsFontSizeToFitWidth = true
-        cell.userCreatedCellLabel2.adjustsFontSizeToFitWidth = true
-        cell.userCreatedCellLabel3.adjustsFontSizeToFitWidth = true
+//        cell.userCreatedCellLabel1.adjustsFontSizeToFitWidth = true
+//        cell.userCreatedCellLabel2.adjustsFontSizeToFitWidth = true
+//        cell.userCreatedCellLabel3.adjustsFontSizeToFitWidth = true
+
         
         
-        if (sectionPastEvents.count + sectionUpcomingEvents.count + sectionUserHostedEvents.count) == 0{
+        if (sectionPastEventsTrans.count + sectionUpcomingEvents.count + sectionUserHostedEvents.count) == 0{
             
             cell.userCreatedCellLabel1.text = ""
             cell.userCreatedCellLabel2.text = "You haven't created any events"
             cell.userCreatedCellLabel3.text = "Head to 'Create An Event' to get started"
+            cell.txtEventOwner.text = ""
             cell.userCreatedCollectionViewDates.isHidden = true
             cell.userCreatedCollectionViewNames.isHidden = true
             cell.imgChatNotification.isHidden = true
+            cell.imgEventNotification.isHidden = true
             
         }
         else{
@@ -239,19 +273,22 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
             cell.layer.borderWidth = 0.5
             cell.clipsToBounds = true
             cell.selectionStyle = .none
+            
+            cell.userCreatedCellLabel2.font.withSize(13)
+            cell.userCreatedCellLabel3.font.withSize(13)
+            cell.txtEventOwner.font.withSize(10)
         
             
             if indexPath.section == 0{
               
                 item = sectionUserHostedEvents[indexPath.row]
                         let eventTitleDescription = NSMutableAttributedString(string: item.eventDescription,
-                                                                                  attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 20)])
-                            eventTitleDescription.append(NSMutableAttributedString(string: " by: \(item.eventOwnerName)",
-                                                                               attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]))
+                                                                                  attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)])
                             
                             
                         cell.userCreatedCellLabel1.attributedText = eventTitleDescription
                         cell.userCreatedCellLabel2.text =  item.eventLocation
+                cell.txtEventOwner.text = item.eventOwnerName
                         
                 cell.userCreatedCellLabel3.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
                         
@@ -262,11 +299,16 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
                     cell.imgChatNotification.layer.borderWidth = 1.0
                     cell.imgChatNotification.layer.borderColor = UIColor.red.cgColor
                     cell.imgChatNotification.layer.masksToBounds = true
-                    
                     }
                 else{
                     
                     cell.imgChatNotification.isHidden = true
+                }
+                if eventNotificationiDs.contains(item.eventID) == true{
+                 cell.imgEventNotification.isHidden = false
+                }
+                else{
+                   cell.imgEventNotification.isHidden = true
                 }
 
                         cell.userCreatedCollectionViewDates.isHidden = false
@@ -281,13 +323,14 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
               
                 item = sectionUpcomingEvents[indexPath.row]
                         let eventTitleDescription = NSMutableAttributedString(string: item.eventDescription,
-                                                                                  attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 20)])
-                            eventTitleDescription.append(NSMutableAttributedString(string: " by: \(item.eventOwnerName)",
-                                                                               attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]))
+                        attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)])
+
                             
                             
                         cell.userCreatedCellLabel1.attributedText = eventTitleDescription
                                 cell.userCreatedCellLabel2.text =  item.eventLocation
+                
+                cell.txtEventOwner.text = item.eventOwnerName
                                 
                         cell.userCreatedCellLabel3.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
                         
@@ -305,21 +348,27 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
                     
                     cell.imgChatNotification.isHidden = true
                 }
+                if eventNotificationiDs.contains(item.eventID) == true{
+                 cell.imgEventNotification.isHidden = false
+                }
+                else{
+                   cell.imgEventNotification.isHidden = true
+                }
                 
                         cell.userCreatedCollectionViewDates.isHidden = false
                         cell.userCreatedCollectionViewNames.isHidden = false
             }
             if indexPath.section == 2{
               
-                item = sectionPastEvents[indexPath.row]
+                item = sectionPastEventsTrans[indexPath.row]
                         let eventTitleDescription = NSMutableAttributedString(string: item.eventDescription,
-                                                                                  attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 20)])
-                            eventTitleDescription.append(NSMutableAttributedString(string: " by: \(item.eventOwnerName)",
-                                                                               attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]))
+                                                                                  attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)])
                             
                             
                         cell.userCreatedCellLabel1.attributedText = eventTitleDescription
                                 cell.userCreatedCellLabel2.text =  item.eventLocation
+                
+                cell.txtEventOwner.text = item.eventOwnerName
                                 
                         cell.userCreatedCellLabel3.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
     
@@ -336,6 +385,12 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
                 else{
                     
                     cell.imgChatNotification.isHidden = true
+                }
+                if eventNotificationiDs.contains(item.eventID) == true{
+                 cell.imgEventNotification.isHidden = false
+                }
+                else{
+                   cell.imgEventNotification.isHidden = true
                 }
                         cell.userCreatedCollectionViewDates.isHidden = false
                         cell.userCreatedCollectionViewNames.isHidden = false
@@ -354,7 +409,6 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
     
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        
         var  numberOfSections = Int()
         
         if (sectionPastEvents.count + sectionUpcomingEvents.count + sectionUserHostedEvents.count) == 0 {
@@ -383,45 +437,81 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView()
         let label = UILabel()
+        let button = UIButton(type: .system)
+        button.setTitleColor(.black, for: .normal)
+        button.addTarget(self, action: #selector(handleExpandClose), for: .touchUpInside)
         var sectionHeaders = [String]()
         sectionHeaders.removeAll()
+        var buttonTitle = [String]()
+        var sectionButton = [Bool]()
         headerView.backgroundColor = UIColor.clear
         
         if sectionUserHostedEvents.count == 0{
             
             sectionHeaders.append("")
+            buttonTitle.append("")
+            sectionButton.append(true)
         }
         else{
             
             sectionHeaders.append("Your Hosted Events 🏠")
+            buttonTitle.append("")
+            sectionButton.append(true)
         }
         
         if sectionUpcomingEvents.count == 0{
            sectionHeaders.append("")
+            buttonTitle.append("")
+            sectionButton.append(true)
             
         }
         else{
         
         sectionHeaders.append("Upcoming Events")
+            buttonTitle.append("")
+            sectionButton.append(true)
             
         }
         
         if sectionPastEvents.count == 0{
            sectionHeaders.append("")
-            
+            buttonTitle.append("")
+            sectionButton.append(true)
         }
         else{
-            
           sectionHeaders.append("Missed Events")
+            sectionButton.append(false)
+            if sectionPastEventsTrans.count == 0{
+                buttonTitle.append("+")
+            }else{
+                buttonTitle.append("-")
+            }
             
         }
 
-            label.frame = CGRect(x: 16, y: 5, width: screenWidth - 16, height: 40)
-            label.text = sectionHeaders[section]
+            label.frame = CGRect(x: 16, y: 5, width: screenWidth - 100, height: 40)
             headerView.addSubview(label)
+            label.text = sectionHeaders[section]
+            button.frame = CGRect(x: screenWidth - 100, y: 5, width: 80, height: 40)
+            button.isHidden = sectionButton[section]
+            button.setTitle(buttonTitle[section], for: .normal)
+            headerView.addSubview(button)
             
             return headerView
         }
+    
+    //    function for closing a section
+    @objc func handleExpandClose(){
+        print("opening a section")
+        
+        if sectionPastEventsTrans.count == 0{
+           sectionPastEventsTrans = sectionPastEvents
+        }else{
+            sectionPastEventsTrans.removeAll()
+        }
+        
+    userCreatedEvents.reloadData()
+    }
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -437,7 +527,7 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
         loadingNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
         loadingNotification.mode = MBProgressHUDMode.customView
         
-        if (sectionPastEvents.count + sectionUpcomingEvents.count + sectionUserHostedEvents.count) == 0{
+        if (sectionPastEventsTrans.count + sectionUpcomingEvents.count + sectionUserHostedEvents.count) == 0{
             
         }
         else{
@@ -469,9 +559,7 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
                 newMessageNotification = true
             }
             else{
-            
             newMessageNotification = false
-            
             }
             currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
             self.prepareForEventDetailsPageCD(segueName: segue, isSummaryView: false, performSegue: true, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
@@ -482,7 +570,7 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
                     }
         else if indexPath.section == 2{
             
-            currentUserSelectedEvent = sectionPastEvents[indexPath.row]
+            currentUserSelectedEvent = sectionPastEventsTrans[indexPath.row]
             if currentUserSelectedEvent.newChatMessage == true{
                 newMessageNotification = true
             }
@@ -537,7 +625,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         
         
 //        if no data for the events exists yet then do not display any cells in the collectionView
-        if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEvents.count) == 0 {
+        if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEventsTrans.count) == 0 {
            
             numberOfItemsForSection = 0
             
@@ -554,10 +642,10 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
           numberOfItemsForSection = sectionUpcomingEvents[(collectionView.tag - 1)/100].startDatesDisplay.count
 
         }
-        else if collectionView.tag < 1000000 && sectionPastEvents.count != 0{
+        else if collectionView.tag < 1000000 && sectionPastEventsTrans.count != 0{
             
             
-            numberOfItemsForSection = sectionPastEvents[(collectionView.tag - 1)/10000].startDatesDisplay.count
+            numberOfItemsForSection = sectionPastEventsTrans[(collectionView.tag - 1)/10000].startDatesDisplay.count
             
             
         }
@@ -574,7 +662,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
 //        collectionView for invitee names
         else{
             
-            if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEvents.count) == 0 {
+            if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEventsTrans.count) == 0 {
                        
                 
             print("no data for invitee names")
@@ -597,12 +685,12 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
                       numberOfItemsForSection = sectionUpcomingEvents[(collectionView.tag - 1)/100000000].currentUserNames.count + sectionUpcomingEvents[(collectionView.tag - 1)/100000000].nonUserNames.count
 
                     }
-                    else if collectionView.tag < 1000000000000 && sectionPastEvents.count != 0{
+                    else if collectionView.tag < 1000000000000 && sectionPastEventsTrans.count != 0{
                         
                 
                 print("data for invitee names - missed events")
                         
-                        numberOfItemsForSection = sectionPastEvents[(collectionView.tag - 1)/10000000000].currentUserNames.count + sectionPastEvents[(collectionView.tag - 1)/10000000000].nonUserNames.count
+                        numberOfItemsForSection = sectionPastEventsTrans[(collectionView.tag - 1)/10000000000].currentUserNames.count + sectionPastEventsTrans[(collectionView.tag - 1)/10000000000].nonUserNames.count
                         
                         
                     }
@@ -653,7 +741,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         cell.backgroundColor = UIColor.white
         
             
-        if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEvents.count) == 0 {
+        if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEventsTrans.count) == 0 {
            
             print("sectionUpcoming not populated")
 
@@ -675,12 +763,12 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
 
 
         }
-        else if collectionView.tag < 1000000 && sectionPastEvents.count != 0{
+        else if collectionView.tag < 1000000 && sectionPastEventsTrans.count != 0{
             
 //            cell.lblUserCreatedDates.text = "loading"
              
 
-            cell.lblUserCreatedDates.text = sectionPastEvents[(collectionView.tag - 1)/10000].startDatesDisplay[indexPath.row]
+            cell.lblUserCreatedDates.text = sectionPastEventsTrans[(collectionView.tag - 1)/10000].startDatesDisplay[indexPath.row]
             
             
         }
@@ -712,7 +800,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
             cell.backgroundColor = UIColor.white
             
             
-            if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEvents.count) == 0 {
+            if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEventsTrans.count) == 0 {
                        
                         print("no data for invitee names")
 
@@ -733,8 +821,8 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
                         cell.lblInviteeNames.text = nameArray[indexPath.row]
 
                     }
-                    else if collectionView.tag < 1000000000000 && sectionPastEvents.count != 0{
-                     let nameArray = sectionPastEvents[(collectionView.tag - 1)/10000000000].currentUserNames + sectionPastEvents[(collectionView.tag - 1)/10000000000].nonUserNames
+                    else if collectionView.tag < 1000000000000 && sectionPastEventsTrans.count != 0{
+                     let nameArray = sectionPastEventsTrans[(collectionView.tag - 1)/10000000000].currentUserNames + sectionPastEventsTrans[(collectionView.tag - 1)/10000000000].nonUserNames
 
                         cell.lblInviteeNames.text = nameArray[indexPath.row]
                         

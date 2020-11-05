@@ -57,8 +57,6 @@ class RegisterViewController: UIViewController {
         }
         
         else{
-            
-            
             registeredName = registerName.text!.capitalized
             registeredEmail = registerEmail.text!
             
@@ -69,17 +67,16 @@ class RegisterViewController: UIViewController {
         }}
     
 
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         //        setup the navigation bar
-        navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
+        navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: MyVariables.colourPlanrGreen)
         
         
 //        sets the background colour of the view
-        setBackgroundColour(currentView: view)
+        view.backgroundColor = .white
+//        setBackgroundColour(currentView: view)
         
         
         //        restrict the rotation of the device to portrait
@@ -104,16 +101,17 @@ class RegisterViewController: UIViewController {
         
         
         let welcomeText = NSMutableAttributedString(string: "Plan",
-                                                    attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 60),NSAttributedString.Key.foregroundColor: UIColor.white])
+                                                    attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 60),NSAttributedString.Key.foregroundColor: MyVariables.colourPlanrGreen])
         
         welcomeText.append(NSMutableAttributedString(string: "r",
-                                                    attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 60),NSAttributedString.Key.foregroundColor: UIColor.white]))
-        
+                                                     attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 60),NSAttributedString.Key.foregroundColor: MyVariables.colourPlanrGreen]))
         
         headerLabel.attributedText = welcomeText
         
         
     }
+    
+
     
 
      func isValidEmail(emailStr:String) -> Bool {

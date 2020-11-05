@@ -13,8 +13,6 @@ import Firebase
 import EventKit
 import AMPopTip
 import Alamofire
-import Fabric
-import Crashlytics
 import BackgroundTasks
 
 
@@ -50,6 +48,51 @@ class GlobalFunctions: UIViewController {
         
        return timeInLocal
     }
+        
+        
+//        function to create the time showing for the chats
+        
+        func covertToChatFormat(inputTime: Double) -> String{
+           
+            let todaysDate = Date()
+            let calendar = NSCalendar.current
+//            convert the double into a date we can transform
+            let myNSDate = Date(timeIntervalSince1970: inputTime)
+            let weekAddition = Calendar.Component.day
+            let plusWeek = calendar.date(byAdding: weekAddition, value: -7, to: todaysDate)!
+            
+//            setup the date formatter
+            let dateFormatterDisplayDate = DateFormatter()
+            dateFormatterDisplayDate.dateFormat = "dd MMM HH:mm"
+            dateFormatterDisplayDate.locale = Locale(identifier: "en_US_POSIX")
+//            we want to show the following, the time if the chat was sent to today, the week day if it was sent this week otherwise the full date dd mmm yyyy
+            
+//        1. check if the date is today
+            if Calendar.current.isDateInToday(myNSDate){
+                let dateFormatterDisplayDate = DateFormatter()
+                dateFormatterDisplayDate.dateFormat = "HH:mm"
+                dateFormatterDisplayDate.locale = Locale(identifier: "en_US_POSIX")
+                
+                let displayDate = dateFormatterDisplayDate.string(from: myNSDate)
+                return displayDate
+            }
+            else if myNSDate > plusWeek{
+                let dateFormatterDisplayDate = DateFormatter()
+                dateFormatterDisplayDate.dateFormat = "E"
+                dateFormatterDisplayDate.locale = Locale(identifier: "en_US_POSIX")
+                
+                let displayDate = dateFormatterDisplayDate.string(from: myNSDate)
+                return displayDate
+            }
+            else{
+                let dateFormatterDisplayDate = DateFormatter()
+                dateFormatterDisplayDate.dateFormat = "dd MMM"
+                dateFormatterDisplayDate.locale = Locale(identifier: "en_US_POSIX")
+                
+                let displayDate = dateFormatterDisplayDate.string(from: myNSDate)
+                return displayDate
+            }
+        }
     
     
     //    Function: converts the input string into a date and converts to GMT. Input: String, Output: String
@@ -190,22 +233,117 @@ class GlobalFunctions: UIViewController {
         
 //    convert date array into display format inputs yyyy-mm-dd HH:mm z output dd MMM YYYY
         func dateTZToDisplayDate(date: String) -> String{
+            
+            if date == ""{
+                return ""
+            }
+            else{
+            
             let dateFormatterTz = DateFormatter()
             dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
             dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
             let dateFormatterForResults = DateFormatter()
             dateFormatterForResults.dateFormat = "dd MMM YYYY"
             dateFormatterForResults.locale = Locale(identifier: "en_US_POSIX")
-                let dateDate = dateFormatterTz.date(from: date)
-                let dateString = dateFormatterForResults.string(from: dateDate!)
-
+            let dateDate = dateFormatterTz.date(from: date)
+            let dateString = dateFormatterForResults.string(from: dateDate!)
             return dateString
+            }
+
         }
+        
+//    convert date array into display format inputs yyyy-mm-dd HH:mm z output E dd MMM = DDD DD MMM
+                func dateTZToShortDisplayDate(date: String) -> String{
+                    
+                    if date == ""{
+                        return ""
+                    }
+                    else{
+                    
+                    let dateFormatterTz = DateFormatter()
+                    dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
+                    dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
+                    let dateFormatterForResults = DateFormatter()
+                    dateFormatterForResults.dateFormat = "E d MMM"
+                    dateFormatterForResults.locale = Locale(identifier: "en_US_POSIX")
+                    let dateDate = dateFormatterTz.date(from: date)
+                    let dateString = dateFormatterForResults.string(from: dateDate!)
+                    return dateString
+                    }
+
+                }
+        
+        
+        
+        //    convert date array into display format inputs yyyy-mm-dd HH:mm z output E = DDD
+                        func dateTZToDay(date: String) -> String{
+                            
+                            if date == ""{
+                                return ""
+                            }
+                            else{
+                            
+                            let dateFormatterTz = DateFormatter()
+                            dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
+                            dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
+                            let dateFormatterForResults = DateFormatter()
+                            dateFormatterForResults.dateFormat = "E"
+                            dateFormatterForResults.locale = Locale(identifier: "en_US_POSIX")
+                            let dateDate = dateFormatterTz.date(from: date)
+                            let dateString = dateFormatterForResults.string(from: dateDate!)
+                            return dateString
+                            }
+
+                        }
+        
+        //    convert date array into display format inputs yyyy-mm-dd HH:mm z output E dd MMM = DDD DD MMM
+                        func dateTZToDayNum(date: String) -> String{
+                            
+                            if date == ""{
+                                return ""
+                            }
+                            else{
+                            
+                            let dateFormatterTz = DateFormatter()
+                            dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
+                            dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
+                            let dateFormatterForResults = DateFormatter()
+                            dateFormatterForResults.dateFormat = "d"
+                            dateFormatterForResults.locale = Locale(identifier: "en_US_POSIX")
+                            let dateDate = dateFormatterTz.date(from: date)
+                            let dateString = dateFormatterForResults.string(from: dateDate!)
+                            return dateString
+                            }
+
+                        }
+        
+        
+        //    convert date array into display format inputs yyyy-mm-dd HH:mm z output E dd MMM = DDD DD MMM
+                        func dateTZToMonth(date: String) -> String{
+                            
+                            if date == ""{
+                                return ""
+                            }
+                            else{
+                            
+                            let dateFormatterTz = DateFormatter()
+                            dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
+                            dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
+                            let dateFormatterForResults = DateFormatter()
+                            dateFormatterForResults.dateFormat = "MMM"
+                            dateFormatterForResults.locale = Locale(identifier: "en_US_POSIX")
+                            let dateDate = dateFormatterTz.date(from: date)
+                            let dateString = dateFormatterForResults.string(from: dateDate!)
+                            return dateString
+                            }
+
+                        }
+        
     
     
 //    function to allow for the process of a string array into the phone number cleaning function
     
-    func getSelectedContactsPhoneNumbers2() -> (phoneNumbers:[String], names:[String]){
+        func getSelectedContactsPhoneNumbers2( completion: @escaping (_ phoneNumbers: [String], _ names: [String]) -> ()){
         
         print("running func getSelectedContactsPhoneNumbers2")
         
@@ -213,19 +351,28 @@ class GlobalFunctions: UIViewController {
         selectedContactNames.removeAll()
         
         print("contactsSelected: \(contactsSelected)")
+//            we need the fucntion to only complete once the for loop in complete, we track this using n
+            
+            var n = 0
 
             for contact in contactsSelected{
-                if contact.selectedContact == true {
-                    
-                   let cleanPhoneNumber = cleanPhoneNumbers(phoneNumbers: contact.phoneNumber)
+
+                self.cleanPhoneNumbers(phoneNumbers: contact.phoneNumber){ (cleanPhoneNumber) in
                     let contactName = contact.name
                     
                         selectedContacts.append(cleanPhoneNumber)
                         selectedContactNames.append(contactName)
-   
-                }}
-        print("output: phoneNumbers: \(selectedContacts) names: \(selectedContactNames)")
-        return (phoneNumbers: selectedContacts, names: selectedContactNames)
+//                    add one to the loop tracker
+                    n = n + 1
+                    if n == contactsSelected.count{
+                        print("output: phoneNumbers: \(selectedContacts) names: \(selectedContactNames)")
+                        completion(selectedContacts, selectedContactNames)
+                    }
+                    
+                }
+  
+            }
+        
         }
     
     
@@ -378,7 +525,7 @@ class GlobalFunctions: UIViewController {
         let queue = DispatchQueue.global()
         var n = 0
         
-//        we use the semaphore signal wait process to ensure the while statement waits for the data to be written to the database before conituining
+//        we use the semaphore signal wait process to ensure the while statement waits for the data to be written to the database before continuing
         queue.async {
         while n <= numberOfUsers{
         
@@ -398,7 +545,12 @@ class GlobalFunctions: UIViewController {
                             }
                             else{
                 //            adds the username to the real time database
-                            ref.child("userEventLink/\(userID[n])/\(eventID)").setValue(eventID)
+                            ref.child("userEventLink/\(userID[n])/newEvent/\(eventID)").setValue(eventID)
+                                
+//                                update the realtime DB with the new event notification information
+                            dbStore.collection("userNotification").document(userID[n]).setData(["eventNotificationPending" : true], merge: true)
+                            dbStore.collection("userNotification").document(userID[n]).setData(["eventNotificationiDs" : [eventID]], merge: true)
+                                
                             }
                 semaphore.signal()
                 if n == numberOfUsers{
@@ -498,34 +650,92 @@ class GlobalFunctions: UIViewController {
         }
    
     }
+        
+        func getUsersPhoneCode( completion: @escaping (_ userPhoneNumber: String) -> ()){
+        print("running func getUsersPhoneCode")
+        var usersPhoneCode = String()
+            
+////    FOR TESTING ONLY!!
+    UserDefaults.standard.setValue("", forKey: "userPhoneNumber")
+        
+    //    we need to get the user local country dial code prefix, we do this by pulling the users number and extracting it, we check if the users number isnt saved in their phone and pull it from Firebase
+        
+        let phoneNumberDefault = UserDefaults.standard.string(forKey: "userPhoneNumber") ?? ""
+        print("phoneNumberDefault \(phoneNumberDefault)")
+        
+
+        
+    //    check if the user name was available, if so we need to get the users number from the database
+        if phoneNumberDefault == "" {
+            print("user didn't have a phone number")
+    //        check we have the users ID
+            if user == nil{
+             print("user == nil")
+            }
+            else{
+            dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments { (querySnapshot, error) in
+            if error != nil {
+                print("Error getting documents: \(error!)")
+            }
+            else {
+                for document in querySnapshot!.documents {
+                    print("we got the user number")
+                    
+                    let phoneNumbersFB = document.get("phoneNumbers") as! [String]
+                    let phoneNumberFB = phoneNumbersFB[0]
+                    
+    //                save down the new phone number
+                    UserDefaults.standard.setValue(phoneNumberFB, forKey: "userPhoneNumber")
+                    usersPhoneCode = phoneNumberFB
+                    completion(usersPhoneCode)
+                }}}}}
+        else{
+            usersPhoneCode = phoneNumberDefault
+        completion(usersPhoneCode)
+        }
+    }
     
 //function returns a clean phone number fron the dirty phone number used as an input
-func cleanPhoneNumbers(phoneNumbers: String) -> String{
+        func cleanPhoneNumbers(phoneNumbers: String, completion: @escaping (_ returnedPhoneNumber: String) -> ()){
+//    now that we have corrected the phone number we get it again
     
-    print("running func cleanPhoneNumbers: Input PhoneNumbers: \(phoneNumbers)")
+    getUsersPhoneCode{ (numberReturned) in
+//    we need to get the dial code with the + i.e +44. a phone number is 10 characters without the country code
+    
+//    get the number of characters in the users number
+    let charNumber = numberReturned.count
+        print("charNumber \(charNumber)")
+
+//    the end of the users country code will be the count - 11 +15127714295 (char 12)
+    let endChar = charNumber - 11
+    let countryCode = numberReturned[1...endChar]
+    let countryPrefix = countryCode
+    
+    print("countryPrefix \(countryPrefix)")
         
-        let currentLocale = NSLocale.current.regionCode
-        let countryPrefix = countryCodePrefixes.countryCodes[currentLocale!]!
-        let phoneNumberLen = phoneNumbers.count
-        
-        //        print(countryPrefix)
-        //        print(currentLocale!)
         
         var returnedPhoneNumber = String()
         
-        //            used to remove all the non digit characters within the phone numbers
+//            used to remove all the non digit characters within the phone numbers
         let phoneNumberClean = phoneNumbers.components(separatedBy:CharacterSet.decimalDigits.inverted).joined(separator: "")
+        print("phoneNumberClean \(phoneNumberClean)")
+//        we get the number of digits in the clean phone number
+        let phoneNumberLen = phoneNumberClean.count
         
+        if phoneNumberLen < 10{
+            print("something is wrong, this number is not correct")
+        }
             
-        //        If the phone number starts with a + we assume it is in the correct format
+//        If the phone number starts with a + we assume it is in the correct format
     
-    if phoneNumberLen > 10 && phoneNumbers[0] == "+" {
+    if phoneNumberLen > 11 && phoneNumbers[0] == "+" {
+        print("phoneNumberLen > 11 && phoneNumbers[0]")
         let phoneNumberLenClean = phoneNumberClean.count
         let phoneNumberZero = phoneNumberLenClean - 11
         let numberZero = phoneNumberClean[phoneNumberZero]
         
         if numberZero == "0"{
-            
+            print("numberZero == 0")
             let phoneNumberZero = phoneNumberLenClean - 11
             let phoneNumberZeroSecond = phoneNumberLenClean - 10
             
@@ -542,10 +752,8 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             returnedPhoneNumber = "+\(phoneNumberClean)"
             
         }
-        
-        
+  
     }
-            
         else if phoneNumberClean.count == 10{
             returnedPhoneNumber = "+\(countryPrefix)\(phoneNumberClean)"
             
@@ -590,9 +798,9 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         else{
             returnedPhoneNumber = phoneNumberClean
         }
-        
         print("returnedPhoneNumber \(returnedPhoneNumber)")
-        return returnedPhoneNumber
+        completion(returnedPhoneNumber)
+        }
     }
     
     
@@ -817,13 +1025,13 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         }))
         alert.addAction(UIAlertAction(title: "YES", style: UIAlertAction.Style.default, handler: { action in
             
+            Analytics.logEvent(firebaseEvents.eventSendInvite, parameters: ["user": user])
             print("User Selected to send texts to thier friends")
 //            self.sendInviteTextMessages(notExistingUserArray: notExistingUserArray)
             
             self.shareLinkToTheEvent()
         }))
         // show the alert
-        
         if self.presentedViewController == nil {
             self.present(alert, animated: true, completion: nil)
         }
@@ -832,6 +1040,32 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             self.present(alert, animated: true, completion: nil)
         }
     }
+        
+        
+func reminderPopUp(eventID: String, userID: String, userName: String){
+            print("reminderpopup eventID \(eventID) userID \(userID) userName \(userName)")
+//            post the user a message asking if they want to send a reminder
+            let utils = Utils()
+                        
+            let button1 = AlertButton(title: "Yes", action: {
+                Analytics.logEvent(firebaseEvents.eventSendReminder, parameters: ["user": user])
+                    AutoRespondHelper.sendTheUserAReminder(eventID: eventID, userID: userID)
+                }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
+                        
+            let button2 = AlertButton(title: "No", action: {
+                print("user selected no")
+            }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
+                        
+            let alertPayload = AlertPayload(title: "Send Reminder!", titleColor: UIColor.red, message: "Would you like to send a reminder to \(userName) to respond?", messageColor: MyVariables.colourPlanrGreen, buttons: [button1,button2], backgroundColor: UIColor.clear)
+            
+            if self.presentedViewController == nil {
+                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+            }
+            else {
+                self.dismiss(animated: false, completion: nil)
+                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+            }
+        }
     
         
         
@@ -860,7 +1094,6 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
     
     
     func resultsResponseComplete(){
-            
     //        performSegue(withIdentifier: "eventCreatedSegue", sender: self)
             
             
@@ -881,7 +1114,6 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                 self.dismiss(animated: false, completion: nil)
                 self.present(alertEventComplete, animated: true, completion: nil)
             }
-            
             }
     
     
@@ -1031,21 +1263,31 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
     }
     
     
-    func checkCalendarStatus2(){
+    func checkCalendarStatus2() -> Bool{
         let status = EKEventStore.authorizationStatus(for: EKEntityType.event)
+        var accessGranted = Bool()
+        
+        print("running func checkCalendarStatus2")
         
         switch (status) {
         case EKAuthorizationStatus.notDetermined:
             requestAccessToCalendar2()
+            return accessGranted
         case EKAuthorizationStatus.authorized:
             print("We got access to the calendar")
             loadCalendars2()
+            accessGranted = true
+            return accessGranted
         case EKAuthorizationStatus.denied:
             print("No access to the calendar")
             showNoAccessToCalendarAlert()
+            accessGranted = false
+            return accessGranted
 
         case .restricted:
             print("Access denied to the calendar")
+            accessGranted = false
+            return accessGranted
         }
         
     }
@@ -1092,18 +1334,31 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
     
     //        request access to the users calendar
     func requestAccessToCalendar2() {
+        
+        let calendarAccessReask = UserDefaults.standard.integer(forKey: "calendarAccessReask") ?? 0
+        
+        if calendarAccessReask == 0{
+        
         eventStore.requestAccess(to: EKEntityType.event, completion: {
             (accessGranted: Bool, error: Error?) in
             
             if accessGranted == true {
                 //                print("we got access")
                 self.loadCalendars2()
+//                since we were just granted access to the calendar we should respond to any events
+                AutoRespondHelper.nonRespondedEventsAuto()
+
             }
             else{
+//                we do not want to show the user this message more than once, so we track it
+                UserDefaults.standard.set(1, forKey: "calendarAccessReask")
                 print("no access to the calendar")
             }
             
-        })
+        })}
+        else{
+//            we already asked the user for access and they said no
+        }
     }
     
 
@@ -1114,15 +1369,45 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         print("running func commitUserAvailbilityData inputs - userEventStoreID: \(userEventStoreID) finalAvailabilityArray2: \(finalAvailabilityArray2) eventID: \(eventID)")
         let dbStoreInd = Firestore.firestore()
     
+//            commit the availability to FireStore
         dbStoreInd.collection("userEventStore").document(userEventStoreID).setData(["userAvailability" : finalAvailabilityArray2,"userResponded": true], merge: true)
+
+//            we need to get the calendarEventID before we can save the evnt down
             
-        
+            
+            
+            
+//        we also commit the users availability to their own CD
+//                            before we commit anything to the DB we should check if it alredy exists and remove it if it does
+            if let index = CDAvailability.index(where: {$0.documentID == userEventStoreID}){
+                                    context.delete(CDAvailability[index])
+                                    CDAvailability.remove(at: index)
+                                    print("index: \(index)")
+                self.CDSaveData()
+            }
+//           commit the data into the CD
+            
+            let CDNewAvailability = CoreDataAvailability(context: context)
+            let name = UserDefaults.standard.string(forKey: "name")
+            
+            CDNewAvailability.documentID = userEventStoreID
+            CDNewAvailability.uid = user!
+            CDNewAvailability.eventID = eventID
+            CDNewAvailability.userName = name
+            CDNewAvailability.userAvailability = finalAvailabilityArray2
+//                        append the new event onto CDAvailability
+            CDAvailability.append(CDNewAvailability)
+            self.CDSaveData()
+            
+//        post notifications that the user has responded
             if serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: true).count == 0{
                 print("commitUserAvailbilityData the event wasnt in CD - maybe we should do something about it")
             }
             else{
                 let userIDs = serialiseEvents(predicate: NSPredicate(format: "eventID == %@", eventID), usePredicate: true)[0].users
                 availabilityCreatedNotification(userIDs: userIDs, availabilityDocumentID: userEventStoreID)
+//                        post notification that the availability has been posted
+                AutoRespondHelper.userRespondedNotification(eventID: eventID)
             }
     }
     
@@ -1267,7 +1552,6 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                 
                 eventOwnerName = ("\(eventOwner) has")
             }
-        
             
 //            checks to see if the event is already in the calendar, the alert message text is updated accordingly
             if calendarEventIDInput == ""{
@@ -1293,9 +1577,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                 if (granted) && (error == nil) {
                     
                     if calendarEventIDInput == "" || eventStore.event(withIdentifier: calendarEventIDInput) == nil{
-                    
                   let event = EKEvent(eventStore: eventStore)
-                    
                     //                    let event = EKEvent(eventStore: eventStore)
                         event.title = title
                         print("Event being saved: Title \(String(describing: event.title))")
@@ -1310,10 +1592,8 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                             
                             event.location = location
                             print("Event being saved: Location \(String(describing: event.location))")
-                            
                         }
                         else{
-                            
                             let geoLocation = CLLocation(latitude: locationLatitude, longitude: locationLongitude)
                             let structuredLocation = EKStructuredLocation(title: location)
                             
@@ -1340,22 +1620,17 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                             completion?(false, e)
                             return
                         }
-                        
                     calendarEventID = event.eventIdentifier ?? ""
-                        
 //                        write the calendarEventID to CoreData
                         self.saveItemAvailabilty(userEventStoreID: userEventStoreID, key: "calendarEventID", value: calendarEventID)
-                        
 //                        write the calendarEventID to the userEventStore
                         dbStore.collection("userEventStore").document(userEventStoreID).setData(["calendarEventID" : calendarEventID, "chosenDateSeen" : true], merge: true)
-                        
                         completion?(true, nil)
-                        
                         print("event saved for date \(startDate)")
                     
                 }
                 else{
-                                    
+//                        there is already an event in the calendar
                    let event = eventStore.event(withIdentifier: calendarEventIDInput)!
                     //                    let event = EKEvent(eventStore: eventStore)
                         event.title = title
@@ -1403,20 +1678,11 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                         }
 //                        if error leave the ID blank, we have a protocal to ignore it if blank
                         calendarEventID = event.eventIdentifier ?? ""
-                        
-                        
                         dbStore.collection("userEventStore").document(userEventStoreID).setData(["chosenDateSeen" : true], merge: true)
-                        
                         completion?(true, nil)
-                        
                         print("event saved for date \(startDate)")
-                    
                 }
-                    
-
                 }
-                
-                
                 else {
                     completion?(false, error as NSError?)
                     print(error ?? "no error message")
@@ -1432,15 +1698,42 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             
         }))
             
+            let currentViewController = topMostController()
+            
             if self.presentedViewController == nil {
-                self.present(alert, animated: true)
+                print("presented VC = nil")
+                currentViewController!.present(alert, animated: true)
             }
             else {
-//                self.dismiss(animated: false, completion: nil)
-                self.present(alert, animated: true)
+                print("presented VC != nil")
+                self.dismiss(animated: false, completion: nil)
+                currentViewController!.present(alert, animated: true)
             }
         
     }
+        
+        //    function to return the current top most view controller
+        func topMostController() -> UIViewController? {
+            guard let window = UIApplication.shared.keyWindow, let rootViewController = window.rootViewController else {
+                return nil
+            }
+
+            var topController = rootViewController
+
+            while true {
+                if let presented = topController.presentedViewController {
+                    topController = presented
+                } else if let nav = topController as? UINavigationController {
+                    topController = nav.visibleViewController!
+                } else if let tab = topController as? UITabBarController {
+                    topController = tab.selectedViewController!
+                } else {
+                    break
+                }
+            }
+
+            return topController
+        }
     
     
 //    function to calculate the number of respondents who are available
@@ -1459,13 +1752,13 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         print("numberOfRows: \(numberOfRows)")
         
 //        something looks wrong, we exit and send back to the homepage, with a message
-//        if numberOfRows == 1{
-//            let sampleStoryBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
-//            let homeView  = sampleStoryBoard.instantiateViewController(withIdentifier: "CreateEventViewController") as! CreateEventViewController
-//            self.navigationController?.pushViewController(homeView, animated: true)
-//
-//        }
-//        else{
+        if numberOfRows == 1{
+            let sampleStoryBoard : UIStoryboard = UIStoryboard(name: "NL_HomePage", bundle:nil)
+            let homeView  = sampleStoryBoard.instantiateViewController(withIdentifier: "NL_HomePage") as! NL_HomePage
+            self.navigationController?.pushViewController(homeView, animated: true)
+
+        }
+        else{
         
         let numberOfColumns = resultsArray[1].count
         print("numberOfColumns: \(numberOfColumns)")
@@ -1497,7 +1790,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         }
         
         countedResultArray.insert("Availability", at: 0)
-//        }
+        }
         
         print("countedResultArray: \(countedResultArray) countedResultArrayFraction \(countedResultArrayFraction)")
         return (countedResults: [countedResultArray], fractionResults: [countedResultArrayFraction])
@@ -1514,7 +1807,6 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         
         let newDate = calendar.date(byAdding: additionType, value: increment, to: todaysDate)!
         
-        
         return newDate
         
     }
@@ -1530,11 +1822,9 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         var hoursFromGMTString = String()
         if hoursFromGMT >= 0{
             hoursFromGMTString = ("+\(hoursFromGMT)")
-            
         }
         else{
            hoursFromGMTString = ("\(hoursFromGMT)")
-            
         }
         var startDates = [String]()
         var endDates = [String]()
@@ -1628,6 +1918,115 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         completion(startDates, endDates)
         
     }
+        
+            //    input formats dates: yyyy-MM-dd, without completion
+            func getStartAndEndDates3NC(startDate: String, endDate: String, startTime: String, endTime: String, daysOfTheWeek: [Int]) -> ([String],[String]){
+                
+                print("running func getStartAndEndDates3 inputs - startDate: \(startDate) endDate: \(endDate) startTime: \(startTime) endTime: \(endTime) daysOfTheWeek: \(daysOfTheWeek)")
+                
+                var secondsFromGMT: Int { return TimeZone.current.secondsFromGMT() }
+                var hoursFromGMT = secondsFromGMT / 3600
+                var hoursFromGMTString = String()
+                if hoursFromGMT >= 0{
+                    hoursFromGMTString = ("+\(hoursFromGMT)")
+                    
+                }
+                else{
+                   hoursFromGMTString = ("\(hoursFromGMT)")
+                    
+                }
+                var startDates = [String]()
+                var endDates = [String]()
+                let calendar = NSCalendar.current
+                let dateFormatter = DateFormatter()
+                let dateFormatterTime = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd HH:mm z"
+                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+                dateFormatterTime.dateFormat = "HH:mm"
+                dateFormatterTime.locale = Locale(identifier: "en_US_POSIX")
+                
+                //        create a start and end date with time from the strings input into the function
+                let startDateString = ("\(startDate) \(startTime) GMT\(hoursFromGMTString)")
+                print("startDateString: \(startDateString)")
+                let startEndDateString = ("\(startDate) \(endTime) GMT\(hoursFromGMTString)")
+                print("startEndDateString: \(startEndDateString)")
+                let endDateString = ("\(endDate) \(endTime) GMT\(hoursFromGMTString)")
+                print("endDateString: \(endDateString)")
+                
+                //        convert the sring dates into NSDates
+                var startDateDate = dateFormatter.date(from: startDateString)
+                print("startDateDate: \(startDateDate!)")
+                var startEndDateDate = dateFormatter.date(from: startEndDateString)
+                print("startDateDate: \(startDateDate!)")
+                let endDateDate = dateFormatter.date(from: endDateString)
+                print("endDateDate: \(endDateDate!)")
+                
+                startDates.removeAll()
+                endDates.removeAll()
+                
+                while startDateDate! <= endDateDate! {
+                    
+                    let startDateDateString = dateFormatter.string(from: startDateDate!)
+                    let dayOfWeekStart = getDayOfWeek3(startDateDateString)! - 1
+                    print("dayOfWeekstart: \(dayOfWeekStart)")
+                    
+                    if daysOfTheWeek.contains(dayOfWeekStart) {
+                        
+                        startDates.append(startDateDateString)
+                        startDateDate = calendar.date(byAdding: .day, value: 1, to: startDateDate!)!
+                        
+                    }
+                    else{
+                        
+                        startDateDate = calendar.date(byAdding: .day, value: 1, to: startDateDate!)!
+                        
+                    }
+                    
+                }
+                print("startDates: \(startDates)")
+                
+                var endDatetz = endDateDate!
+
+                
+                while startEndDateDate! <= endDatetz {
+                    
+        //            We need to adjust the end time when coming out of daylight savings time, if the current date we are checking is not in daylight savings time then we move the hour of the end date forward by 1
+                    
+                    let dayLight = TimeZone.current
+                    
+                    if dayLight.isDaylightSavingTime(for: startEndDateDate!) {
+                        
+                        endDatetz = endDateDate!
+           
+                    }
+                    else{
+
+                        endDatetz = calendar.date(byAdding: .hour, value: 1, to: endDateDate!)!
+                        
+                    }
+                    
+                    let startEndDateDateString = dateFormatter.string(from: startEndDateDate!)
+                    let dayOfWeekEnd = getDayOfWeek3(startEndDateDateString)! - 1
+                    //            print("dayOfWeekEnd: \(dayOfWeekEnd)")
+                    
+                    if daysOfTheWeek.contains(dayOfWeekEnd) {
+                        
+                        endDates.append(startEndDateDateString)
+                        startEndDateDate = calendar.date(byAdding: .day, value: 1, to: startEndDateDate!)!
+                        
+                    }
+                    else{
+                        
+                        startEndDateDate = calendar.date(byAdding: .day, value: 1, to: startEndDateDate!)!
+                        
+                    }
+                    
+                }
+                print("endDates: \(endDates)")
+                
+                return (startDates: startDates,endDates: endDates)
+                
+            }
     
     func getDayOfWeek3(_ today:String) -> Int? {
         
@@ -1703,13 +2102,15 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                     let datesBetweenChosenDatesEndDates = dateFormatter.date(from: datesBetweenChosenDatesEnd[y])!
                     
                     if startDatesOfTheEvents[n] < datesBetweenChosenDatesStartDate && endDatesOfTheEvents[n] > datesBetweenChosenDatesEndDates || (datesBetweenChosenDatesStartDate ... datesBetweenChosenDatesEndDates).contains(startDatesOfTheEvents[n]) == true || (datesBetweenChosenDatesStartDate ... datesBetweenChosenDatesEndDates).contains(endDatesOfTheEvents[n]) == true{
-                        print("within the dates to test")
+//                        print("within the dates to test")
+//                        we need to check if the event is listed as free rather than not
+                        
                         finalAvailabilityArray.append(0)
 //                        print(finalAvailabilityArray)
                         n = 0
                         if y == numeberOfDatesToCheck{
                             
-                            print("break point y checks complete: \(y) numeberOfDatesToCheck \(numeberOfDatesToCheck)")
+//                            print("break point y checks complete: \(y) numeberOfDatesToCheck \(numeberOfDatesToCheck)")
                             
                             break datesLoop
                             
@@ -1725,21 +2126,21 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                         if n == numberOfEventDatesToCheck && y == numeberOfDatesToCheck{
                             finalAvailabilityArray.append(1)
 //                            print(finalAvailabilityArray)
-                            print("Outside dates to test and end of the list of event dates and dates to test")
+//                            print("Outside dates to test and end of the list of event dates and dates to test")
                             
                             
                             break datesLoop
                             
                         }
                         else if n == numberOfEventDatesToCheck{
-                            print("Outside dates to test and end of the list of dates to test, going to next event date")
+//                            print("Outside dates to test and end of the list of dates to test, going to next event date")
                             finalAvailabilityArray.append(1)
 //                            print(finalAvailabilityArray)
                             y = y + 1
                             n = 0
                         }
                         else{
-                            print("Outside dates to test")
+//                            print("Outside dates to test")
                             
                             n = n + 1
                         }
@@ -1749,13 +2150,13 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                 n = n + 1
                 
             }}
-        print(finalAvailabilityArray)
+//        print(finalAvailabilityArray)
         return finalAvailabilityArray
     }
         
         
         func compareTheEventTimmings4(datesBetweenChosenDatesStart: [String], datesBetweenChosenDatesEnd: [String], startDateDate: Date, endDateDate: Date) -> Array<Int>{
-            print("running func compareTheEventTimmings3 inputs - datesBetweenChosenDatesStart:\(datesBetweenChosenDatesStart) datesBetweenChosenDatesEnd: \(datesBetweenChosenDatesEnd) ")
+            print("running func compareTheEventTimmings4 inputs - datesBetweenChosenDatesStart:\(datesBetweenChosenDatesStart) datesBetweenChosenDatesEnd: \(datesBetweenChosenDatesEnd) ")
         
         let endDatesOfTheEvents = getCalendarData3(startDate: startDateDate, endDate: endDateDate).endDatesOfTheEvents
         let startDatesOfTheEvents = getCalendarData3(startDate: startDateDate, endDate: endDateDate).startDatesOfTheEvents
@@ -1789,17 +2190,11 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                     finalAvailabilityArray.append(1)
                     
                     y = y + 1
-         
                 }
-                
-                
             }
                 
             else{
-                
-                
                 datesLoop: while y <= numeberOfDatesToCheck {
-                    
                     print("y \(y)")
                     
                     eventsLoop: while n <= numberOfEventDatesToCheck {
@@ -1816,13 +2211,13 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                         let datesBetweenChosenDatesEndDates = dateFormatter.date(from: datesBetweenChosenDatesEnd[y])!
                         
                         if startDatesOfTheEvents[n] < datesBetweenChosenDatesStartDate && endDatesOfTheEvents[n] > datesBetweenChosenDatesEndDates || (datesBetweenChosenDatesStartDate ... datesBetweenChosenDatesEndDates).contains(startDatesOfTheEvents[n]) == true || (datesBetweenChosenDatesStartDate ... datesBetweenChosenDatesEndDates).contains(endDatesOfTheEvents[n]) == true{
-                            print("within the dates to test")
+//                            print("within the dates to test")
                             finalAvailabilityArray.append(0)
                             print(finalAvailabilityArray)
                             n = 0
                             if y == numeberOfDatesToCheck{
                                 
-                                print("break point y checks complete: \(y) numeberOfDatesToCheck \(numeberOfDatesToCheck)")
+//                                print("break point y checks complete: \(y) numeberOfDatesToCheck \(numeberOfDatesToCheck)")
                                 
                                 break datesLoop
                                 
@@ -1837,22 +2232,22 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                             
                             if n == numberOfEventDatesToCheck && y == numeberOfDatesToCheck{
                                 finalAvailabilityArray.append(1)
-                                print(finalAvailabilityArray)
-                                print("Outside dates to test and end of the list of event dates and dates to test")
+//                                print(finalAvailabilityArray)
+//                                print("Outside dates to test and end of the list of event dates and dates to test")
                                 
                                 
                                 break datesLoop
                                 
                             }
                             else if n == numberOfEventDatesToCheck{
-                                print("Outside dates to test and end of the list of dates to test, going to next event date")
+//                                print("Outside dates to test and end of the list of dates to test, going to next event date")
                                 finalAvailabilityArray.append(1)
-                                print(finalAvailabilityArray)
+//                                print(finalAvailabilityArray)
                                 y = y + 1
                                 n = 0
                             }
                             else{
-                                print("Outside dates to test")
+//                                print("Outside dates to test")
                                 
                                 n = n + 1
                             }
@@ -1862,7 +2257,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                     n = n + 1
                     
                 }}
-            print(finalAvailabilityArray)
+//            print(finalAvailabilityArray)
             return finalAvailabilityArray
         }
     
@@ -1898,6 +2293,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
 
     }
     
+//        function to get the events from the users calendar for the dates we are searching in. We remove any events that are shown as free.
     func getCalendarData3(startDate: Date, endDate: Date) -> (datesOfTheEvents: Array<Date>, startDatesOfTheEvents: Array<Date>, endDatesOfTheEvents: Array<Date>){
         
         checkCalendarStatus2()
@@ -1907,6 +2303,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         var datesOfTheEvents = Array<Date>()
         var startDatesOfTheEvents = Array<Date>()
         var endDatesOfTheEvents = Array<Date>()
+        var availabilityArray = Array<Int>()
         var calendarToUse: [EKCalendar]?
         let eventStore = EKEventStore()
         var calendarArray = [EKEvent]()
@@ -1923,10 +2320,13 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         print("Start date of the period to search \(startDate)")
         print("End date of the period to search \(endDate)")
         
-        //                print(calendarArray)
         
-        
+//                        print(calendarArray)
         for event in calendarArray{
+            
+            if event.availability.rawValue == 1{
+              print("event shown as free, we do not include it")
+            }else{
             
             //            appends new items into the array calendarEventsArray
             let newItemInArray = Event()
@@ -1950,16 +2350,16 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             datesOfTheEvents.append(event.occurrenceDate)
             startDatesOfTheEvents.append(event.startDate)
             endDatesOfTheEvents.append(event.endDate)
+            availabilityArray.append(event.availability.rawValue)
             
-            print("dates of the events \(datesOfTheEvents)")
-            print("start dates of the events \(startDatesOfTheEvents)")
-            print("end dates of the events \(endDatesOfTheEvents)")
+//            print("dates of the events \(datesOfTheEvents)")
+//            print("start dates of the events \(startDatesOfTheEvents)")
+//            print("end dates of the events \(endDatesOfTheEvents)")
+//            print("availabilityArray \(availabilityArray)")
             
         }
-        
+        }
         return (datesOfTheEvents: datesOfTheEvents, startDatesOfTheEvents: startDatesOfTheEvents, endDatesOfTheEvents: endDatesOfTheEvents)
-        
-        
     }
     
     //    function used to pull down the information of the event stored in the Firebase database
@@ -2003,16 +2403,21 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
     
     
     func loadCalendars2(){
+        print("running func loadCalendars2")
         var calendars: [EKCalendar]!
             calendars = eventStore.calendars(for: EKEntityType.event)
             
-    //        If the calendar array hasnt been created previously then then the function creates a new array
-            if SelectedCalendarsStruct.calendarsStruct.count == 0 {
+    //        If the calendar array hasnt been created previously then then the function creates a new array, or if there are no selected calendars, we repopulate
+        if SelectedCalendarsStruct.calendarsStruct.count == 0 || SelectedCalendarsStruct.selectedCalendarArray.count == 0 {
                 
                 SelectedCalendarsStruct.calendarsStruct = calendars!
+            
+//            we loop through the calendars and add them to the selected calendar array
+            for calendar in calendars{
+                SelectedCalendarsStruct.selectedCalendarArray.append(1)
+            }
                 
-//                BUG: we loop through the list of calendars we don't want to use - this should be made a struct
-                
+//                BUG: we loop through the list of calendars we don't want to use - this should be made a struct, we also remove them from the list of selected calendars
                 if let index = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "US Holidays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index)
                 }
@@ -2098,30 +2503,30 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
 // function to check if the users exists in the user database, if not we log them out and send back to the homepage
     func checkUserInUserDatabase(){
         print("running func checkUserInUserDatabase existingUserLoggedIn: \(existingUserLoggedIn) userJustRegistered: \(userJustRegistered)")
-        
 //        flag used to notify if the user has just registered, as want to avoid checking if they are in the DB as this may not have been written yet
         if userJustRegistered == true{
-            
+            print("checkUserInUserDatabase - userJustRegistered == true")
         }
         else{
         
         if existingUserLoggedIn == false{
+            print("checkUserInUserDatabase - existingUserLoggedIn == false")
           
             if let userID = Auth.auth().currentUser?.uid{
             
             dbStore.collection("users").whereField("uid", isEqualTo: userID).getDocuments { (querySnapshot, error) in
             
-                            print("querySnapshot from user check \(String(describing: querySnapshot))")
+                            print("checkUserInUserDatabase - querySnapshot from user check \(String(describing: querySnapshot))")
             
                             if error != nil {
-                                print("there was an error")
+                                print("checkUserInUserDatabase - there was an error")
                             }
                             else {
-                                print("querySnapshot!.isEmpty: \(querySnapshot!.isEmpty)")
+                                print("checkUserInUserDatabase - querySnapshot!.isEmpty: \(querySnapshot!.isEmpty)")
             
                                 if querySnapshot!.isEmpty {
             
-                                    print("Empty: querysnapshot: \(String(describing: querySnapshot)), isEmpty: \(String(describing: querySnapshot!.isEmpty))")
+                                    print("checkUserInUserDatabase - Empty: querysnapshot: \(String(describing: querySnapshot)), isEmpty: \(String(describing: querySnapshot!.isEmpty))")
             
                                         let alertEventComplete = UIAlertController(title: "Phone number not registered", message: "This phone number isn't linked to an account, please register", preferredStyle: UIAlertController.Style.alert)
             
@@ -2133,7 +2538,11 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                                             
                                             self.signOut()
             
-                                            self.performSegue(withIdentifier: "userNotInDatabase", sender: self)
+                                            if let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "HomePageViewController") as? HomePageViewController {
+                                               self.navigationController?.pushViewController(viewController, animated: false)
+                                                self.navigationController?.setNavigationBarHidden(false, animated: false)
+                                                self.navigationController?.navigationItem.setHidesBackButton(true, animated: false)
+                                            }
             
                                         }))
                                         self.present(alertEventComplete, animated: true, completion: {
@@ -2177,7 +2586,13 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                                         
                                         self.signOut()
         
-                                        self.performSegue(withIdentifier: "userNotInDatabase", sender: self)
+                                        
+//                                        send the user back to the homepage
+                                        if let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "HomePageViewController") as? HomePageViewController {
+                                           self.navigationController?.pushViewController(viewController, animated: false)
+                                            self.navigationController?.setNavigationBarHidden(false, animated: false)
+                                            self.navigationController?.navigationItem.setHidesBackButton(true, animated: false)
+                                        }
         
                                     }))
                                     self.present(alertEventComplete, animated: true, completion: {
@@ -2280,7 +2695,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         
         else if isBarHidden == true && isBackButtonHidden == false{
           
-            navigationController.navigationBar.barTintColor = UIColor(red: 0, green: 176, blue: 156)
+            navigationController.navigationBar.barTintColor = .white
 
             navigationController.navigationBar.tintColor = tintColour
                     
@@ -2297,7 +2712,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         
         else if isBarHidden == false && isBackButtonHidden == true{
             
-            navigationController.navigationBar.barTintColor = UIColor(red: 0, green: 176, blue: 156)
+            navigationController.navigationBar.barTintColor = .white
 
             navigationController.navigationBar.tintColor = tintColour
                     
@@ -2310,7 +2725,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
         }
         else{
         
-        navigationController.navigationBar.barTintColor = UIColor(red: 0, green: 176, blue: 156)
+            navigationController.navigationBar.barTintColor = .white
 
         navigationController.navigationBar.tintColor = tintColour
                 
@@ -2335,9 +2750,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             loadingNotification.customView = UIImageView(image: UIImage(named: imageName))
             loadingNotification.label.adjustsFontSizeToFitWidth = true
             loadingNotification.hide(animated: true, afterDelay: delay)
-            
-            
-            
+ 
         }
         
         
@@ -2395,10 +2808,7 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
                         completion(userNameArray)
                         
                     }
-                    
             }
-            
-   
         }
         
         
@@ -2479,6 +2889,92 @@ func cleanPhoneNumbers(phoneNumbers: String) -> String{
             }
         
         
+        //    this function is used to get the events we will display on the different pages, it sets the gloabl variable, eventPageEvents
+        func getTheEventsFunc(hosted: Bool, upcoming: Bool, past: Bool, completionHandler: @escaping (_ events: [eventSearch]) -> ()){
+            
+            var allEvents = [eventSearch]()
+            
+            //            get all of the events for the user
+            let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
+            
+//            gets all of the events hosted by the user
+            if hosted == true{
+                            
+                //      filter the serilaised events for events hosted by the user and in the pending status
+                        let events1 = filteringEventsForDisplay(pending: true, createdByUser: true, pastEvents: false, serialisedEvents: serialisedEvents)
+                        
+                //      filter the serilaised events for events hosted by the user and in the pending status, but in the past
+                        let events2 = filteringEventsForDisplay(pending: false, createdByUser: true, pastEvents: false, serialisedEvents: serialisedEvents)
+                
+                 allEvents = events1 + events2
+                
+            }
+//                get all the upcoming events not hosted by the user
+            else if upcoming == true{
+              //      filter the serilaised events for events not hosted by the user and in the pending status
+                        let events1 = filteringEventsForDisplay(pending: true, createdByUser: false, pastEvents: false, serialisedEvents: serialisedEvents)
+                        
+                //      filter the serilaised events for events not hosted by the user and in the pending status, but in the past
+                        let events2 = filteringEventsForDisplay(pending: false, createdByUser: false, pastEvents: false, serialisedEvents: serialisedEvents)
+                
+                 allEvents = events1 + events2
+                
+            }
+            else if past == true{
+                //      pending & hosted by user & past
+                let events1 = filteringEventsForDisplay(pending: true, createdByUser: true, pastEvents: true, serialisedEvents: serialisedEvents)
+                //      not pending & hosted by user & past
+                let events2 = filteringEventsForDisplay(pending: false, createdByUser: true, pastEvents: true, serialisedEvents: serialisedEvents)
+                //      pending & hosted by user & past
+                let events3 = filteringEventsForDisplay(pending: true, createdByUser: false, pastEvents: true, serialisedEvents: serialisedEvents)
+                              //      not pending & hosted by user & past
+                let events4 = filteringEventsForDisplay(pending: false, createdByUser: false, pastEvents: true, serialisedEvents: serialisedEvents)
+                
+                allEvents = events1 + events2 + events3 + events4
+   
+            }
+            
+//            once we have all the events we should loop through and check we have the user images if they exist
+            
+            
+            
+            completionHandler(allEvents)
+        }
+        
+        
+        
+        func resizeImage(image: UIImage, newWidth: CGFloat) -> UIImage? {
+
+            let scale = newWidth / image.size.width
+            let newHeight = image.size.height * scale
+            UIGraphicsBeginImageContext(CGSize(width: newWidth, height: newHeight))
+            image.draw(in: CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
+
+            let newImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+
+            return newImage
+        }
+        
+//        function for creating an image from text
+        func imageWith(name: String?, width: CGFloat, height: CGFloat, fontSize: CGFloat, textColor: UIColor) -> UIImage? {
+             let frame = CGRect(x: 0, y: 0, width: width, height: height)
+             let nameLabel = UILabel(frame: frame)
+             nameLabel.textAlignment = .center
+             nameLabel.backgroundColor = textColor
+             nameLabel.textColor = .white
+             nameLabel.font = UIFont.boldSystemFont(ofSize: fontSize)
+             nameLabel.text = name
+            nameLabel.numberOfLines = 2
+            nameLabel.lineBreakMode = .byWordWrapping
+             UIGraphicsBeginImageContext(frame.size)
+              if let currentContext = UIGraphicsGetCurrentContext() {
+                 nameLabel.layer.render(in: currentContext)
+                 let nameImage = UIGraphicsGetImageFromCurrentImageContext()
+                 return nameImage
+              }
+              return nil
+        }
         
 
         
@@ -2504,6 +3000,18 @@ extension UIColor {
         )
     }
 }
+
+extension UIImage {
+
+    func alpha(_ value:CGFloat) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        draw(at: CGPoint.zero, blendMode: .normal, alpha: value)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage!
+    }
+}
+
 
 
 

@@ -13,22 +13,29 @@ import Firebase
 import EventKit
 import AMPopTip
 import Alamofire
-import Fabric
-import Crashlytics
 import BackgroundTasks
 import CoreData
+import ContactsUI
+
+
 
 
 class AutoRespondHelper {
     
     
    static func sendUserAvailabilityAuto(eventID: String, completion: @escaping()-> Void){
+    print("running func sendUserAvailabilityAuto")
+    
+    if checkCalendarStatusAuto() == false{
+        print("sendUserAvailabilityAuto - checkCalendarStatusAuto = false")
+    }
+    else{
             
             print("running sendUserAvailability with inputs - eventID: \(eventID)")
             
             let docRefUserEventStore = dbStore.collection("userEventStore")
             
-            docRefUserEventStore.whereField("eventID", isEqualTo: eventID).whereField("uid", isEqualTo: user!).getDocuments() { (querySnapshot, err) in
+    docRefUserEventStore.whereField("eventID", isEqualTo: eventID).whereField("uid", isEqualTo: user).getDocuments() { (querySnapshot, err) in
                 
                 print("querySnapshot: \(String(describing: querySnapshot))")
                 print("is querySnapshot empty \(String(describing: querySnapshot?.isEmpty))")
@@ -41,8 +48,6 @@ class AutoRespondHelper {
                     for document in querySnapshot!.documents{
                         
                     let documentID = document.documentID
-                    
-
                         getEventInformation3Auto(eventID: eventID, userEventStoreID: documentID) { (userEventStoreID, eventSecondsFromGMT, startDates, endDates, users) in
                                     
                                     print("Succes getting the event data")
@@ -55,7 +60,7 @@ class AutoRespondHelper {
                                     let dateFormatterTZ = DateFormatter()
                                     dateFormatterTZ.dateFormat = "yyyy-MM-dd HH:mm z"
                                     dateFormatterTZ.locale = Locale(identifier: "en_US_POSIX")
-                                    
+                                     
                                     let startDateDate = dateFormatterTZ.date(from: startDates[0])
                                     let endDateDate = dateFormatterTZ.date(from: endDates[numberOfDates])
 
@@ -65,22 +70,26 @@ class AutoRespondHelper {
                                             (finalAvailabilityArray) in
                                             
                                             commitUserAvailbilityDataAuto(userEventStoreID: userEventStoreID, finalAvailabilityArray2: finalAvailabilityArray, eventID: eventID){
+                                                
+//                                            commit the users availability into CD
+                                                commitUserAvailabilityDataCD(userEventStoreID: userEventStoreID, finalAvailabilityArray2: finalAvailabilityArray, eventID: eventID, calendarEventID: "sendUserAvailabilityAuto"){
                                             
                                             availabilityCreatedNotificationAuto(userIDs: users, availabilityDocumentID: userEventStoreID)
                                             
                                             completion()
+                                                }
                                             }
                                         }
                                     }
                             
-                                    }}}}}
+                        }}}}}}
     
     
     
     //    function used to pull down the information of the event stored in the Firebase database
    static func getEventInformation3Auto(  eventID:String, userEventStoreID: String, completion: @escaping (_ userEventStoreID: String, _ eventSecondsFromGMT: Int, _ startDates: [String], _ endDates: [String],_ userIDs: [String]) -> Void) {
         
-        print("running func getEventInformation3 inputs - eventID: \(eventID)")
+        print("running func getEventInformation3Auto inputs - eventID: \(eventID)")
         
         let dateFormatterTime = DateFormatter()
         let dateFormatterSimple = DateFormatter()
@@ -91,9 +100,6 @@ class AutoRespondHelper {
         dateFormatterTime.locale = Locale(identifier: "en_US_POSIX")
         dateFormatterSimple.locale = Locale(identifier: "en_US_POSIX")
         dateFormatterTZ.locale = Locale(identifier: "en_US_POSIX")
-        
-    
-        
         
         let docRef = dbStore.collection("eventRequests").document(eventID)
         
@@ -119,7 +125,7 @@ class AutoRespondHelper {
     static func getCalendarData3Auto(startDate: Date, endDate: Date, completion: @escaping (_ datesOfTheEvents: Array<Date>, _ startDatesOfTheEvents: Array<Date>,_ endDatesOfTheEvents: Array<Date>)-> Void){
            
            
-           print("running func getCalendarData3 inputs - startDate: \(startDate) endDate: \(endDate)")
+           print("running func getCalendarData3Auto inputs - startDate: \(startDate) endDate: \(endDate)")
            
            var datesOfTheEvents = Array<Date>()
            var startDatesOfTheEvents = Array<Date>()
@@ -168,9 +174,9 @@ class AutoRespondHelper {
                startDatesOfTheEvents.append(event.startDate)
                endDatesOfTheEvents.append(event.endDate)
                
-               print("dates of the events \(datesOfTheEvents)")
-               print("start dates of the events \(startDatesOfTheEvents)")
-               print("end dates of the events \(endDatesOfTheEvents)")
+//               print("dates of the events \(datesOfTheEvents)")
+//               print("start dates of the events \(startDatesOfTheEvents)")
+//               print("end dates of the events \(endDatesOfTheEvents)")
                
            }
            
@@ -181,7 +187,7 @@ class AutoRespondHelper {
     
    
     static func compareTheEventTimmings3Auto(datesBetweenChosenDatesStart: [String], datesBetweenChosenDatesEnd: [String], startDatesOfTheEvents: Array<Date>, endDatesOfTheEvents: Array<Date>, completion: @escaping (_ finalAvailabilityArray: Array<Int>)-> Void){
-            print("running func compareTheEventTimmings3 inputs - datesBetweenChosenDatesStart:\(datesBetweenChosenDatesStart) datesBetweenChosenDatesEnd: \(datesBetweenChosenDatesEnd) startDatesOfTheEvents:\(startDatesOfTheEvents) endDatesOfTheEvents: \(endDatesOfTheEvents)")
+//            print("running func compareTheEventTimmings3Auto inputs - datesBetweenChosenDatesStart:\(datesBetweenChosenDatesStart) datesBetweenChosenDatesEnd: \(datesBetweenChosenDatesEnd) startDatesOfTheEvents:\(startDatesOfTheEvents) endDatesOfTheEvents: \(endDatesOfTheEvents)")
             let numeberOfDatesToCheck = datesBetweenChosenDatesStart.count - 1
             print("numeberOfDatesToCheck: \(numeberOfDatesToCheck)")
             let numberOfEventDatesToCheck = startDatesOfTheEvents.count - 1
@@ -196,34 +202,23 @@ class AutoRespondHelper {
             
     //        validation to cofirm the data pulled from the database is correct, we have the same number of start and end dates
             if datesBetweenChosenDatesStart.count == 0 || datesBetweenChosenDatesEnd.count == 0 || datesBetweenChosenDatesStart.count != datesBetweenChosenDatesEnd.count{
-                
                 print("Fatal Error, one of the date lists is empty")
                 
             }
     //            If the user doesn't have any events in thier calendar for the period we create a useravailability array of 0
             if startDatesOfTheEvents.count == 0{
-                
                 print("User doesn't have events in thier calendar for this period")
-            
                 while y <= numeberOfDatesToCheck{
-                    print("y \(y)")
-                    
+//                    print("y \(y)")
                     finalAvailabilityArray.append(1)
-                    
                     y = y + 1
-         
                 }
-                
-                
+  
             }
                 
             else{
-                
-                
                 datesLoop: while y <= numeberOfDatesToCheck {
-                    
-                    print("y \(y)")
-                    
+//                    print("y \(y)")
                     eventsLoop: while n <= numberOfEventDatesToCheck {
                         //                debug only
                         //                            print("n \(n)")
@@ -238,13 +233,13 @@ class AutoRespondHelper {
                         let datesBetweenChosenDatesEndDates = dateFormatter.date(from: datesBetweenChosenDatesEnd[y])!
                         
                         if startDatesOfTheEvents[n] < datesBetweenChosenDatesStartDate && endDatesOfTheEvents[n] > datesBetweenChosenDatesEndDates || (datesBetweenChosenDatesStartDate ... datesBetweenChosenDatesEndDates).contains(startDatesOfTheEvents[n]) == true || (datesBetweenChosenDatesStartDate ... datesBetweenChosenDatesEndDates).contains(endDatesOfTheEvents[n]) == true{
-                            print("within the dates to test")
+//                            print("within the dates to test")
                             finalAvailabilityArray.append(0)
                             print(finalAvailabilityArray)
                             n = 0
                             if y == numeberOfDatesToCheck{
                                 
-                                print("break point y checks complete: \(y) numeberOfDatesToCheck \(numeberOfDatesToCheck)")
+//                                print("break point y checks complete: \(y) numeberOfDatesToCheck \(numeberOfDatesToCheck)")
                                 
                                 break datesLoop
                                 
@@ -259,23 +254,20 @@ class AutoRespondHelper {
                             
                             if n == numberOfEventDatesToCheck && y == numeberOfDatesToCheck{
                                 finalAvailabilityArray.append(1)
-                                print(finalAvailabilityArray)
-                                print("Outside dates to test and end of the list of event dates and dates to test")
-                                
-                                
+//                                print(finalAvailabilityArray)
+//                                print("Outside dates to test and end of the list of event dates and dates to test")
                                 break datesLoop
                                 
                             }
                             else if n == numberOfEventDatesToCheck{
-                                print("Outside dates to test and end of the list of dates to test, going to next event date")
+//                                print("Outside dates to test and end of the list of dates to test, going to next event date")
                                 finalAvailabilityArray.append(1)
-                                print(finalAvailabilityArray)
+//                                print(finalAvailabilityArray)
                                 y = y + 1
                                 n = 0
                             }
                             else{
-                                print("Outside dates to test")
-                                
+//                                print("Outside dates to test")
                                 n = n + 1
                             }
                         }
@@ -284,16 +276,47 @@ class AutoRespondHelper {
                     n = n + 1
                     
                 }}
-            print(finalAvailabilityArray)
+//            print(finalAvailabilityArray)
              completion(finalAvailabilityArray)
         }
     
     //    commits the user availability data to the userEventStore and also adds the notifications to the availabilityNotificationStore
         static func commitUserAvailbilityDataAuto(userEventStoreID: String, finalAvailabilityArray2: [Int], eventID: String, completion: @escaping () -> Void){
-        print("running func commitUserAvailbilityData inputs - userEventStoreID: \(userEventStoreID) finalAvailabilityArray2: \(finalAvailabilityArray2) eventID: \(eventID)")
+        print("running func commitUserAvailbilityDataAuto inputs - userEventStoreID: \(userEventStoreID) finalAvailabilityArray2: \(finalAvailabilityArray2) eventID: \(eventID)")
         let dbStoreInd = Firestore.firestore()
     
             dbStoreInd.collection("userEventStore").document(userEventStoreID).setData(["userAvailability" : finalAvailabilityArray2,"userResponded": true], merge: true)
+//              post a notification that we responded
+            userRespondedNotification(eventID: eventID)
+            
+            completion()
+    }
+    
+    
+//    commits the user availability data to the users CD, this means they don't have to pull it down from the DB
+    static func commitUserAvailabilityDataCD(userEventStoreID: String, finalAvailabilityArray2: [Int], eventID: String, calendarEventID: String, completion: @escaping () -> Void){
+        
+        //                            before we commit anything to the DB we should check if it alredy exists and remove it if it does
+        if let index = CDAvailability.index(where: {$0.documentID == userEventStoreID}){
+                                context.delete(CDAvailability[index])
+                                CDAvailability.remove(at: index)
+                                print("index: \(index)")
+            self.CDSaveDataAuto()
+        }
+        
+        let CDNewAvailability = CoreDataAvailability(context: context)
+        let userName = UserDefaults.standard.string(forKey: "name") ?? ""
+                                
+            CDNewAvailability.documentID = userEventStoreID
+            CDNewAvailability.uid = user!
+            CDNewAvailability.eventID = eventID
+            CDNewAvailability.userName = userName
+            CDNewAvailability.userAvailability = finalAvailabilityArray2
+            CDNewAvailability.calendarEventID = calendarEventID
+//                        append the new event onto CDAvailability
+            CDAvailability.append(CDNewAvailability)
+            self.CDSaveDataAuto()
+            print("commitUserAvailabilityDataCD - update complete")
             completion()
     }
     
@@ -304,16 +327,23 @@ class AutoRespondHelper {
           print("running func availabilityCreatedNotification- adding notificaitons to userAvailabilityUpdates - inputs - userIDs \(userIDs) availabilityString \(availabilityDocumentID)")
             
             for i in userIDs{
-    //            add the eventID and an updated notification to the userEventUpdates tbales
+//                we do not want to post a notification for the current use as they have already commited their availability to the CD
+                if i == user!{
+                    
+                }
+                else{
+                
+    //            add the eventID and an updated notification to the userAvailabilityUpdates tbales
                 dbStore.collection("userAvailabilityUpdates").document(i).setData([availabilityDocumentID: "New"])
+                    
+                }
             }
         }
     
     
     //    check for events with updated flags in the userEventsUpdate table
         static func CDRetrieveUpdatedEventCheckAuto(completion: @escaping (_ eventIDString: [String:Any]) -> Void){
-            
-            print("running func CDRetrieveUpdatedEventCheck")
+            print("running func CDRetrieveUpdatedEventCheckAuto")
             
             var eventIDString = [String: Any]()
             
@@ -321,7 +351,7 @@ class AutoRespondHelper {
             if user == nil{
             }
             else{
-            dbStore.collection("userEventUpdates").document(user!).getDocument{ (querySnapshot, error) in
+                dbStore.collection("userEventUpdates").document(user!).getDocument{ (querySnapshot, error) in
                     if error != nil {
                         print("Error getting documents: \(error!)")
                         completion(eventIDString)
@@ -339,23 +369,31 @@ class AutoRespondHelper {
                             
                             eventIDString = documentData
                             
-                            print("CDRetrieveUpdatedEventCheck documentData \(documentData)")
-                            completion(eventIDString)
+                            print("CDRetrieveUpdatedEventCheckAuto documentData \(documentData)")
+                            completion(documentData)
                         }}}}}
     
     
     //    adds, deletes and amends events based on the userEventNotifications table in FireStore
         static func CDRetrieveUpdatedEventsAuto(eventIDs: [String: Any], completion: @escaping () -> Void){
+            print("running func CDRetrieveUpdatedEventsAuto inputs - eventIDs: \(eventIDs)")
+            Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - eventIDs: \(eventIDs)")
+//            testing using dispatch to ensure all actions are run asynchronously
+            let myGroup = DispatchGroup()
             
-//            MARK: we need this function to tell us when it is complete!!!!!!! DEV!!!!!!
-            print("running func CDRetrieveUpdatedEvents inputs - eventIDs: \(eventIDs)")
+//            we add the list of events and the type of notification to the user defaults, this is used to populate the notifications tab
+            UserDefaults.standard.set(eventIDs, forKey: "eventNotifications")
             
             let numberOfEvents = eventIDs.count
             var n = 0
     //        loop thorugh the eventIDs and determine the action for each notification
             for i in eventIDs{
+//                start the tracking of the tasks
+                myGroup.enter()
+                Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group enter \(n)")
                 let notification = i.value as! String
                 n = n + 1
+                print("CDRetrieveUpdatedEventsAuto - event number \(n)")
                 
                 if notification == "delete" || notification == "Delete"{
                     print("CDRetrieveUpdatedEvents - deleting event \(i.key)")
@@ -367,11 +405,12 @@ class AutoRespondHelper {
                         self.CDSaveDataAuto()
                     }
     //                    remove the event notification from the event notification table
-                    self.removeSignleEventNotificationsAuto(eventID: i.key)
-                    
-//                  mark complete if we are on the final event
-                    if n == numberOfEvents{
-                        completion()
+                    self.removeSignleEventNotificationsAuto(eventID: i.key){
+                        NotificationCenter.default.post(name: .newDataLoaded, object: nil)
+//                        once the notification has been removed, we tell the loop to go onto the next
+                        Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                        myGroup.leave()
+  
                     }
                 }
                 else if notification == "amend" || notification == "Amend"{
@@ -388,16 +427,40 @@ class AutoRespondHelper {
 //                        we should also send new availability for the event
                         self.sendUserAvailabilityAuto(eventID: i.key){
 
-//                            remove the event notification from the event notification table
-                            self.removeSignleEventNotificationsAuto(eventID: i.key)
+//                        remove the event notification from the event notification table
+                        self.removeSignleEventNotificationsAuto(eventID: i.key){
+                            NotificationCenter.default.post(name: .newDataLoaded, object: nil)
                             
-                            //                  mark complete if we are on the final event
-                            if n == numberOfEvents{
-                                completion()
+//                        once the notification has been removed, we tell the loop to go onto the next
+                            Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                            myGroup.leave()
+                            
                             }
-
                         }}
                 }
+                else if notification == "amendAvailability" || notification == "AmendAvailability"{
+                                            print("amendAvailability - amending event \(i.key)")
+//                event has been updated, delete the event from our array of events and repalce it
+                                            if let index = CDEevents.index(where: {$0.eventID == i.key}){
+                                                context.delete(CDEevents[index])
+                                                CDEevents.remove(at: index)
+                                                print("index: \(index)")
+                                                self.CDSaveDataAuto()
+                                            }
+                                            CDRetrieveSinglEventsFBAuto(eventID: i.key){(numberOfDates) in
+//                    remove the event notification from the event notification table
+//                                upload availability for this specific event
+                                                self.sendUserAvailabilityAuto(eventID: i.key){
+                                                    
+                                                    self.removeSignleEventNotificationsAuto(eventID: i.key){
+                        NotificationCenter.default.post(name: .newDataLoaded, object: nil)
+//                        once the notification has been removed, we tell the loop to go onto the next
+                        Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                            myGroup.leave()
+                                                        
+                                                    }
+                                                }}
+                    }
                 else if notification == "new" || notification == "New"{
                     print("CDRetrieveUpdatedEvents - new event \(i.key)")
                     if let index = CDEevents.index(where: {$0.eventID == i.key}){
@@ -412,11 +475,12 @@ class AutoRespondHelper {
 //                        add the users availability to the user eventStore
                             self.sendUserAvailabilityAuto(eventID: i.key){
 //                    remove the event notification from the event notification table
-                                self.removeSignleEventNotificationsAuto(eventID: i.key)
-                                
-                                //                  mark complete if we are on the final event
-                                if n == numberOfEvents{
-                                    completion()
+                                self.removeSignleEventNotificationsAuto(eventID: i.key){
+                            NotificationCenter.default.post(name: .newDataLoaded, object: nil)
+//                        once the notification has been removed, we tell the loop to go onto the next
+                        Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                                    myGroup.leave()
+                                    
                                 }
                             }
                         }
@@ -429,30 +493,40 @@ class AutoRespondHelper {
 //                    we do not want to do anything with a dateChosen notification for now
 //                    DEV - maybe we could show a notificiton, although APN would be better
                     
-                    //                  mark complete if we are on the final event
-                    if n == numberOfEvents{
-                        completion()
-                    }
+//                    we still need to leave the group, even if nothing happens
+                    Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                    myGroup.leave()
+                    
                 }
                 
+            }
+//            complete the for loop and mark as complete
+            myGroup.notify(queue: .main) {
+                print("Finished all requests.")
+                Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - Finished all requests")
+                completion()
             }
         }
     
     
     // function to remove a single event from the notification tbale
-    static func removeSignleEventNotificationsAuto(eventID: String){
-        
-        print("running func - removeTheEventNotifications")
-        
+    static func removeSignleEventNotificationsAuto(eventID: String, completion: @escaping () -> Void){
+        print("running func - removeSignleEventNotificationsAuto inputs eventID \(eventID)")
+        Crashlytics.crashlytics().log("running func - removeSignleEventNotificationsAuto inputs eventID \(eventID)")
         if user == nil{
+            completion()
+            Crashlytics.crashlytics().log("removeSignleEventNotificationsAuto - user = nil")
         }
         else{
-        
-        dbStore.collection("userEventUpdates").document(user!).updateData([eventID : FieldValue.delete()]) { err in
+            dbStore.collection("userEventUpdates").document(user!).updateData([eventID : FieldValue.delete()]) { err in
             if let err = err {
                 print("Error removing document: \(err)")
+                Crashlytics.crashlytics().log("removeSignleEventNotificationsAuto - Error removing document: \(err)")
+                completion()
             } else {
                 print("Document successfully removed!")
+                Crashlytics.crashlytics().log("removeSignleEventNotificationsAuto - Document successfully removed!")
+                completion()
             }
             }
         }
@@ -522,7 +596,7 @@ class AutoRespondHelper {
     
     //    function save down the core data
     static func CDSaveDataAuto(){
-        print("running func CDSaveData")
+        print("running func CDSaveDataAuto")
         
         do{
         try context.save()
@@ -541,7 +615,7 @@ class AutoRespondHelper {
         
         do{
             filteredAvailabilityResults = try context.fetch(request)
-                print("filteredAvailabilityResults - availability count: \(filteredAvailabilityResults.count)")
+                print(" CDFetchFilteredAvailabilityDataFromDBAuto - filteredAvailabilityResults - availability count: \(filteredAvailabilityResults.count) filteredAvailabilityResults \(filteredAvailabilityResults)")
                 
                 return filteredAvailabilityResults
                 
@@ -555,7 +629,7 @@ class AutoRespondHelper {
     
     //    fetch availability for a specific event and serialise the data
     static func serialiseAvailabilityAuto(eventID: String) -> [AvailabilityStruct]{
-     print("running func serialiseAvailability inputs - eventID \(eventID)")
+     print("running func serialiseAvailabilityAuto inputs - eventID \(eventID)")
         var filteredAvailability = [CoreDataAvailability]()
         var serialisedAvailability = [AvailabilityStruct]()
     
@@ -582,7 +656,7 @@ class AutoRespondHelper {
     
     //    func to serialise data from CDStore to eventSearch class for any or specific events
         static func serialiseEventsAuto(predicate: NSPredicate, usePredicate: Bool) -> [eventSearch]{
-            print("runing func serialiseEvents inputs - usePredicate: \(usePredicate)")
+            print("runing func serialiseEventsAuto inputs - usePredicate: \(usePredicate)")
             
             let dateFormatterSimple = DateFormatter()
             dateFormatterSimple.dateFormat = "yyyy-MM-dd"
@@ -628,13 +702,15 @@ class AutoRespondHelper {
                 n.startDatesDisplay = CDNewEvent.startDatesDisplay!
                 n.users = CDNewEvent.users ?? [""]
                 
-    //            adding the final date in the search array
-                let finalSearchDate = dateFormatterSimple.date(from: CDNewEvent.endDateInput!)
+//            adding the final date in the search array
+                let lastDate = n.endDateArray.last!
+                let lateDateYYYMMDD = lastDate[0...9]
+                let finalSearchDate = dateFormatterSimple.date(from: String(lateDateYYYMMDD))
                 n.finalSearchDate = finalSearchDate!.addingTimeInterval(TimeInterval(secondsFromGMT))
                 
     //            changing the event owner name to be you for those events the user is hosting
                 
-                if CDNewEvent.eventOwnerName! == user!{
+                if CDNewEvent.eventOwnerName! == user{
                     n.eventOwnerName = "You"
                 }
                 else{
@@ -769,4 +845,890 @@ class AutoRespondHelper {
     }
     
     
+    //    Ask the user for permission to show them notificaitons
+   static func registerForPushNotificationsAuto() {
+    print("running func - registerForPushNotificationsAuto")
+    
+    let badgeBool = UserDefaults.standard.bool(forKey: "notificationBadge")
+    let bannerBool = UserDefaults.standard.bool(forKey: "notificationBanners")
+    print("badgeBool \(badgeBool) bannerBool \(bannerBool)")
+    
+    var options = UNAuthorizationOptions()
+    
+    if badgeBool == true && bannerBool == true{
+        options = [.alert, .sound, .badge]
+    }
+    if badgeBool == true && bannerBool == false{
+        options = [.sound, .badge]
+    }
+    if badgeBool == false && bannerBool == true{
+        options = [.alert, .sound]
+    }
+    if badgeBool == false && bannerBool == false{
+        options = [.alert, .sound, .badge]
+    }
+    
+      UNUserNotificationCenter.current() // 1
+        .requestAuthorization(options: options) { // 2
+          granted, error in
+          print("Permission granted: \(granted)") // 3
+            guard granted else {
+                
+                print("user didnt give us access to their notifications")
+                return }
+            
+            // 1 set the action we would like to perform
+            let respondAction = UNNotificationAction(
+              identifier: "respondAction", title: "Auto Respond",
+              options: [])
+            
+            let viewAction = UNNotificationAction(
+            identifier: "viewAction", title: "View Event",
+            options: [.foreground])
+
+            // 2
+            let newsCategory = UNNotificationCategory(
+              identifier: "newEventCategory", actions: [respondAction, viewAction],
+              intentIdentifiers: [], options: [])
+
+            // 3
+            UNUserNotificationCenter.current().setNotificationCategories([newsCategory])
+            self.getNotificationSettings()
+            self.getUserPushToken()
+      }
+    }
+    
+    
+    //    Returns the user notification settings the user gave us access to
+   static func getNotificationSettings() {
+      UNUserNotificationCenter.current().getNotificationSettings { settings in
+        print("Notification settings: \(settings)")
+        DispatchQueue.main.async {
+          UIApplication.shared.registerForRemoteNotifications()
+        }
+      }
+    }
+    
+    static func getUserPushToken(){
+    InstanceID.instanceID().instanceID { (result, error) in
+    if let error = error {
+    print("Error fetching remote instance ID: \(error)")
+    } else if let result = result {
+    print("Remote instance ID token: \(result.token)")
+//    check to see if the user token has chnaged, if it hasnt we don't need to write the token to the database
+        
+//        let userNotificationToken = UserDefaults.standard.string(forKey: "userNotificationToken") ?? ""
+        
+//        if userNotificationToken == result.token{
+//         print("getUserPushToken - user token hasn't changed")
+//        }
+//        else{
+        
+        if user == nil{
+            print("getUserPushToken - user hasn't signed-in yet")
+        }
+        else{
+//            set the default for the push token
+            UserDefaults.standard.set(result.token, forKey: "userNotificationToken")
+            
+        dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments { (querySnapshot, error) in
+            
+            print("getUserPushToken - querySnapshot \(String(describing: querySnapshot))")
+            
+            if error != nil {
+                print("getUserPushToken - there was an error")
+            }
+            else {
+                for document in querySnapshot!.documents {
+                    
+                    print("getUserPushToken - there was no issue")
+                 
+                    let documentID = document.documentID
+                    let name = document.get("name")
+                    UserDefaults.standard.set(name, forKey: "name")
+                    // Reference for the realtime database
+                    let ref = Database.database().reference()
+                    
+                    dbStore.collection("users").document(documentID).setData(["tokenID" : result.token], merge: true)
+                    
+//                    we remove all previous device tokens
+                    ref.child("users").child(user!).removeValue()
+                    
+//                    save down the new device tokens and the users name
+                    ref.child("users/\(user!)/\(result.token)").setValue(result.token)
+                    ref.child("users/\(user!)/name").setValue(name)
+//                }
+                
+            }}}}}}}
+    
+    
+    static func checkCalendarStatusAuto() -> Bool{
+        let status = EKEventStore.authorizationStatus(for: EKEntityType.event)
+        
+        switch (status) {
+        case EKAuthorizationStatus.notDetermined:
+            requestAccessToCalendar2Auto()
+            return false
+        case EKAuthorizationStatus.authorized:
+            print("We got access")
+            return true
+        case EKAuthorizationStatus.denied:
+//            requestAccessToCalendar2Auto()
+            print("No access")
+            return false
+        case .restricted:
+            print("Access denied")
+            return false
+        }
+        
+    }
+    
+//        request access to the users calendar
+    static func requestAccessToCalendar2Auto() {
+        print("running func requestAccessToCalendar2Auto")
+        
+        let calendarAccessReask = UserDefaults.standard.integer(forKey: "calendarAccessReask") ?? 0
+        
+        if calendarAccessReask == 0{
+        
+        eventStore.requestAccess(to: EKEntityType.event, completion: {
+            (accessGranted: Bool, error: Error?) in
+            
+            if accessGranted == true {
+                //                print("we got access")
+                self.loadCalendars2Auto()
+//                since we were just granted access to the calendar we should respond to any events
+                AutoRespondHelper.nonRespondedEventsAuto()
+
+            }
+            else{
+//                we do not want to show the user this message more than once, so we track it
+                UserDefaults.standard.set(1, forKey: "calendarAccessReask")
+                print("no access to the calendar")
+            }
+            
+        })}
+        else{
+//            we already asked the user for access and they said no
+        }
+    }
+    
+//    function for loading the calendars into the structs
+    static func loadCalendars2Auto(){
+
+//        we only want this function to run once and not multiple times, as doing this can cause a crash. so we set a property to notify when the function is already being called
+        if loadCalendars2AutoIsRunning == true{
+//            we dont run the function
+        }
+        else{
+            loadCalendars2AutoIsRunning = true
+        
+        print("running func loadCalendars2")
+        var calendars: [EKCalendar]!
+            calendars = eventStore.calendars(for: EKEntityType.event)
+            
+    //        If the calendar array hasnt been created previously then then the function creates a new array, or if there are no selected calendars, we repopulate. we also check if this fucntion is already running
+        if SelectedCalendarsStruct.calendarsStruct.count == 0 || SelectedCalendarsStruct.selectedCalendarArray.count == 0 {
+                
+                SelectedCalendarsStruct.calendarsStruct = calendars!
+            
+//            we set the variable to true so that we do not run the function more than once
+            loadCalendars2AutoIsRunning = true
+            
+//            we loop through the calendars and add them to the selected calendar array
+            for calendar in calendars{
+                SelectedCalendarsStruct.selectedCalendarArray.append(1)
+            }
+                
+//                BUG: we loop through the list of calendars we don't want to use - this should be made a struct, we also remove them from the list of selected calendars
+                if let index = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "US Holidays"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index)
+                }
+                if let index1 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "UK Holidays"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index1)
+                }
+                if let index2 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Birthdays"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index2)
+                }
+                if let index3 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "South Korean Holidays"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index3)
+                }
+                if let index4 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Hong Kong Holidays"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index4)
+                }
+                if let index5 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Holidays in United Kingdom"}){
+                    SelectedCalendarsStruct.calendarsStruct.remove(at: index5)
+                }
+                
+                print("SelectedCalendarsStruct: \(SelectedCalendarsStruct.calendarsStruct)")
+            loadCalendars2AutoIsRunning = false
+   
+            }
+                else{
+                    
+                    
+                }
+        }
+            }
+    
+    
+//    function used to saved save a notificaiton that the user has responded to the database, this is used to trigger a notification to the event owner and the responder, we set the vaule being written to now, such that it is always updated
+    static func userRespondedNotification(eventID: String){
+//        we use the userdefault to ensure a new number is always written to the database, if the same value is written nothing is actually written and the listener will not be tirggered
+        let notificationNumber = UserDefaults.standard.integer(forKey: "notificationNumber")
+        let notificationNumberNew = notificationNumber + 1
+        
+        print(" running func userRespondedNotification - eventID: \(eventID)")
+        let ref = Database.database().reference().child("userResponded")
+        let fromId = user!
+        ref.child(eventID).child(fromId).setValue(notificationNumberNew)
+        UserDefaults.standard.set(notificationNumberNew, forKey: "notificationNumber")
+        
+    }
+    
+//    fucntion to check for the availability
+    static func availabilityChangeListenerAuto(){
+        
+        if availabilityListenerEngaged == true{
+            print("availabilityChangeListener already engaged, not re-engaging")
+               }
+               else{
+                availabilityListenerEngaged = true
+        
+        print("engaging availabilityChangeListener")
+            
+            if user == nil{
+            }
+            else{
+
+        availabilityListenerRegistration = dbStore.collection("userAvailabilityUpdates").document(user!).addSnapshotListener(){ (querySnapshot, error) in
+                if error != nil {
+                    print("Error getting documents: \(error!)")
+                }
+                else {
+                    let source = querySnapshot!.metadata.hasPendingWrites ? "Local" : "Server"
+                    
+                    if source == "local"{
+                        print("This is the local trigger, we don't do anything with this")
+                    }
+                    else{
+                    
+                    if querySnapshot!.data()?.isEmpty == true || querySnapshot!.data() == nil{
+        //                the user doesn't have any  event data to retrieve
+                        print("availabilityChangeListener triggered but user has no new availability notifications")}
+                    else{
+                        
+                        let documentData: [String: Any] = (querySnapshot!.data()!)
+                        
+                        print("availabilityChangeListener triggered - there is data in the document \(documentData.keys) \(documentData.values)")
+                        
+                        self.CDRetrieveUpdatedAvailabilityAuto(availabilityID: documentData)
+                        
+                        }}}}}
+
+        }}
+    
+    //    adds, deletes and amends availability based on the userAvailabilityNotifications table in FireStore
+           static func CDRetrieveUpdatedAvailabilityAuto(availabilityID: [String: Any]){
+             
+                print("running func CDRetrieveUpdatedAvailability inputs - availabilityID: \(availabilityID)")
+                
+
+//            we add the list of availabilities and the type of notification to the user defaults, this is used to populate the notifications tab
+            UserDefaults.standard.set(availabilityID, forKey: "availabilityNotifications")
+            
+        //        loop thorugh the availabilityID and determine the action for each notification
+                for i in availabilityID{
+                    let notification = i.value as! String
+                    
+                    if notification == "delete" || notification == "Delete"{
+                        print("CDRetrieveUpdatedAvailability - deleting availability \(i.key)")
+        //                event has been deleted, we remove it from our array of events
+                        if let index = CDAvailability.index(where: {$0.documentID == i.key}){
+                            context.delete(CDAvailability[index])
+                            CDAvailability.remove(at: index)
+                            print("index: \(index)")
+                            self.CDSaveDataAuto()
+
+                        }
+    //                        remove the notificaiton from the notification table
+                        removeSingleAvailabilityNotificationsAuto(documentID: i.key)
+                    }
+                    else if notification == "amend" || notification == "Amend"{
+                        print("CDRetrieveUpdatedAvailability - amending availability \(i.key)")
+        //                event has been updated, delete the event from our array of events and repalce it
+                        if let index = CDAvailability.index(where: {$0.documentID == i.key}){
+                            context.delete(CDAvailability[index])
+                            CDAvailability.remove(at: index)
+                            print("index: \(index)")
+                            self.CDSaveDataAuto()
+                        }
+                        CDRetrieveSingleAvailabilityFBAuto(availabilityID: i.key){
+                            print("CDRetrieveUpdatedAvailability - CDRetrieveSingleAvailabilityFB: complete")
+    //                        remove the specific notificaiton for that availability
+                            self.nonRespondedEventsAuto()
+                            NotificationCenter.default.post(name: .availabilityUpdated, object: nil)
+                        }
+                        self.removeSingleAvailabilityNotificationsAuto(documentID: i.key)
+                    }
+                    else if notification == "new" || notification == "New"{
+                        print("CDRetrieveUpdatedAvailability - new availability \(i.key)")
+                        if let index = CDAvailability.index(where: {$0.documentID == i.key}){
+                            context.delete(CDAvailability[index])
+                            CDAvailability.remove(at: index)
+                            print("index: \(index)")
+                            self.CDSaveDataAuto()
+                        }
+                        CDRetrieveSingleAvailabilityFBAuto(availabilityID: i.key){
+                            print("CDRetrieveUpdatedAvailability - CDRetrieveSingleAvailabilityFB: complete")
+                            NotificationCenter.default.post(name: .availabilityUpdated, object: nil)
+
+                        }
+    //                        remove the specific notificaiton for that availability
+                        self.removeSingleAvailabilityNotificationsAuto(documentID: i.key)
+                    }
+
+                }
+            }
+    
+    
+    //    function to retrieve all the availability from Firebase, this should only be used if the coredata is currently empty
+    static func CDRetrieveSingleAvailabilityFBAuto(availabilityID: String, completion: @escaping () -> Void ){
+            
+            print("running func CDRetrieveSingleAvailabilityFB inputs - availabilityID: \(availabilityID)")
+            
+        dbStore.collection("userEventStore").document(availabilityID).getDocument{ (querySnapshot, error) in
+                   if error != nil {
+                       print("Error getting documents: \(error!)")
+                    completion()
+                   }
+                   else {
+                       
+                    if querySnapshot!.exists == false{
+                         
+           //                the user doesn't have any  event data to retrieve
+                           print("no availability data to retrieve")
+                        completion()
+                    }
+                       else{
+                        
+                        //                            before we commit anything to the DB we should check if it alredy exists and remove it if it does
+                        if let index = CDAvailability.index(where: {$0.documentID == querySnapshot!.documentID}){
+                                                context.delete(CDAvailability[index])
+                                                CDAvailability.remove(at: index)
+                                                print("index: \(index)")
+                            self.CDSaveDataAuto()
+                        }
+                        
+                            let CDNewAvailability = CoreDataAvailability(context: context)
+                            
+                            CDNewAvailability.documentID = querySnapshot!.documentID
+                            CDNewAvailability.uid = querySnapshot!.get("uid") as? String
+                            CDNewAvailability.eventID = querySnapshot!.get("eventID") as? String
+                            CDNewAvailability.userName = querySnapshot!.get("userName") as? String
+                            CDNewAvailability.userAvailability = querySnapshot!.get("userAvailability") as? [Int] ?? [99]
+                            CDNewAvailability.calendarEventID = querySnapshot!.get("calendarEventID") as? String ?? ""
+    //                        append the new event onto CDAvailability
+                            CDAvailability.append(CDNewAvailability)
+                        self.CDSaveDataAuto()
+                        print("CDRetrieveSingleAvailabilityFB - update complete")
+                        completion()
+                        
+                        }}}
+            
+        }
+    
+   static func removeSingleAvailabilityNotificationsAuto(documentID: String){
+        
+        print("running func - removeSingleAvailabilityNotifications")
+        if user == nil{
+        }
+        else{
+        
+        dbStore.collection("userAvailabilityUpdates").document(user!).updateData([documentID : FieldValue.delete()]) { err in
+            if let err = err {
+                print("Error removing document: \(err)")
+            } else {
+                print("Document successfully removed!")
+            }}
+        }
+    }
+    
+    //    function to location events we haven't responded to and respond, this should run each time we open the app and maybe when we open the events page
+        static func nonRespondedEventsAuto(){
+    //        find events where the availability for our user ID = [99]
+            print("running func nonRespondedEvents")
+            
+            if user == nil{
+            }
+            else{
+            let request : NSFetchRequest<CoreDataAvailability> = CoreDataAvailability.fetchRequest()
+                request.predicate = NSPredicate(format: "uid == %@ && (userAvailability == %@ || userAvailability == %@ || userAvailability == %@)", argumentArray:[user ?? "", [99], [11], []])
+            let filteredAvailability = CDFetchFilteredAvailabilityDataFromDBAuto(with: request)
+            print("nonRespondedEvents filteredAvailability \(filteredAvailability)")
+                
+    //            adding a catch in case nothing is returned from the request
+                if filteredAvailability.count == 0{
+                    
+                }
+                else{
+    //            filter through each empty availability and respond
+                for i in filteredAvailability{
+                    uploadCurrentUsersAvailabilityAuto(eventID: i.eventID!)
+                }
+                }
+            }
+        }
+    
+    static func uploadCurrentUsersAvailabilityAuto(eventID: String){
+            print("running func uploadCurrentUsersAvailabilityAuto inputs - eventID: \(eventID)")
+    //        if we don't have access to the calendar we stop
+            if checkCalendarStatusAuto() == false{
+                   print("uploadCurrentUsersAvailability - checkCalendarStatusAuto = false")
+                
+                
+                
+               }
+            else{
+            
+            var dateFormatterTZ = DateFormatter()
+            dateFormatterTZ.dateFormat = "yyyy-MM-dd HH:mm z"
+            dateFormatterTZ.locale = Locale(identifier: "en_US_POSIX")
+            
+    //        1. retrieve the event data, eventSearch
+            let predicate = NSPredicate(format: "eventID = %@", eventID)
+            let predicateReturned = serialiseEventsAuto(predicate: predicate, usePredicate: true)
+            if predicateReturned.count == 0{
+             print("something went wrong")
+            }
+            else{
+                let eventData = predicateReturned[0]
+            print("uploadCurrentUsersAvailability documentID: \(eventData)")
+            
+    //        2. retrieve the documentID for the users eventStore ID
+            let availabilityData = serialiseAvailabilityAuto(eventID: eventID)
+            let filteredAvailabilityData = availabilityData.filter { $0.uid == user!}
+                if filteredAvailabilityData.count == 0{
+                    print("something went wrong")
+                }
+                else{
+            let documentID = filteredAvailabilityData[0].documentID
+            let calendarID = filteredAvailabilityData[0].calendarEventID
+            print("uploadCurrentUsersAvailability documentID: \(documentID)")
+            
+    //        3. calcaulte the users availability
+            
+            let numberOfDates = eventData.endDateArray.count - 1
+            
+    //        check that we have start or end dates and abort if we dont
+            if eventData.startDateArray.count == 0 || eventData.endDateArray.count == 0{
+                 print("something went wrong")
+    //            WE SHOULD ADD A FIX HERE
+            }
+            else{
+
+            let startDateDate = dateFormatterTZ.date(from: eventData.startDateArray[0])
+            let endDateDate = dateFormatterTZ.date(from: eventData.endDateArray[numberOfDates])
+                let users = eventData.users
+                
+            getCalendarData3Auto(startDate: startDateDate!, endDate: endDateDate!){ (datesOfTheEvents, startDatesOfTheEvents, endDatesOfTheEvents) in
+
+
+                compareTheEventTimmings3Auto(datesBetweenChosenDatesStart: eventData.startDateArray, datesBetweenChosenDatesEnd: eventData.endDateArray, startDatesOfTheEvents: startDatesOfTheEvents, endDatesOfTheEvents: endDatesOfTheEvents){
+            (finalAvailabilityArray) in
+            print("uploadCurrentUsersAvailability finalAvailabilityArray: \(finalAvailabilityArray)")
+
+    //                        add the finalAvailabilityArray to the userEventStore
+                    commitUserAvailbilityDataAuto(userEventStoreID: documentID, finalAvailabilityArray2: finalAvailabilityArray, eventID: eventID){
+                        
+                        //                                            commit the users availability into CD
+                        commitUserAvailabilityDataCD(userEventStoreID: documentID, finalAvailabilityArray2: finalAvailabilityArray, eventID: eventID, calendarEventID: calendarID){
+                        
+                        availabilityCreatedNotificationAuto(userIDs: users, availabilityDocumentID: documentID)
+                        NotificationCenter.default.post(name: .availabilityUpdated, object: nil)
+                        }}
+                }}}}}}
+        }
+ 
+    
+//    static func for checking if the event has its date chosen and updating the event information, the input is the eventID
+    
+    static func checkValidityOfCalendareevnt(eventID: String){
+        print("running func checkValidityOfCalendareevnt eventID: \(eventID)")
+        
+     //        1. retrieve the event data, eventSearch
+        let predicate = NSPredicate(format: "eventID = %@", eventID)
+        let predicateReturned = serialiseEventsAuto(predicate: predicate, usePredicate: true)
+        if predicateReturned.count == 0{
+            print("soemthing we wrong, we end the function")
+        }
+        else{
+         let eventToCheck = predicateReturned[0]
+//        2. get the users availability to check if they have a calendar event
+          let availabilityData = serialiseAvailabilityAuto(eventID: eventID)
+            let filteredAvailabilityData = availabilityData.filter {$0.uid == user!}
+                if filteredAvailabilityData.count == 0{
+                    print("checkValidityOfCalendareevnt - something went wrong")
+                }
+                else{
+                    print("checkValidityOfCalendareevnt - filteredAvailabilityData \(filteredAvailabilityData)")
+                    let usersAvailability = filteredAvailabilityData[0]
+                    let eventCalendarID = usersAvailability.calendarEventID
+                    print("eventCalendarID \(eventCalendarID)")
+                    
+//                    3. check to see if the user has saved the event into their calendar
+                    
+                    let defaultCalendarToSave = UserDefaults.standard.string(forKey: "saveToCalendar") ?? ""
+                    let eventStore = EKEventStore()
+                    
+                    eventStore.requestAccess(to: .event, completion: { (granted, error) in
+                    if (granted) && (error == nil) {
+                    if eventCalendarID == "" || eventStore.event(withIdentifier: eventCalendarID) == nil{
+                        print("user hasnt saved the event into thier calendar or we couldn't find the event, we should do some clean up here if that is the case eventCalendarID \(eventCalendarID) eventStore.event(withIdentifier: eventCalendarID) \(String(describing: eventStore.event(withIdentifier: eventCalendarID)))")
+//                        we clean up the data by removing any event that has been saved down
+     
+                    }
+//                        if the event chosen date has been removed, but the event is still in the users calendar we remove it
+                    else if eventToCheck.chosenDate == "" && eventCalendarID != "" && eventStore.event(withIdentifier: eventCalendarID) != nil{
+                        
+                        let event = eventStore.event(withIdentifier: eventCalendarID)
+                        do{
+//                            remove the event from the calendar
+                            try eventStore.remove(event!, span: .thisEvent)
+                            
+//                            set the ID for the event in CD to ""
+                        }
+                        catch{
+                            
+                        }
+                    }
+                    else{
+//                       4. update the information in the users calendar
+                        let event = eventStore.event(withIdentifier: eventCalendarID)!
+                        let dateFormatterTZCreate = DateFormatter()
+                        dateFormatterTZCreate.dateFormat = "yyyy-MM-dd HH:mm z"
+                        dateFormatterTZCreate.locale = Locale(identifier: "en_US_POSIX")
+                        //                    let event = EKEvent(eventStore: eventStore)
+                        event.title = eventToCheck.eventDescription
+                            print("Event being saved: Title \(String(describing: event.title))")
+                        event.startDate = dateFormatterTZCreate.date(from: eventToCheck.startDateArray[eventToCheck.chosenDatePosition])
+                            print("Event being saved: startDate \(String(describing: event.startDate))")
+                        event.endDate = dateFormatterTZCreate.date(from: eventToCheck.endDateArray[eventToCheck.chosenDatePosition])
+                            print("Event being saved: endDate \(String(describing: event.endDate))")
+                        event.notes = eventToCheck.eventDescription
+                            print("Event being saved: description \(String(describing: event.description))")
+                            
+                        if eventToCheck.locationLongitude == 0.0{
+                                
+                            event.location = eventToCheck.eventLocation
+                                print("Event being saved: Location \(String(describing: event.location))")
+                                
+                            }
+                            else{
+                                
+                            let geoLocation = CLLocation(latitude: eventToCheck.locationLatitue, longitude: eventToCheck.locationLongitude)
+                            let structuredLocation = EKStructuredLocation(title: eventToCheck.eventLocation)
+                                
+                                structuredLocation.geoLocation = geoLocation
+                                event.structuredLocation = structuredLocation
+                                
+                            }
+                            
+                            if defaultCalendarToSave == ""{
+                                event.calendar = eventStore.defaultCalendarForNewEvents
+                            }
+                            else{
+                                event.calendar = eventStore.calendar(withIdentifier: UserDefaults.standard.string(forKey: "saveToCalendar")!)
+                                
+                            }
+                            print("Event being saved: calendar being saved to \(String(describing: event.calendar))")
+                            
+                            
+                            do {
+                                try eventStore.save(event, span: .thisEvent)
+                        
+                                print("Trying to save down event")
+                            } catch let e as NSError {
+//                                completion?(false, e)
+                                return
+                            }
+                        }}
+                        else {
+//                            completion?(false, error as NSError?)
+                            print(error ?? "no error message")
+                            print("error saving event")
+                        }
+                    })
+            }
+        }
+    }
+    
+    
+    static func setupNotificatonPage(){
+//     let eventNotifications = UserDefaults.standard(forKey: "eventNotifications")
+        
+        
+    }
+    
+    static func getUserContacts(completion: @escaping () -> Void){
+             print("Attempting to fetch the contacts")
+             
+             contacts.removeAll()
+
+             let store = CNContactStore()
+             
+             store.requestAccess(for: .contacts) { (granted, error) in
+                 if let error = error {
+                     print("Failed to get access",error)
+                     
+                     print("Access Denied")
+                     
+                     let alert = UIAlertController(title: "Acess to Contacts Denied", message: "Please go to setting to enable Planr access", preferredStyle: UIAlertController.Style.alert)
+                     
+                     // add the actions (buttons)
+                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel, handler: { action in
+                         
+                         print("User selected OK")
+                         
+                     }))
+                     
+                     alert.addAction(UIAlertAction(title: "Settings", style: UIAlertAction.Style.default, handler: { action in
+                         
+                         guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                             return
+                         }
+                         
+                         if UIApplication.shared.canOpenURL(settingsUrl) {
+                         UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                             print("Settings opened: \(success)") // Prints true
+                         })}
+                         
+                         
+                         print("User selected Settings")
+                         
+                     }))
+                     
+                     // show the alert
+                     NL_AddInvitees().present(alert, animated: true, completion: nil)
+
+                 }
+                 if granted{
+                     print("Acccess Granted")
+                     
+                     //                Need to request access to both the given name and the family name and the phone number, each has its own key
+                     let keys = [CNContactGivenNameKey,CNContactFamilyNameKey,CNContactPhoneNumbersKey]
+                     let request = CNContactFetchRequest(keysToFetch: keys as [CNKeyDescriptor])
+                     
+                     do{
+                         
+                         try store.enumerateContacts(with: request, usingBlock: { (contact, stopPointerIfYouWantToStopPointerEnumerating) in
+                             //                        print(contact.givenName)
+                             
+                             contacts.append(contactList(name: contact.givenName + " " + contact.familyName, phoneNumber: contact.phoneNumbers.first?.value.stringValue ?? "", selectedContact: false))
+
+                         })
+                         
+                         contactsSorted = contacts.sorted(by: { $0.name < $1.name })
+                         
+                         contactsSorted.removeAll {$0.name == ""}
+                         contactsSorted.removeAll {$0.name == " "}
+                         contactsSorted.removeAll {$0.name == "  "}
+                         contactsSorted.removeAll {$0.name == "   "}
+                         contactsSorted.removeAll {$0.name == "    "}
+                         contactsSorted.removeAll {$0.name == "     "}
+                         contactsSorted.removeAll {$0.name == "      "}
+                         contactsSorted.removeAll {$0.name == "       "}
+                         contactsSorted.removeAll {$0.phoneNumber == ""}
+                         contactsSorted.removeAll {$0.phoneNumber == " "}
+                         contactsSorted.removeAll {$0.phoneNumber == "  "}
+                         contactsSorted.removeAll {$0.phoneNumber == "   "}
+                         contactsSorted.removeAll {$0.phoneNumber == "    "}
+                         contactsSorted.removeAll {$0.phoneNumber == "     "}
+                         contactsSorted.removeAll {$0.phoneNumber == "      "}
+                         contactsSorted.removeAll {$0.phoneNumber == "       "}
+                             
+                         
+                         completion()
+                         
+                     } catch let error{
+                         print("Failed to enumerate contacts:",error)
+                     }
+                 }
+                 else{
+                     print("Access Denied")
+                     
+                     let alert = UIAlertController(title: "Acess to Contacts Denied", message: "Please go to setting to enable Planr access", preferredStyle: UIAlertController.Style.alert)
+                     
+                     // add the actions (buttons)
+                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel, handler: { action in
+                         
+                         print("User selected OK")
+                         
+                     }))
+                     
+                     alert.addAction(UIAlertAction(title: "Settings", style: UIAlertAction.Style.default, handler: { action in
+                         
+                         guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                             return
+                         }
+                         
+                         if UIApplication.shared.canOpenURL(settingsUrl) {
+                         UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                             print("Settings opened: \(success)") // Prints true
+                         })}
+                         
+                         
+                         print("User selected Settings")
+                         
+                     }))
+                     
+                     // show the alert
+                    NL_AddInvitees().present(alert, animated: true, completion: nil)
+        
+                 }
+             }
+         }
+    
+    
+    static func textToImage(drawText text: String, inImage image: UIImage, atPoint point: CGPoint) -> UIImage {
+        let textColor = UIColor.white
+        let textFont = UIFont(name: "Helvetica Bold", size: 12)!
+
+        let scale = UIScreen.main.scale
+        UIGraphicsBeginImageContextWithOptions(image.size, false, scale)
+
+        let textFontAttributes = [
+            NSAttributedString.Key.font: textFont,
+            NSAttributedString.Key.foregroundColor: textColor,
+            ] as [NSAttributedString.Key : Any]
+        image.draw(in: CGRect(origin: CGPoint.zero, size: image.size))
+
+        let rect = CGRect(origin: point, size: image.size)
+        text.draw(in: rect, withAttributes: textFontAttributes)
+
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage!
+    }
+    
+    
+    
+    //    MARK: Functions for deleting a created event
+    
+    //    section for deleting the realtime database entries
+        static func deleteRealTimeDatabaseEventInfo(eventID: String){
+        let ref = Database.database().reference()
+            
+            ref.child("events/\(eventID)").removeValue()
+       
+        }
+        
+    //    function to delete the new event notification
+    static   func deleteRealTimeDatabaseUserEventLink(eventID: String){
+            let ref = Database.database().reference()
+            ref.child("userEventLink/\(user!)/newEvent/\(eventID)").removeValue()
+        }
+    
+    
+        
+   static func deleteEventRequest(eventID: String){
+            let docRefEventRequest = dbStore.collection("eventRequests")
+            
+            docRefEventRequest.document(eventID).delete()
+        }
+        
+    //    fucntion to delete the eventStore
+        static func deleteEventStore(eventID: String){
+            
+            for i in currentUserSelectedAvailability{
+            
+            print("running func deleteEventStore, inputs - eventID: \(i.documentID)")
+            
+            let docRefUserEventStore = dbStore.collection("userEventStore")
+            
+                docRefUserEventStore.document(i.documentID).updateData(["userAvailability" : FieldValue.delete()]){ err in
+                            if let err = err {
+                                print("Error updating document: \(err)")
+                            } else {
+                                print("Document successfully updated")
+                            }
+                        }
+                        
+                        docRefUserEventStore.document(i.documentID).delete()
+            }
+        }
+        
+        static func deleteTemporaryUserEventStore(eventID: String){
+            
+            print("running func deleteTemporaryUserEventStore, inputs - eventID: \(eventID)")
+            
+            let docRefUserEventStore = dbStore.collection("temporaryUserEventStore")
+            
+            docRefUserEventStore.whereField("eventID", isEqualTo: eventID).getDocuments() { (querySnapshot, err) in
+                if let err = err {
+                    print("Error getting documents: \(err)")}
+                    
+                else{
+                    for document in querySnapshot!.documents{
+                        
+                        let documentID = document.documentID
+                        
+                        docRefUserEventStore.document(documentID).delete(){ err in
+                            if let err = err {
+                                print("Error deleting document: \(err)")
+                            } else {
+                                print("Document successfully deleted")
+                            }
+                        }
+                        
+                        docRefUserEventStore.document(documentID).delete()
+                    }
+                }
+            }
+        }
+        
+    //
+        static func deleteEventStoreAvailability(eventID: String){
+            
+            print("running func deleteEventStoreAvailability, inputs - eventID: \(eventID)")
+            let docRefUserEventStore = dbStore.collection("userEventStore")
+            
+            for i in  currentUserSelectedAvailability{
+                
+                docRefUserEventStore.document(i.documentID).updateData(["userAvailability" : FieldValue.delete()]){ err in
+                    if let err = err {
+                        print("Error updating document: \(err)")
+                    } else {
+                        print("Document successfully updated")
+                    }
+                }
+                
+                docRefUserEventStore.document(i.documentID).updateData(["chosenDate" : FieldValue.delete()]){ err in
+                    if let err = err {
+                        print("Error updating document: \(err)")
+                    } else {
+                        print("Document successfully updated")
+                    }
+                }
+            }
+            }
+    
+    
+    //        function to reminder the user to respond, we post to both the notifications in Firestore and to realtime databse to send a message
+         static   func sendTheUserAReminder(eventID: String, userID: String){
+                let rRef = Database.database().reference()
+                
+    //            post to Firestore
+                dbStore.collection("userEventUpdates").document(userID).setData([eventID : "new"], merge: true)
+                
+    //            set the realtime database
+                rRef.child("userEventLink/\(userID)/eventReminder/\(eventID)").setValue(eventID)
+                
+            }
+
+    
+//    helper end
 }
+
+

@@ -12,10 +12,12 @@ class UserInvitedEventsCell: UITableViewCell {
 
     
     @IBOutlet var userInvitedCellImage: UIImageView!
+    @IBOutlet weak var txtEventOwner: UILabel!
     
     @IBOutlet var userInvitedCellLabel1: UILabel!
     @IBOutlet var userInvitedCellLabel2: UILabel!
     @IBOutlet var userInvitedCellLabel3: UILabel!
+    
     
     
     @IBOutlet weak var imgChatNotification: UIImageView!

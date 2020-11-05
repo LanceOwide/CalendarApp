@@ -14,6 +14,10 @@ var currentUsersAvailability = [Int]()
 
 class ManualAvailabilityViewController: UIViewController,CoachMarksControllerDataSource, CoachMarksControllerDelegate {
     
+   
+//    setup for coachmarks
+    let coachMarksController = CoachMarksController()
+    
     
     /// Get distance from top, based on status bar and navigation
     public var topDistance : CGFloat{
@@ -49,7 +53,7 @@ class ManualAvailabilityViewController: UIViewController,CoachMarksControllerDat
         availabilityCollectionView.dataSource = self
         coachMarksController.dataSource = self
         coachMarksController.delegate = self
-        coachMarksController.overlay.allowTap = true
+        coachMarksController.overlay.isUserInteractionEnabled = true
         
         self.view.backgroundColor = UIColor.black.withAlphaComponent(0.8)
         
@@ -61,15 +65,47 @@ class ManualAvailabilityViewController: UIViewController,CoachMarksControllerDat
         //        setup the navigation bar
         navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: UIColor.black)
         
-        
-        let t = currentUserSelectedAvailability.filter(){$0.uid == user!}
-        print("t \(t)")
-        temporaryCurrentUsersAvailability = t[0].userAvailability
-        print("temporaryCurrentUsersAvailability: \(temporaryCurrentUsersAvailability)")
+//        set the users availability
+        prepareUserAvailability()
+
         
         buttonSettings(uiButton: btnClose)
         buttonSettings(uiButton: btnSave)
                 
+    }
+    
+//    function to create an array of not responded users, for each
+    func prepareUserAvailability(){
+        print("running func - createArrayIfUserHasntResponded")
+        currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+//        get the users current availability
+        let t = currentUserSelectedAvailability.filter(){$0.uid == user!}
+        print("t \(t)")
+        let currentUserAvailability = t[0].userAvailability
+        print("currentUserAvailability: \(currentUserAvailability)")
+
+//        we need to check if the user hasn't responded to the event temporaryCurrentUsersAvailability
+        if currentUserAvailability[0] == 99{
+
+        let numberOfDays = currentUserSelectedEvent.endDateArray.count
+        var nonRespondedArray = [Int]()
+        var n = 0
+        
+//        add 10 to the array for each day in the array
+        while n < numberOfDays{
+            
+            nonRespondedArray.append(10)
+            n = n + 1
+        }
+        temporaryCurrentUsersAvailability = nonRespondedArray
+        }
+        else{
+//            the use has responded and their availability is set to their response
+            temporaryCurrentUsersAvailability = currentUserAvailability
+        }
+        
+
+        
     }
     
     
@@ -115,7 +151,9 @@ class ManualAvailabilityViewController: UIViewController,CoachMarksControllerDat
     //    Defines where the coachmark will appear
     var pointOfInterest = UIView()
     
-    func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: CoachMarkBodyView, arrowView: CoachMarkArrowView?) {
+    
+    
+    func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: (UIView & CoachMarkBodyView), arrowView: (UIView & CoachMarkArrowView)?) {
         
         
         let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
@@ -186,7 +224,7 @@ class ManualAvailabilityViewController: UIViewController,CoachMarksControllerDat
         }
         
 
-        let coachMarksController = CoachMarksController()
+        
 
 }
 

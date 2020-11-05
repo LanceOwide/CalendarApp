@@ -11,12 +11,7 @@ import Firebase
 import MBProgressHUD
 import DLRadioButton
 
-var inviteesNames = Array<String>()
-var inviteesUserIDs = Array<String>()
-var inviteesNamesNew = Array<String>()
-var deletedInviteeNames = Array<String>()
-var deletedUserIDs = Array<String>()
-var deletedNonUserInviteeNames = Array<String>()
+
 
 class EventEditViewController: UIViewController, UITableViewDelegate,UITableViewDataSource, UIPopoverPresentationControllerDelegate, CellSubclassDelegate {
 
@@ -27,6 +22,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     private var datePicker: UIDatePicker?
     var dateFormatterDay = DateFormatter()
     var dateFormatterString = DateFormatter()
+
     
 
     @IBOutlet var eventTitle: UITextField!
@@ -107,12 +103,12 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
         
 
         //Looks for single or multiple taps.
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+//        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         
         //Uncomment the line below if you want the tap not not interfere and cancel other interactions.
         //tap.cancelsTouchesInView = false
         
-        view.addGestureRecognizer(tap)
+//        view.addGestureRecognizer(tap)
         
         
         eventTitle.text = currentUserSelectedEvent.eventDescription
@@ -226,11 +222,11 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     }
 
     
-    //Calls this function when the tap is recognized.
-    @objc func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
-        view.endEditing(true)
-    }
+//    //Calls this function when the tap is recognized.
+//    @objc func dismissKeyboard() {
+//        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+//        view.endEditing(true)
+//    }
     
     @objc func setLocationLabel() {
      
@@ -243,7 +239,7 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     //    function to call show popover when location selected
     @objc func myTargetFunction(textField: UITextField) {
         
-        let popController = storyboard?.instantiateViewController(withIdentifier: "locationMapNavigation") as! UINavigationController
+        let popController = storyboard?.instantiateViewController(withIdentifier: "locationSearchTableNavigation") as! UINavigationController
 
         // set the presentation style
         popController.modalPresentationStyle = UIModalPresentationStyle.popover
@@ -261,6 +257,9 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
     @objc func saveSelected() {
         //the user selected to save the event
         
+//        variable to hold a bool indicating whether the user needs to resend thier availability
+        var sendAvailability = false
+        
         dateFormatter.dateFormat = "dd MMM yyyy"
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         
@@ -271,33 +270,20 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
          
         
         if eventTitle.text == "" {
-            
             showProgressHUD(notificationMessage: "Please add an event title", imageName: "Unavailable", delay: 1)
-            
-    
         }
         else if eventStartDate.text == "" {
-            
             showProgressHUD(notificationMessage: "Please add an event start date", imageName: "Unavailable", delay: 1)
-            
-
         }
        else if eventEndDate.text == "" {
-            
             showProgressHUD(notificationMessage: "Please add an end date", imageName: "Unavailable", delay: 1)
-            
-
         }
         else if eventStartTime.text == "" {
-            
             showProgressHUD(notificationMessage: "Please add an event start time", imageName: "Unavailable", delay: 1)
-            
-
         }
        else if eventEndTime.text == "" {
             
             showProgressHUD(notificationMessage: "Please add an event end time", imageName: "Unavailable", delay: 1)
-            
         }
             
        else if mondayButton.isSelected ==  false && tuesdayButton.isSelected ==  false && wednesdayButton.isSelected ==  false && thursdayButton.isSelected ==  false && fridayButton.isSelected ==  false && saturdayButton.isSelected ==  false && sundayButton.isSelected ==  false{
@@ -309,15 +295,11 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
        else if dateFormatter.date(from: eventEndDate.text!)!  < dateFormatter.date(from: eventStartDate.text!)! {
             
             showProgressHUD(notificationMessage: "Start date must be before end date", imageName: "Unavailable", delay: 1)
-            
-
          }
             
        else if dateFormatterTime.date(from: eventEndTime.text!)! < dateFormatterTime.date(from: eventStartTime.text!)!{
             
             showProgressHUD(notificationMessage: "Start time must be before start time", imageName: "Unavailable", delay: 1)
-            
-
             }
             
         else {
@@ -381,111 +363,155 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             let endDateInputDates = dateFormatter.date(from: eventEndDate.text!)
             let startDateInputString = dateFormatterInput.string(from: startDateInputDates!)
             let endDateInputString = dateFormatterInput.string(from: endDateInputDates!)
-
+            
+            let dateArray = getStartAndEndDates3NC(startDate: startDateInputString, endDate: endDateInputString, startTime: eventStartTime.text!, endTime: eventEndTime.text!, daysOfTheWeek: daysOfTheWeekNewEvent).0
+//            check if there are any dates in between the chosen parameters
+            print("the date in the array - dateArray \(dateArray.count)")
+            if dateArray.count == 0{
+            showProgressHUD(notificationMessage: "No dates in search period, adjust dates or days of the week ", imageName: "Unavailable", delay: 1)
+            }
+            else{
 // checks to see whether the user has made any changes to the event timing
             if eventStartTime.text == convertToLocalTime(inputTime: currentUserSelectedEvent.eventStartTime) &&
                 eventEndTime.text == convertToLocalTime(inputTime: currentUserSelectedEvent.eventEndTime) &&
                 eventStartDate.text == convertToDisplayDate(inputDate: currentUserSelectedEvent.eventStartDate) &&
             eventEndDate.text == convertToDisplayDate(inputDate: currentUserSelectedEvent.eventEndDate) && currentUserSelectedEvent.daysOfTheWeekArray == daysOfTheWeekNewEvent {
-                
+//                set the bool to send amendAvailability to the event notifications DB
+
                 showProgressHUD(notificationMessage: "Event Information Updated", imageName: "icons8-double-tick-100", delay: 2)
+                
+//                SAVE THE EVENT!!
+                saveTheEventInformation(startDateInputString: startDateInputString, endDateInputString: endDateInputString, sendAvailability: sendAvailability)
             
         }
             else{
-                
-                //            removes any availability arrays that have already been saved down
-                print("event timmings have changed")
-                updateEventStoreAvailability(eventID: currentUserSelectedEvent.eventID)
-                
-                showProgressHUD(notificationMessage: "Event Information Updated - availability data reset", imageName: "icons8-double-tick-100", delay: 2)
+//                if the date for the event has been chosen we want to confirm withe user that they want to continue
+                if currentUserSelectedEvent.chosenDate == ""{
+                    //            removes any availability arrays that have already been saved down
+                    print("event timmings have changed")
+                    sendAvailability = true
+                    updateEventStoreAvailability(eventID: currentUserSelectedEvent.eventID)
+                    
+                    //                SAVE THE EVENT!!
+                    saveTheEventInformation(startDateInputString: startDateInputString, endDateInputString: endDateInputString, sendAvailability: sendAvailability)
+                    
+                    showProgressHUD(notificationMessage: "Event Information Updated - availability data reset", imageName: "icons8-double-tick-100", delay: 2)
+                }
+                else{
+//                    show the user and alert
+                          let alert = UIAlertController(title: "Changing search period", message: "You're about to change the search period for an event with a chosen date. This will remove the chosen date and notify everyone that you're searching for a new date", preferredStyle: UIAlertController.Style.alert)
+                          
+                      
+                         alert.addAction(UIAlertAction(title: "NO", style: UIAlertAction.Style.cancel, handler: nil))
+                          
+                          alert.addAction(UIAlertAction(title: "YES", style: UIAlertAction.Style.default, handler: { action in
+                              print("User chose to continue")
+                            sendAvailability = true
+                            
+                            //                SAVE THE EVENT!!
+                            self.saveTheEventInformation(startDateInputString: startDateInputString, endDateInputString: endDateInputString, sendAvailability: sendAvailability)
+                            
+                            self.updateEventStoreAvailability(eventID: currentUserSelectedEvent.eventID)
+                            self.showProgressHUD(notificationMessage: "Event Information Updated - availability data reset", imageName: "icons8-double-tick-100", delay: 2)
+                    
+                          }))
+                          
+                          self.present(alert, animated: true, completion: nil)
+
+                }
   
             }
-        
-        print("contactsSelected: \(contactsSelected)")
-        
-//            MARK: loop through a series of check to update the users invited to the event and save down the event
-            
-//        0. if the user didn't make any change so the event we can save down the new event information
-            if deletedUserIDs.count == 0 && deletedNonUserInviteeNames.count == 0 && contactsSelected.count == 0{
-                commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: false, deletedNonUser: false, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""])
-            }
-            else{
-            
-//        1. Did the user delete users and non users and not add anyone?
-        if deletedUserIDs.count != 0 && deletedNonUserInviteeNames.count != 0 && contactsSelected.count == 0{
-            deletedUsers{
-                self.deletedNonUsers {
-                    self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: true, deletedNonUser: true, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""])
-                }
-            }
-        }
-//        2. Did the user delete users and not add anyone?
-                if deletedUserIDs.count != 0 && contactsSelected.count == 0{
-                    deletedUsers{
-                            self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: true, deletedNonUser: false, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""])
-                    }
-                }
-                
-//        3. Did the user delete non users and not add anyone?
-                if deletedNonUserInviteeNames.count != 0 && contactsSelected.count == 0{
-                    deletedNonUsers {
-                        self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: false, deletedNonUser: true, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""])
-                    }
-                }
-//        4. Did the user add somone new to the event?
-                if contactsSelected.count != 0{
-//                    check if the user also deleted anyone
-                    if deletedUserIDs.count != 0{
-                        deletedUsers{}
-                        
-                    }
-                    if deletedNonUserInviteeNames.count != 0{
-                        deletedNonUsers {}
-                    }
-
-                           print("the user has added new invitees")
-                                var selectedPhoneNumbers = [String]()
-                                var selectedNames = [String]()
-                                
-                //                1. get the phone numbers and names of the new users added
-                                selectedPhoneNumbers = getSelectedContactsPhoneNumbers2().phoneNumbers
-                                selectedNames = getSelectedContactsPhoneNumbers2().names
-                                
-                //                2. confirm which of the new invitees are users or not and add them to the arrya
-                                createUserIDArrays(phoneNumbers: selectedPhoneNumbers, names: selectedNames) { (nonExistentArray, existentArray, userNameArray, nonExistentNameArray) in
-                                                
-                                print("nonExistentArray \(nonExistentArray)")
-                                print("existentArray \(existentArray)")
-                                                
-                //           3. adds the non users to the database
-                                self.addNonExistingUsers2(phoneNumbers: nonExistentArray, eventID: currentUserSelectedEvent.eventID, names: nonExistentNameArray)
-                                                
-                //            4. Adds the user event link to the userEventStore. this also adds the required availability notification
-                            self.userEventLinkArray(userID: existentArray, userName: userNameArray, eventID: currentUserSelectedEvent.eventID){
-                                                    
-                                                }
-                //           5. Add the new user names and IDs to the database
-                                    self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: false, deletedNonUser: false, addedNewInvitees: true, nonUserNames: nonUserInviteeNames + nonExistentNameArray, userNames: inviteesNames + userNameArray, userIDs: inviteesUserIDs + existentArray)
-                            
-                                                
-                                                print("new users added")
-                                                
-                                //            remove the selected contacts from the array
-                                             contactsSelected.removeAll()
-                                                inviteesNamesNew.removeAll()
-                                                selectedContacts.removeAll()
-                            }
-                    
-                }
-            }
-            
+    
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // Change `1.0` to the desired number of seconds.
-            self.performSegue(withIdentifier: "saveSelected", sender: Any.self)
+//            self.performSegue(withIdentifier: "saveSelected", sender: Any.self)
         }
-        }
+            }}
         
 //     save selected end
+    }
+    
+    
+    func saveTheEventInformation(startDateInputString: String, endDateInputString: String, sendAvailability: Bool){
+                print("contactsSelected: \(contactsSelected)")
+                
+        //            MARK: loop through a series of checks to update the users invited to the event and save down the event
+                    
+        //        0. if the user didn't make any change so the event we can save down the new event information
+                    if deletedUserIDs.count == 0 && deletedNonUserInviteeNames.count == 0 && contactsSelected.count == 0{
+                        print("user didn't change the invitees")
+                        commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: false, deletedNonUser: false, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""], amendAvailability: sendAvailability)
+                    }
+                    else{
+                    
+        //        1. Did the user delete users and non users and not add anyone?
+                if deletedUserIDs.count != 0 && deletedNonUserInviteeNames.count != 0 && contactsSelected.count == 0{
+                    deletedUsers{
+                        self.deletedNonUsers {
+                            self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: true, deletedNonUser: true, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""], amendAvailability: sendAvailability)
+                        }
+                    }
+                }
+        //        2. Did the user delete users and not add anyone?
+                        if deletedUserIDs.count != 0 && contactsSelected.count == 0{
+                            deletedUsers{
+                                self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: true, deletedNonUser: false, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""], amendAvailability: sendAvailability)
+                            }
+                        }
+                        
+        //        3. Did the user delete non users and not add anyone?
+                        if deletedNonUserInviteeNames.count != 0 && contactsSelected.count == 0{
+                            deletedNonUsers {
+                                self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: false, deletedNonUser: true, addedNewInvitees: false, nonUserNames: [""], userNames: [""], userIDs: [""], amendAvailability: sendAvailability)
+                            }
+                        }
+        //        4. Did the user add somone new to the event?
+                        if contactsSelected.count != 0{
+        //                    check if the user also deleted anyone
+                            if deletedUserIDs.count != 0{
+                                deletedUsers{}
+                                
+                            }
+                            if deletedNonUserInviteeNames.count != 0{
+                                deletedNonUsers {}
+                            }
+
+                                   print("the user has added new invitees")
+                                        var selectedPhoneNumbers = [String]()
+                                        var selectedNames = [String]()
+                                        
+                        //                1. get the phone numbers and names of the new users added
+                                        selectedPhoneNumbers = ["",""]
+                                        selectedNames = ["",""]
+                                        
+                        //                2. confirm which of the new invitees are users or not and add them to the arrya
+                                        createUserIDArrays(phoneNumbers: selectedPhoneNumbers, names: selectedNames) { (nonExistentArray, existentArray, userNameArray, nonExistentNameArray) in
+                                                        
+                                        print("nonExistentArray \(nonExistentArray)")
+                                        print("existentArray \(existentArray)")
+                                                        
+                        //           3. adds the non users to the database
+                                        self.addNonExistingUsers2(phoneNumbers: nonExistentArray, eventID: currentUserSelectedEvent.eventID, names: nonExistentNameArray)
+                                                        
+                        //            4. Adds the user event link to the userEventStore. this also adds the required availability notification
+                                    self.userEventLinkArray(userID: existentArray, userName: userNameArray, eventID: currentUserSelectedEvent.eventID){
+                                                            
+                                                        }
+                        //           5. Add the new user names and IDs to the database
+                                            self.commitDataToDB(startDateInputString: startDateInputString, endDateInputString: endDateInputString, deletedUsers: false, deletedNonUser: false, addedNewInvitees: true, nonUserNames: nonUserInviteeNames + nonExistentNameArray, userNames: inviteesNames + userNameArray, userIDs: inviteesUserIDs + existentArray, amendAvailability: sendAvailability)
+                                    
+                                                        
+                                                        print("new users added")
+                                                        
+                                        //            remove the selected contacts from the array
+                                                     contactsSelected.removeAll()
+                                                        inviteesNamesNew.removeAll()
+                                                        selectedContacts.removeAll()
+                                    }
+                            
+                        }
+                    }
+        
     }
 
     func createTimePicker(){
@@ -704,8 +730,6 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
             invitees.reloadData()
             
         }
-        
-        
     }
     }
     
@@ -814,7 +838,6 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
 //        1. get the availability for all users
         
         for i in  currentUserSelectedAvailability{
-            
             docRefUserEventStore.document(i.documentID).updateData(["userAvailability" : FieldValue.delete(), "userResponded" : false, "chosenDate" : FieldValue.delete(), "chosenDateDay" : FieldValue.delete(), "chosenDateMonth" : FieldValue.delete(), "chosenDateYear" : FieldValue.delete()]){ err in
                                    if let err = err {
                                        print("Error updating document: \(err)")
@@ -822,13 +845,13 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
                                        print("Document successfully updated")
                                    }
                     }
-            availabilityAmendedNotification(userIDs: [i.uid], availabilityDocumentID: i.documentID)
+//            turned off to stop the invitee phone from responding to this notification
+//            availabilityAmendedNotification(userIDs: [i.uid], availabilityDocumentID: i.documentID)
         }
     }
 
     
 //    section for deleting the realtime database entries
-    
     func deleteRealTimeDatabaseEventInfo(eventID: String){
     let ref = Database.database().reference()
         
@@ -836,15 +859,16 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
    
     }
     
+//    function to delete the new event notification
     func deleteRealTimeDatabaseUserEventLink(eventID: String){
         let ref = Database.database().reference()
-        ref.child("userEventLink/\(user!)/\(eventID)").removeValue()
-        
+        ref.child("userEventLink/\(user!)/newEvent/\(eventID)").removeValue()
     }
     
     
 //    fucntion to commit data to the database
-    func commitDataToDB(startDateInputString: String, endDateInputString: String, deletedUsers: Bool, deletedNonUser: Bool, addedNewInvitees: Bool, nonUserNames: [String], userNames: [String], userIDs: [String]){
+    func commitDataToDB(startDateInputString: String, endDateInputString: String, deletedUsers: Bool, deletedNonUser: Bool, addedNewInvitees: Bool, nonUserNames: [String], userNames: [String], userIDs: [String], amendAvailability: Bool){
+        print("running func commitDataToDB - inputs: startDateInputString:\(startDateInputString) endDateInputString: \(endDateInputString) deletedUsers: \(deletedUsers) deletedNonUser: \(deletedNonUser) nonUserNames: \(nonUserNames) addedNewInvitees:\(addedNewInvitees) userNames:\(userNames) amendAvailability:\(amendAvailability)")
         
                         getStartAndEndDates3(startDate: startDateInputString, endDate: endDateInputString, startTime: eventStartTime.text!, endTime: eventEndTime.text!, daysOfTheWeek: daysOfTheWeekNewEvent){ (startDates,endDates) in
                         
@@ -865,14 +889,37 @@ class EventEditViewController: UIViewController, UITableViewDelegate,UITableView
                                 dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["users": userIDs, "currentUserNames": userNames, "nonUserNames": nonUserNames], merge: true)
                                 
                             }
-                            
-                            
-                            
             //                AmendNotifiction  - post to the eventNotification to table that the event has been amended
-                            self.eventAmendedNotification(userIDs: currentUserSelectedEvent.users, eventID: currentUserSelectedEvent.eventID)
-                            print("event updates committed")
+                            self.eventAmendedNotification(userIDs: currentUserSelectedEvent.users, eventID: currentUserSelectedEvent.eventID, amendWithAvailability: amendAvailability)
+                            
+                            
+//                            check to see if the event availability has been amended, we also need to remove the chosen information for the event
+                            if amendAvailability == true{
+                                print("amendAvailability = true")
+//                                delete chosen data
+                                dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).updateData(["chosenDate" : FieldValue.delete(), "chosenDateDay" : FieldValue.delete(), "chosenDateMonth" : FieldValue.delete(), "chosenDateYear" : FieldValue.delete(), "chosenDatePosition" : FieldValue.delete()])
+                                
+                                
+//                              post a notification to the real time DB to trigger the push notification
+                                let ref = Database.database().reference()
+                                let userIDs = currentUserSelectedEvent.users
+                                
+//                                loop through each user ID and post to the database
+                                for i in userIDs{
+//                                    dont post a notification for the current user
+                                    if i == user!{
+                                    }
+                                    else{
+//                                        add the notification to the realtime database
+                               ref.child("userEventLink/\(i)/amendedEvent/\(currentUserSelectedEvent.eventID)").setValue(currentUserSelectedEvent.eventID)
+                                    }
+                                }
+                                
+                                print("event updates committed")
+                                
+                            }
                         
-            //            updated the realtime database
+//            updated the realtime database
                         let rRef = Database.database().reference()
                         
                             rRef.child("events/\(currentUserSelectedEvent.eventID)/eventDescription").setValue(self.eventTitle.text!)

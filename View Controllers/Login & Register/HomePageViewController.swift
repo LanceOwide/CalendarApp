@@ -54,10 +54,10 @@ class HomePageViewController: UIViewController {
         super.viewDidLoad()
 
         
-        view.backgroundColor = UIColor(red: 0, green: 176, blue: 156)
+        view.backgroundColor = .white
         
 //        setup the navigation bar
-        navigationBarSettings(navigationController: navigationController!, isBarHidden: true, isBackButtonHidden: true, tintColour: UIColor.black)
+        navigationBarSettings(navigationController: navigationController!, isBarHidden: true, isBackButtonHidden: true, tintColour: MyVariables.colourPlanrGreen)
 
         
         //        restrict the rotation of the device to portrait
@@ -94,10 +94,10 @@ class HomePageViewController: UIViewController {
 
         
         let welcomeText = NSMutableAttributedString(string: "Plan",
-                                                    attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 70),NSAttributedString.Key.foregroundColor: UIColor.white])
+                                                    attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 70),NSAttributedString.Key.foregroundColor: MyVariables.colourPlanrGreen])
         
         welcomeText.append(NSMutableAttributedString(string: "r",
-                                                    attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 70),NSAttributedString.Key.foregroundColor: UIColor.white]))
+                                                     attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 70),NSAttributedString.Key.foregroundColor: MyVariables.colourPlanrGreen]))
         
         
         openingTitleLabel.attributedText = welcomeText
@@ -110,31 +110,43 @@ class HomePageViewController: UIViewController {
 //    This listener will detect if the users login status changes
     func checkLogIn(){
         
+        print("running func checkLogIn")
+        
         if authStatusListener == true{
             
         }
         else{
-            
         authStatusListener = true
-            
-            print("listener activated")
-        
-        authListener = Auth.auth().addStateDidChangeListener { auth, user in
-            if user != nil {
+        print("checkLogIn listener activated")
+        authListener = Auth.auth().addStateDidChangeListener { auth, userDetail in
+            print("Auth state change event triggered")
+            if userDetail != nil {
                 
                 print("Auth: \(auth)")
-                print("User: \(String(describing: user))")
+                print("User: \(String(describing: userDetail?.uid))")
                 
-                self.performSegue(withIdentifier: "existingUserSegue2", sender: self)
+                user = userDetail?.uid
+                
+//                segway the user to the new homePage
+                if let viewController = UIStoryboard(name: "NL_HomePage", bundle: nil).instantiateViewController(withIdentifier: "NL_HomePage") as? NL_HomePage {
+//                    we have to set the navigation bar to be visible before we show the page
+                        self.navigationController?.pushViewController(viewController, animated: true)
+                        self.navigationController?.setNavigationBarHidden(false, animated: true)
+                        self.navigationController?.navigationItem.setHidesBackButton(true, animated: true)
+                        
+                }
             } else {
+                print("checkLogIn user details were nil")
                 
 //                we should probably log out the user here and return to home page
                 
-
             }}}}
     
     
     func setupPrivacyStatement(UITextView: UITextView){
+        
+//        eventListenerEngaged = false
+//        availabilityListenerEngaged = false
       
        let string = "View our privacy and data policy"
        
@@ -144,8 +156,8 @@ class HomePageViewController: UIViewController {
        UITextView.isEditable = false
         UITextView.textColor = UIColor.white
         
-        UITextView.backgroundColor = UIColor(red: 0, green: 176, blue: 156)
-        UITextView.linkTextAttributes = [ .foregroundColor: UIColor.white ]
+        UITextView.backgroundColor = .white
+        UITextView.linkTextAttributes = [ .foregroundColor: MyVariables.colourPlanrGreen ]
        UITextView.attributedText = attributedLinkString
         
         

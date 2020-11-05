@@ -26,6 +26,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
     var noResultsArray = Array<Any>()
     var sectionUpcomingEvents = [eventSearch]()
     var sectionPastEvents = [eventSearch]()
+    var sectionPastEventsTrans = [eventSearch]()
     
 //    variable for refreshing the UITableViews on pull down
     var refreshControlCreated   = UIRefreshControl()
@@ -41,8 +42,11 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //        set the badge number to 0
+        UIApplication.shared.applicationIconBadgeNumber = 0
         
-        updateDateChosenNotificationStatus()
+        
+        updateDateChosenNotificationStatus(eventBool: false, eventID: "")
         
 //        navigation bar setup
 
@@ -73,9 +77,16 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
         
         
         // Refresh control add in tableview.
-        refreshControlCreated.attributedTitle = NSAttributedString(string: "Pull to refresh")
-        refreshControlCreated.addTarget(self, action: #selector(refreshCreated), for: .valueChanged)
-        self.userInvitedEvents.addSubview(refreshControlCreated)
+//        refreshControlCreated.attributedTitle = NSAttributedString(string: "Pull to refresh")
+//        refreshControlCreated.addTarget(self, action: #selector(refreshCreated), for: .valueChanged)
+//        self.userInvitedEvents.addSubview(refreshControlCreated)
+        
+        //        trigger for updating when new notifications are recieved
+        NotificationCenter.default.addObserver(self, selector: #selector(updateTable), name: .notificationsReloaded, object: nil)
+        
+        
+        //        refresh when new data is recieved
+        NotificationCenter.default.addObserver(self, selector: #selector(updateTable), name: .newDataLoaded, object: nil)
         
         //        The end of the viewDidLoad
     }
@@ -95,15 +106,23 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
         
     }
     
+    @objc func updateTable(){
+        DispatchQueue.main.async {
+            self.userInvitedEvents.reloadData()}
+    }
+    
     
     
     //    MARK: code to pull down the events the user is invited to and display them
     @objc func getUsersInvtedEvents(){
         
-        
+        //        we unwrap user, hence we must confirm it is has a value
+        if user == nil{
+        }
+        else{
 
         //            DUMMY predicate
-        let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
+            let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
                         
 //      filter the serilaised events for events hosted by the user and not in the pending status
         sectionUserHostedEvents = filteringEventsForDisplay(pending: false, createdByUser: true, pastEvents: false, serialisedEvents: serialisedEvents)
@@ -113,7 +132,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                         
 //      filter the serilaised events for events not hosted by the user and not in the pending status, but in the past
         sectionPastEvents = filteringEventsForDisplay(pending: false, createdByUser: false, pastEvents: true, serialisedEvents: serialisedEvents) + filteringEventsForDisplay(pending: false, createdByUser: true, pastEvents: true, serialisedEvents: serialisedEvents)
-        
+        }
     }
 
     
@@ -122,7 +141,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
             
             let sectionUpcomingRows = sectionUpcomingEvents.count
             let sectionUserHostedEventsRows = sectionUserHostedEvents.count
-            let sectionPastRows = sectionPastEvents.count
+            let sectionPastRows = sectionPastEventsTrans.count
             var numberOfRows = [Int]()
             
             if (sectionUpcomingRows + sectionPastRows + sectionUserHostedEventsRows) == 0 {
@@ -159,17 +178,18 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
             
             cell.selectionStyle = .none
             
-            cell.userInvitedCellLabel1.adjustsFontSizeToFitWidth = true
-            cell.userInvitedCellLabel2.adjustsFontSizeToFitWidth = true
-            cell.userInvitedCellLabel3.adjustsFontSizeToFitWidth = true
-            cell.userInvitedCellLabel4.adjustsFontSizeToFitWidth = true
+//            cell.userInvitedCellLabel1.adjustsFontSizeToFitWidth = true
+//            cell.userInvitedCellLabel2.adjustsFontSizeToFitWidth = true
+//            cell.userInvitedCellLabel3.adjustsFontSizeToFitWidth = true
+//            cell.userInvitedCellLabel4.adjustsFontSizeToFitWidth = true
             
-            if (sectionPastEvents.count + sectionUpcomingEvents.count + sectionUserHostedEvents.count) == 0{
+            if (sectionPastEventsTrans.count + sectionUpcomingEvents.count + sectionUserHostedEvents.count) == 0{
                 
                 cell.userInvitedCellLabel2.text = "Here you'll see your confirmed events"
                 cell.userInvitedCellLabel3.text = ""
                 cell.userInvitedCellLabel4.text = "Create an event to get started"
                 cell.userInvitedCellLabel1.text = ""
+                cell.txtEventOwner.text = ""
                 cell.imgChatNotification.isHidden = true
             }
             else{
@@ -184,14 +204,14 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                     item = sectionUserHostedEvents[indexPath.row]
 
                             let eventTitleDescription = NSMutableAttributedString(string: item.eventDescription,
-                                                                                      attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 20)])
-                                eventTitleDescription.append(NSMutableAttributedString(string: " by: \(item.eventOwnerName)",
-                                                                                   attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]))
+                                                                                      attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)])
+
                                 
                             cell.userInvitedCellLabel1.attributedText = eventTitleDescription
                             cell.userInvitedCellLabel2.text =  item.eventLocation
                             cell.userInvitedCellLabel4.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
                             cell.userInvitedCellLabel3.text = dateTZToDisplayDate(date: item.chosenDate)
+                    cell.txtEventOwner.text = item.eventOwnerName
                     
                     
                     //                        check if there is an outstanding chat message
@@ -212,15 +232,15 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                   
                     item = sectionUpcomingEvents[indexPath.row]
                             let eventTitleDescription = NSMutableAttributedString(string: item.eventDescription,
-                                                                                      attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 20)])
-                                eventTitleDescription.append(NSMutableAttributedString(string: " by: \(item.eventOwnerName)",
-                                                                                   attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]))
+                                                                                      attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)])
+
                                 
                                 
                             cell.userInvitedCellLabel1.attributedText = eventTitleDescription
                             cell.userInvitedCellLabel2.text = ("\(item.eventLocation) \n\(item.eventStartTime) - \(item.eventEndTime)")
                             cell.userInvitedCellLabel4.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
                             cell.userInvitedCellLabel3.text = dateTZToDisplayDate(date: item.chosenDate)
+                    cell.txtEventOwner.text = item.eventOwnerName
                     
                     
                     //                        check if there is an outstanding chat message
@@ -241,17 +261,17 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                 }
                 if indexPath.section == 2{
                   
-                    item = sectionPastEvents[indexPath.row]
+                    item = sectionPastEventsTrans[indexPath.row]
                             let eventTitleDescription = NSMutableAttributedString(string: item.eventDescription,
-                                                                                      attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 20)])
-                                eventTitleDescription.append(NSMutableAttributedString(string: " by: \(item.eventOwnerName)",
-                                                                                   attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]))
+                                                                                      attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)])
+
                                 
                                 
                             cell.userInvitedCellLabel1.attributedText = eventTitleDescription
                             cell.userInvitedCellLabel2.text = ("Location: \(item.eventLocation) \nTime: \(item.eventStartTime) - \(item.eventEndTime)")
                             cell.userInvitedCellLabel4.text = ("\(convertToLocalTime(inputTime: item.eventStartTime)) - \(convertToLocalTime(inputTime: item.eventEndTime))")
                             cell.userInvitedCellLabel3.text = dateTZToDisplayDate(date: item.chosenDate)
+                    cell.txtEventOwner.text = item.eventOwnerName
                     
                     //                        check if there is an outstanding chat message
                     if chatNotificationiDs.contains(item.eventID) == true{
@@ -305,54 +325,80 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
             let cellSpacingHeight: CGFloat = 50
             return cellSpacingHeight
         }
-    
-    
             
         // Make the background color show through
         func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
             let headerView = UIView()
             let label = UILabel()
-                var sectionHeaders = [String]()
-                headerView.backgroundColor = UIColor.clear
-            
+            let button = UIButton(type: .system)
+            button.setTitleColor(.black, for: .normal)
+            button.addTarget(self, action: #selector(handleExpandClose), for: .touchUpInside)
+            var sectionHeaders = [String]()
+            var buttonTitle = [String]()
+            var sectionButton = [Bool]()
+            headerView.backgroundColor = UIColor.clear
+
             
             if sectionUserHostedEvents.count == 0{
-                
                 sectionHeaders.append("")
+                buttonTitle.append("")
+                sectionButton.append(true)
             }
             else{
-                
                 sectionHeaders.append("Your Hosted Events 🏠")
-                
-                
+                buttonTitle.append("")
+                sectionButton.append(true)
             }
             
             if sectionUpcomingEvents.count == 0{
                sectionHeaders.append("")
-                
+                buttonTitle.append("")
+                sectionButton.append(true)
             }
             else{
-            
             sectionHeaders.append("Upcoming Events")
-                
+                buttonTitle.append("")
+                sectionButton.append(true)
             }
-            
             if sectionPastEvents.count == 0{
                sectionHeaders.append("")
-                
+                buttonTitle.append("")
+                sectionButton.append(true)
             }
             else{
-                
               sectionHeaders.append("Past Events")
+                sectionButton.append(false)
+                
+                if sectionPastEventsTrans.count == 0{
+                    buttonTitle.append("+")
+                }else{
+                    buttonTitle.append("-")
+                }
                 
             }
-                
-                label.frame = CGRect(x: 16, y: 5, width: screenWidth - 16, height: 40)
-                label.text = sectionHeaders[section]
+                label.frame = CGRect(x: 16, y: 5, width: screenWidth - 100, height: 40)
                 headerView.addSubview(label)
+                label.text = sectionHeaders[section]
+                button.frame = CGRect(x: screenWidth - 100, y: 5, width: 80, height: 40)
+                button.isHidden = sectionButton[section]
+                button.setTitle(buttonTitle[section], for: .normal)
+                headerView.addSubview(button)
                 
                 return headerView
             }
+    
+//    function for closing a section
+    @objc func handleExpandClose(){
+        print("opening a section")
+        
+        if sectionPastEventsTrans.count == 0{
+           sectionPastEventsTrans = sectionPastEvents
+        }else{
+            sectionPastEventsTrans.removeAll()
+        }
+        
+    userInvitedEvents.reloadData()
+    }
         
     
     
@@ -370,7 +416,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
             loadingNotification.customView = UIImageView(image: UIImage(named: "Loading-100.png"))
             loadingNotification.mode = MBProgressHUDMode.customView
             
-            if (sectionPastEvents.count + sectionUpcomingEvents.count + sectionUserHostedEvents.count) == 0 {
+            if (sectionPastEventsTrans.count + sectionUpcomingEvents.count + sectionUserHostedEvents.count) == 0 {
                 
             }
             else{
@@ -417,7 +463,7 @@ class UserInvitedEvents: UIViewController, UITableViewDataSource, UITableViewDel
                         }
             else{
                 
-                currentUserSelectedEvent = sectionPastEvents[indexPath.row]
+                currentUserSelectedEvent = sectionPastEventsTrans[indexPath.row]
                 userInvitedEvents.deselectRow(at: indexPath, animated: false)
                 
                 if currentUserSelectedEvent.newChatMessage == true{
@@ -454,7 +500,7 @@ extension UserInvitedEvents: UICollectionViewDataSource, UICollectionViewDelegat
             
             
     //        if no data for the events exists yet then do not display any cells in the collectionView
-            if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEvents.count) == 0 {
+            if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEventsTrans.count) == 0 {
                
                 numberOfItemsForSection = 0
                 
@@ -471,10 +517,10 @@ extension UserInvitedEvents: UICollectionViewDataSource, UICollectionViewDelegat
               numberOfItemsForSection = sectionUpcomingEvents[(collectionView.tag - 1)/100].currentUserNames.count + sectionUpcomingEvents[(collectionView.tag - 1)/100].nonUserNames.count
 
             }
-            else if collectionView.tag < 1000000 && sectionPastEvents.count != 0{
+            else if collectionView.tag < 1000000 && sectionPastEventsTrans.count != 0{
                 
                 
-                numberOfItemsForSection = sectionPastEvents[(collectionView.tag - 1)/10000].currentUserNames.count + sectionPastEvents[(collectionView.tag - 1)/10000].nonUserNames.count
+                numberOfItemsForSection = sectionPastEventsTrans[(collectionView.tag - 1)/10000].currentUserNames.count + sectionPastEventsTrans[(collectionView.tag - 1)/10000].nonUserNames.count
 
                 
                 
@@ -524,7 +570,7 @@ extension UserInvitedEvents: UICollectionViewDataSource, UICollectionViewDelegat
             cell.backgroundColor = UIColor.white
             
                 
-            if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEvents.count) == 0 {
+            if (sectionUserHostedEvents.count + sectionUpcomingEvents.count + sectionPastEventsTrans.count) == 0 {
                
                 print("sectionUpcoming not populated")
 
@@ -547,7 +593,7 @@ extension UserInvitedEvents: UICollectionViewDataSource, UICollectionViewDelegat
             }
             else if collectionView.tag < 1000000 && sectionPastEvents.count != 0{
                 
-                let nameArray = sectionPastEvents[(collectionView.tag - 1)/10000].currentUserNames + sectionPastEvents[(collectionView.tag - 1)/10000].nonUserNames
+                let nameArray = sectionPastEventsTrans[(collectionView.tag - 1)/10000].currentUserNames + sectionPastEventsTrans[(collectionView.tag - 1)/10000].nonUserNames
                  
 
                 cell.lblCircledInvitees.text = nameArray[indexPath.row]

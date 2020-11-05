@@ -8,14 +8,28 @@
 
 import UIKit
 import Firebase
-import IQKeyboardManagerSwift
+import CoreData
 
 
-var messagesChat = [Message]()
+
 var userMessagesRef: DatabaseReference!
+//var chatMessageListener: UInt!
+//var chatListenerInt = Bool()
+
+
+//array to hold the message and save them into core data
+var CDMessages = [CoreDataChatMessages]()
 
 
 class ChatLogController: UICollectionViewController, UITextFieldDelegate, UICollectionViewDelegateFlowLayout {
+    
+    var keyboardFrame = CGRect()
+
+    var messagesChat = [CDMessage]()
+    
+//    variable used to house whether the keyboard has been activated and the resigned, we do not want to adjust the keyboard if the user retaps it
+    var keyboardIsActive = false
+    
     
     /// Get distance from top, based on status bar and navigation
     public var topDistance : CGFloat{
@@ -30,32 +44,46 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
          }
     }
     
+    
 
     func observeMessages() {
-
-        userMessagesRef = Database.database().reference().child("messages").child(currentUserSelectedEvent.eventID)
         
-        userMessagesRef.observe(.childAdded, with: { (snapshot) in
-
-                guard let dictionary = snapshot.value as? [String: AnyObject] else {
-                    return
-                }
-                let message = Message(dictionary: dictionary)
-
-                //do we need to attempt filtering anymore?
-                messagesChat.append(message)
+//        fetch the message from the DB for the specific event we are viewing
+        let predicate = NSPredicate(format: "eventID == %@", argumentArray: [currentUserSelectedEvent.eventID])
+        var eventChats = CoreDataCode().serialiseChatMessages(predicate: predicate, usePredicate: true)
+        
+//        sort the messages by their timestamp
+        eventChats.sort {
+            $0.timestamp! < $1.timestamp!
+        }
+        
+        messagesChat = eventChats
+    
+        print("number of messages \(eventChats.count)")
+        
                 DispatchQueue.main.async(execute: {
                     self.collectionView?.reloadData()
                     self.collectionView.scrollToLast()
+                    print("reload the chat tableview")
                 })
-            }, withCancel: nil)
+//            }, withCancel: nil)
+//        }
     }
     
-    lazy var inputTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "Enter message..."
+    var inputTextField: UITextView = {
+//        let textField = UITextField()
+        let textField = UITextView()
+//        textField.text = "Enter message..."
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.delegate = self
+        textField.font = UIFont.systemFont(ofSize: 15)
+        textField.layer.masksToBounds = true
+        textField.layer.borderColor = UIColor.lightGray.cgColor
+        textField.layer.borderWidth = 3
+        textField.layer.cornerRadius = 15
+        
+ 
+//        textField.delegate = self
+        
         return textField
     }()
     
@@ -63,25 +91,59 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("running view did load")
+                
         
-        collectionView?.contentInset = UIEdgeInsets(top: topDistance, left: 0, bottom: 8, right: 0)
+        //        set the badge number to 0
+        UIApplication.shared.applicationIconBadgeNumber = 0
+        
+        
+//        add a tap gesture to remove the keyboard when tapped
+        let tapGesture = UITapGestureRecognizer(target: self,
+                                                            action: #selector(hideKeyBoard))
+        collectionView?.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 100, right: 0)
         collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = UIColor.white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.addGestureRecognizer(tapGesture)
         
         collectionView?.keyboardDismissMode = .interactive
         
-        updatePendingNotificationStatus()
-        
-//        testing removing the IQKeyboard
-        IQKeyboardManager.shared.disabledDistanceHandlingClasses.append(ChatLogController.self)
-        
-//        reset the messages chat list
-        messagesChat.removeAll()
-        
+        let textAttributes = [NSAttributedString.Key.foregroundColor:MyVariables.colourLight]
+        navigationController?.navigationBar.titleTextAttributes = textAttributes
         self.title = "Event Chat"
         
+        
+        
+        
+        //            create a button to dismiss the  viewController
+        let menuBtn = UIButton(type: .custom)
+        menuBtn.frame = CGRect(x: 0.0, y: 0.0, width: 10, height: 10)
+        menuBtn.setTitle("X", for: .normal)
+        menuBtn.setTitleColor(MyVariables.colourLight, for: .normal)
+        menuBtn.addTarget(self, action: #selector(closeTapped), for: .touchUpInside)
+
+        let menuBarItem = UIBarButtonItem(customView: menuBtn)
+        navigationItem.leftBarButtonItem = menuBarItem
+        
+        
+        
         observeMessages()
+        
+// set observer for UIApplication.willEnterForegroundNotification
+        NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        
+// set observer for UIApplication.willResignActiveNotification
+        NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: UIApplication.willResignActiveNotification, object: nil)
+        
+//        if the user gets a message for the current event they are viewing we immediately remove the event from the message notification array
+        NotificationCenter.default.addObserver(self, selector: #selector(messageNotificationUpdate), name: .notificationsReloaded, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(chatNotificationTappedSelector), name: .chatNotificationTapped, object: nil)
+        
+//        notification for when the user adds a new chat, refreshes the chats the user is looking at
+        NotificationCenter.default.addObserver(self, selector: #selector(chatNotificationTappedSelector), name: .newChatDataLoaded, object: nil)
+
         
 //        funcition to remove notification from the realtime database
         updateNotificationArray()
@@ -93,51 +155,109 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     }
     
     
-    @objc func dismissKeyboard() {
-        print("dismissKeyboard running")
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
-        collectionView.keyboardDismissMode = .interactive
+//    when the user opens the app from a chat notification and the chat page is up, we need to force the observe message to reload, we resign and then reassing it
+    @objc func chatNotificationTappedSelector(){
+//        add the new chats to the tableview
+        observeMessages()
         
-        self.view.endEditing(true)
+//        the keyboard is active we need to refresh the height adjustment
+        if keyboardIsActive == true{
+            messageSpacingCalc()
+        }
     }
+    
+    
+    @objc func closeTapped() {
+        keyboardIsActive = false
+        self.dismiss(animated: true) {
+//            we set the notification to reload the data in the chat tab
+            NotificationCenter.default.post(name: .newChatDataLoaded, object: nil)
+            NotificationCenter.default.post(name: .notificationsReloaded, object: nil)
+        }
+    }
+    
+
+   
+//    function for process when the app has returned from the background, we need to do this otherwise the listener will not re-engage
+    @objc func willEnterForeground(){
+        print("running func willEnterForeground")
+        observeMessages()
+        //        remove the chat notifications for the event and the homepage
+//        updateNotifications()
+        
+    }
+    
+//    function to remove the new message notification
+    @objc func messageNotificationUpdate(){
+//        confirm this event has been added to the message notifications
+        if chatNotificationiDs.contains(currentUserSelectedEvent.eventID){
+            
+//            self.updateNotifications()
+        }
+        
+    }
+    
+//    function to detect when the app has gone into the background / the user has enetered multi tasking mode
+    @objc func  willResignActive(){
+       print("willResignActive running")
+        inputTextField.resignFirstResponder()
+        //        we remove the listeners and set the chat int, this ensures that when the user reopens that app from a notification the chat updates
+//        userMessagesRef.removeAllObservers()
+//        chatListenerInt = false
+        
+//        print("willResignActive - chatListenerInt\(chatListenerInt)")
+        
+    }
+    
+    
+//    @objc func dismissKeyboard() {
+//        keyboardIsActive = false
+//        print("dismissKeyboard running")
+//        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+//        collectionView.keyboardDismissMode = .interactive
+//
+//        view.endEditing(true)
+//    }
+        
     
     lazy var inputContainerView: UIView = {
         
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+//        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         
         let containerView = UIView()
         containerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 100)
         containerView.backgroundColor = UIColor.white
-        self.view.addGestureRecognizer(tap)
+//        self.view.addGestureRecognizer(tap)
         
 //        trying to add a bottom piece
         let bottomView = UIView()
-        bottomView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50)
+        bottomView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20)
         bottomView.backgroundColor = UIColor.lightGray
         containerView.addSubview(bottomView)
         
         bottomView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
-        bottomView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+//        bottomView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
         bottomView.widthAnchor.constraint(equalTo: containerView.widthAnchor).isActive = true
-        bottomView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        bottomView.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
         
 //        trying to add a top piece
         let topView = UIView()
-        topView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50)
+        topView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 80)
         topView.backgroundColor = UIColor.white
         containerView.addSubview(topView)
                 
         topView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
         topView.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
         topView.widthAnchor.constraint(equalTo: containerView.widthAnchor).isActive = true
-        topView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        topView.heightAnchor.constraint(equalToConstant: 80).isActive = true
         
         
         let sendButton = UIButton(type: .system)
         sendButton.setTitle("Send", for: UIControl.State())
         sendButton.translatesAutoresizingMaskIntoConstraints = false
         sendButton.addTarget(self, action: #selector(handleSend), for: .touchUpInside)
+        sendButton.tintColor = MyVariables.colourPlanrGreen
         topView.addSubview(sendButton)
         //x,y,w,h
         sendButton.rightAnchor.constraint(equalTo: topView.rightAnchor).isActive = true
@@ -149,8 +269,9 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         //x,y,w,h
         self.inputTextField.leftAnchor.constraint(equalTo: topView.leftAnchor, constant: 8).isActive = true
         self.inputTextField.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
-        self.inputTextField.widthAnchor.constraint(equalToConstant: screenWidth - 80).isActive = true
-        self.inputTextField.heightAnchor.constraint(equalTo: topView.heightAnchor).isActive = true
+        self.inputTextField.widthAnchor.constraint(equalToConstant: self.view.frame.width - 80).isActive = true
+        self.inputTextField.heightAnchor.constraint(equalTo: topView.heightAnchor, constant: -10).isActive = true
+
         
         let separatorLineView = UIView()
         separatorLineView.backgroundColor = UIColor(red: 220, green: 220, blue: 220)
@@ -159,7 +280,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         //x,y,w,h
         separatorLineView.leftAnchor.constraint(equalTo: topView.leftAnchor).isActive = true
         separatorLineView.topAnchor.constraint(equalTo: topView.topAnchor).isActive = true
-        separatorLineView.widthAnchor.constraint(equalTo: topView.widthAnchor).isActive = true
+        separatorLineView.widthAnchor.constraint(equalToConstant: self.view.frame.width).isActive = true
         separatorLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
         
         return containerView
@@ -176,8 +297,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     }
     
     func setupKeyboardObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
@@ -187,38 +307,78 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         NotificationCenter.default.removeObserver(self)
     }
     
+    
     @objc func handleKeyboardWillShow(_ notification: Notification) {
-        let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as AnyObject).cgRectValue
-//        let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
         
-        print("handleKeyboardWillShow is running keyboardFrame!.height \(keyboardFrame!.height)")
+//        we need to check if the keyboard is already the first responder, otherwise we will push the message of the screen again, this is being called when the viewload, we dont know how to stop this, so we check if there are no messages first
         
-//       need to check the heigt of the messages and compare them to the heigt of the keyboard
+        keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as AnyObject).cgRectValue
+//        set the global variable for the keyboard
+        print("handleKeyboardWillShow is running keyboardFrame!.height \(keyboardFrame.height)")
         
-        var height: CGFloat = 0
-        for message in messagesChat{
-            height = height + estimateFrameForText(message.text!).height + 40
-        }
+//        if keyboardIsActive == false && messagesChat.count != 0 && keyboardFrame.height != 100{
+//            print("handleKeyboardWillShow - keyboardIsActive = false")
+//        run the func to set the height of the texrt
+        messageSpacingCalc()
+        keyboardIsActive = true
+//        }
+//        else{
+//            print("handleKeyboardWillShow - keyboardIsActive = true")
+//        }
+    }
+    
+//    function for calculating the space required to show the messages correctly
+    func messageSpacingCalc(){
+        print("running func messageSpacingCalc")
         
-        print("handleKeyboardWillShow height \(height)")
+        //       need to check the heigt of the messages and compare them to the heigt of the keyboard, we do not want to move the messages off the screen if they are the only ones
+                var height: CGFloat = 0
+                for message in messagesChat{
+//                    print("message height \(height)")
+                    height = height + estimateFrameForText(message.text!).height + 40
+                }
 
-        if height + 75 < keyboardFrame!.height{
-            self.view.frame.origin.y = 0
-        }
-        else{
-        self.view.frame.origin.y -= keyboardFrame!.height
-        }
-        
-        
+        //        we do not want to move the mesasge there off the page, hence we check to see how tall the messages are. Remaining screen = screenHeight - (topdistance + keyboardHeight + text entry)
+                let remainingSpace = screenHeight - topDistance - CGFloat(keyboardFrame.height) - 100
+                
+                print("handleKeyboardWillShow height \(height) keyboardFrame!.height \(keyboardFrame.height) view.frame.origin.y \(view.frame.origin.y) remainingSpace \(remainingSpace) screenHeight \(screenHeight) topDistance: \(topDistance)")
+                
+                if height < remainingSpace{
+                    print("messages will not be shifted up")
+                }
+                else{
+                    print("messages willapgest be shifted up")
+//                    to ensure we do not move the view up each time the fucntion is called, we rest the view starting point and then make the adjustement
+                    self.view.frame.origin.y = 0
+//            we adjust the amount the screen is shifted to account for the blank space on the screen,
+                    var screenAdjust = screenHeight - topDistance - height - 100
+                    if screenAdjust < 0{
+                      screenAdjust = 100
+                    }
+                    print("screenAdjust \(screenAdjust)")
+                    
+                self.view.frame.origin.y -= keyboardFrame.height - screenAdjust
+                    print("new view.frame.origin.y \(view.frame.origin.y)")
+                }
     }
     
     @objc func handleKeyboardWillHide(_ notification: Notification) {
+        keyboardIsActive = false
         let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
         
+//        self.view.endEditing(true)
+        
         self.view.frame.origin.y = 0
-        UIView.animate(withDuration: keyboardDuration!, animations: {
-            self.view.layoutIfNeeded()
-        })
+//        UIView.animate(withDuration: keyboardDuration!, animations: {
+//            self.view.layoutIfNeeded()
+//        })
+    }
+    
+    
+    @objc func hideKeyBoard() {
+        print("running keyboard will hide")
+        self.inputTextField.resignFirstResponder()
+
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -235,7 +395,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         dateFormatterDisplayDate.locale = Locale(identifier: "en_US_POSIX")
         
         let timeInterval = Double(message.timestamp!)
-        // create NSDate from Double (NSTimeInterval)
+//       create NSDate from Double (NSTimeInterval)
         let myNSDate = Date(timeIntervalSince1970: timeInterval)
         
         let displayDate = dateFormatterDisplayDate.string(from: myNSDate)
@@ -245,29 +405,27 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         
         setupCell(cell, message: message)
         
-        //sets the bubble width based on name, if it is longer than the text, or the text if it is longer
-        
+//sets the bubble width based on name, if it is longer than the text, or the text if it is longer
         if estimateFrameForText(message.text!).width > estimateFrameForText(message.fromId!).width{
-        
         cell.bubbleWidthAnchor?.constant = estimateFrameForText(message.text!).width + 32
         }
         else{
-         
             cell.bubbleWidthAnchor?.constant = estimateFrameForText(message.fromId!).width + 32
-            
         }
         
         return cell
     }
     
-    fileprivate func setupCell(_ cell: ChatMessageCell, message: Message) {
+    fileprivate func setupCell(_ cell: ChatMessageCell, message: CDMessage) {
         
         if message.fromId == Auth.auth().currentUser?.uid {
             //outgoing blue
-            cell.bubbleView.backgroundColor = ChatMessageCell.blueColor
+            cell.bubbleView.backgroundColor = MyVariables.colourPlanrGreen
             cell.textView.textColor = UIColor.white
             cell.textViewName.textColor = UIColor.white
             cell.profileImageView.isHidden = true
+//            stops the user from being able to interact with chats already on the screen
+            cell.isUserInteractionEnabled = false
             
             cell.bubbleViewRightAnchor?.isActive = true
             cell.bubbleViewLeftAnchor?.isActive = false
@@ -288,8 +446,21 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         collectionView?.collectionViewLayout.invalidateLayout()
     }
     
+// before the view is about to appear we set the observe message, this ensures that when the user moves the chat to the back
+    override func viewWillAppear(_ animated: Bool) {
+         print("running view will appear")
+        //        reset the messages chat list
+        observeMessages()
+        
+//        remove the chat ID from the notifications
+        chatNotificationiDs.removeAll(where: {$0 == currentUserSelectedEvent.eventID})
+        NotificationCenter.default.post(name: .notificationsReloaded, object: nil)
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
-        userMessagesRef.removeAllObservers()
+        print("running view will disappear")
+//        userMessagesRef.removeAllObservers()
+//        chatListenerInt = false
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -327,18 +498,32 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     
     
     @objc func handleSend() {
+        
+//        check if the input text is blank, if so dont send the message
+        if inputTextField.text! == ""{
+            print("text is empty, don't send")
+        }
+        else{
+            
+//        log the change event
+        Analytics.logEvent(firebaseEvents.chatSent, parameters: ["chatSent" : true])
+            
         let ref = Database.database().reference().child("messages").child(currentUserSelectedEvent.eventID)
         let ref2 = Database.database().reference().child("messageNotifications").child(currentUserSelectedEvent.eventID)
         let childRef = ref.childByAutoId()
         let fromId = user!
         let timestamp = Int(Date().timeIntervalSince1970)
         let dbStore = Firestore.firestore()
-        
         let userIDs = currentUserSelectedEvent.users
+            
+//            move the text to a property
+        let newText = inputTextField.text
+            
+//            remove the text in the text field to allow the user to send a new message
+        self.inputTextField.text = nil
      
         
         for ids in userIDs{
-            
 //        we do not want to write a notification if we sent the message, this writes to the real time database for notifications
             if ids == user!{
             }
@@ -347,43 +532,46 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             }
         }
                         
-//        This writes to the FireStore for our notification table
-        for ids in userIDs{
-            //        we do not want to write a notification if we sent the message
-            if ids == user!{
-                
-            }
-            else{
-//                adds true to the users userNotification field, this shows the chat icon on the homepage
-                if currentUserSelectedEvent.chosenDate != ""{
-            dbStore.collection("userNotification").document(ids).setData(["chatNotificationDateChosen" : true], merge: true)
-            }
-            else{
-            dbStore.collection("userNotification").document(ids).setData(["chatNotificationPending" : true], merge: true)
-            }
-                
-             dbStore.collection("userNotification").document(ids).setData(["chatNotificationEventIDs" : [currentUserSelectedEvent.eventID]], merge: true)
-                
-            }}
-        
 //        Posts the message into the RealTime DB, first we use getUserName to ensure we have the latest name for the user
         getUserName { (fromName) in
             
-            let values = ["text": self.inputTextField.text!, "fromId": fromId, "timestamp": timestamp, "fromName": fromName] as [String : Any]
+            let values = ["text": newText!, "fromId": fromId, "timestamp": timestamp, "fromName": fromName] as [String : Any]
+            
+//            commit the new chat into the CD
+//             To get the messageID we remove the rest of the DB reference and just show the new location
+            let newIDFullString = ("\(childRef)")
+            let newID = newIDFullString.replacingOccurrences(of: "https://calendarplayground-3c791.firebaseio.com/messages/\(currentUserSelectedEvent.eventID)/", with: "")
+            print("new message posted with ref  newID \(newID)")
+            
+            self.commitSingleChatDB(fromId: fromId, text: newText!, fromName: fromName, timestamp: Int64(timestamp), toId: "", eventID: currentUserSelectedEvent.eventID, messageID: newID)
+            
+            NotificationCenter.default.post(name: .newChatDataLoaded, object: nil)
 
         childRef.updateChildValues(values) { (error, ref) in
             if error != nil {
                 print(error!)
                 return
             }
-            self.inputTextField.text = nil
-            }}}
+
+
+            }}
+            //        This writes to the FireStore for our notification table
+                    for ids in userIDs{
+                        //        we do not want to write a notification if we sent the message
+                        if ids == user!{
+                        }
+                        else{
+            //                adds the chat eventIDs to the notification database
+                         dbStore.collection("userNotification").document(ids).setData(["chatNotificationEventIDs" : [currentUserSelectedEvent.eventID]], merge: true)
+                }
+        }
+        }}
 }
 
 
 extension UICollectionView {
     func scrollToLast() {
-        print("running func scrollToLast")
+//        print("running func scrollToLast numberOfSections \(numberOfSections)")
         guard numberOfSections > 0 else {
             return
         }
@@ -405,14 +593,15 @@ extension UICollectionView {
         
         let lastItemIndexPath = IndexPath(item: numberOfItems(inSection: lastSection) - 1,
         section: lastSection)
+        print("scrolling to the bottom lastItemIndexPath \(lastItemIndexPath)")
         
-        if messagesChat.count == 1{
-            print("scrolling to the first item on the chat")
-            scrollToItem(at: lastItemIndexPath, at: .top, animated: true)
+        if ChatLogController().messagesChat.count == 1{
+//            print("scrolling to the first item on the chat")
+            scrollToItem(at: lastItemIndexPath, at: .top, animated: false)
         }
         else{
-        print("scrolling to the last item on the chat")
-        scrollToItem(at: lastItemIndexPath, at: .bottom, animated: true)
+//        print("scrolling to the last item on the chat")
+        scrollToItem(at: lastItemIndexPath, at: .bottom, animated: false)
         }
     }
     
@@ -434,4 +623,5 @@ fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [Stri
 fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
     return input.rawValue
 }
+
 

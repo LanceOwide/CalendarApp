@@ -38,8 +38,9 @@ class LocationMapViewController: UIViewController {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
         locationManager.requestLocation()
-        
+                
         let locationSearchTable = storyboard!.instantiateViewController(withIdentifier: "LocationSearchTable") as! LocationSearchTable
+        
         resultSearchController = UISearchController(searchResultsController: locationSearchTable)
         resultSearchController.searchResultsUpdater = locationSearchTable
         let searchBar = resultSearchController!.searchBar
@@ -49,13 +50,21 @@ class LocationMapViewController: UIViewController {
         resultSearchController.hidesNavigationBarDuringPresentation = false
         resultSearchController.obscuresBackgroundDuringPresentation = true
         definesPresentationContext = true
-        locationSearchTable.mapView = mapView
+//        locationSearchTable.mapView = mapView
         locationSearchTable.handleMapSearchDelegate = self
+        
+        let gestureZ = UILongPressGestureRecognizer(target: self, action: #selector(getDirections))
+        mapView.addGestureRecognizer(gestureZ)
+
     }
     
     
     @objc func getDirections(){
-        guard let selectedPin = selectedPin else { return }
+        print("running getDirections")
+        
+        guard let selectedPin = selectedPin else { return
+            print("selectedPin did not return")
+        }
         let mapItem = MKMapItem(placemark: selectedPin)
         let launchOptions = [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving]
         mapItem.openInMaps(launchOptions: launchOptions)
@@ -136,7 +145,7 @@ extension LocationMapViewController : MKMapViewDelegate {
         let button = UIButton(frame: CGRect(origin: CGPoint.zero, size: smallSquare))
         button.setBackgroundImage(UIImage(named: "car"), for: .normal)
         button.addTarget(self, action: #selector(getDirections), for: .touchUpInside)
-//        pinView?.leftCalloutAccessoryView = button
+        pinView?.leftCalloutAccessoryView = button
         
         return pinView
     }

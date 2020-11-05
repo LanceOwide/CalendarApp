@@ -171,7 +171,7 @@ class ViewController2: UIViewController, UICollectionViewDataSource, UICollectio
         //        ***For coachMarks
         coachMarksController.dataSource = self
         coachMarksController.delegate = self
-        coachMarksController.overlay.allowTap = true
+        coachMarksController.overlay.isUserInteractionEnabled = true
 
         
         
@@ -487,7 +487,7 @@ class ViewController2: UIViewController, UICollectionViewDataSource, UICollectio
     
     //    MARK: - three mandatory methods for choach tips
         
-        func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: CoachMarkBodyView, arrowView: CoachMarkArrowView?) {
+        func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkViewsAt index: Int, madeFrom coachMark: CoachMark) -> (bodyView: (UIView & CoachMarkBodyView), arrowView: (UIView & CoachMarkArrowView)?) {
             
             let coachViews = coachMarksController.helper.makeDefaultCoachViews(withArrow: true, arrowOrientation: coachMark.arrowOrientation)
             
@@ -631,7 +631,7 @@ class ViewController2: UIViewController, UICollectionViewDataSource, UICollectio
         
         print("running automaticallyRespondNow")
         
-        dbStore.collection("userEventStore").whereField("uid", isEqualTo: user!).whereField("eventID", isEqualTo: eventIDChosen).getDocuments { (querySnapshot, error) in
+        dbStore.collection("userEventStore").whereField("uid", isEqualTo: user).whereField("eventID", isEqualTo: eventIDChosen).getDocuments { (querySnapshot, error) in
                 if error != nil {
                     print("there was an error")
                 }

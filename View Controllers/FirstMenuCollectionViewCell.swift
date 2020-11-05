@@ -18,4 +18,7 @@ class FirstMenuCollectionViewCell: UICollectionViewCell {
     
     @IBOutlet weak var imgNewMessage: UIImageView!
     
+    @IBOutlet weak var imgNewEvent: UIImageView!
+    
+    
 }

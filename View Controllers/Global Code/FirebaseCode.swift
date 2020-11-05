@@ -13,13 +13,19 @@ import Firebase
 import EventKit
 import AMPopTip
 import Alamofire
-import Fabric
-import Crashlytics
 import BackgroundTasks
+import FirebaseStorage
 
 var chatNotificationPending = Bool()
 var chatNotificationDateChosen = Bool()
 var chatNotificationiDs = [String]()
+var eventNotificationPending = Bool()
+var eventNotificationiDs = [String]()
+
+// variable to determin if the notification listener is engaged
+var notificationListenerEnagaged = Bool()
+//variable to hold the listener itself
+var notificationListenerRegistration: ListenerRegistration!
 
 
 class FirebaseCode: UIViewController {
@@ -34,7 +40,7 @@ extension UIViewController{
             summaryView = isSummaryView
             eventIDChosen = eventID
             
-            if isEventOwnerID == user!{
+        if isEventOwnerID == user{
             
             selectEventToggle = 1
             }
@@ -122,80 +128,197 @@ extension UIViewController{
         
     }
     
-//    functiont to check if the user has any new events or chat notifications, these are then displayed on the home page
-    func checkNotificationStatus(completion: @escaping () -> Void){
-        
-        print("running func checkNotificationStatus")
-//        check to see if the user isnt nil
-        if user == nil{
-         print("running func checkNotificationStatus user is nil, stop running")
+    
+//    function to check if the user has any new events or chat notifications, these are then displayed on the home page
+        func checkNotificationStatusListener(){
+        print("running func checkNotificationStatusListener")
+               
+//        we start by getting the previously stored user defaults of the chatIDs from the userDefaults
+        var chatNotificationIDsDefaults = UserDefaults.standard.object(forKey: "chatNotificationEventIDs") as? [String]
+//        we need to add project around the chatNotificationIDsDefaults incase it equals nil
+        if chatNotificationIDsDefaults == nil{
+            chatNotificationIDsDefaults = [""]
+            chatNotificationiDs = chatNotificationIDsDefaults!
         }
         else{
-        
-        
-     let docRefEventRequest = dbStore.collection("userNotification").document(user!)
-        docRefEventRequest.getDocument { (document, error) in
-            if let document = document, document.exists {
-             
-                 chatNotificationPending = document.get("chatNotificationPending") as? Bool ?? false
-                 chatNotificationDateChosen = document.get("chatNotificationDateChosen") as? Bool ?? false
-                chatNotificationiDs.append(contentsOf: document.get("chatNotificationEventIDs") as? [String] ?? [""])
-                
-                print("chatNotificationiDs \(chatNotificationiDs)")
-                
-//                once we have pulled down the new notification eventID data we need to remove the field
-                dbStore.collection("userNotification").document(user!).updateData(["chatNotificationEventIDs" : FieldValue.delete()]){ err in
-                if let err = err {
-                    print("Error updating document: \(err)")
-                } else {
-                    print("Document successfully updated")
-                    }}
-                
-                completion()
+            chatNotificationiDs = chatNotificationIDsDefaults!
+        }
+    //        check to see if the user isnt nil
+            if user == nil{
+             print("running func checkNotificationStatus user is nil, stop running")
             }
-            }}
-    }
+            else{
+//                check if the listener is already engaged
+                if notificationListenerEnagaged == false{
+            notificationListenerRegistration = dbStore.collection("userNotification").document(user!).addSnapshotListener(){ (document, error) in
+                
+                if let document = document, document.exists {
+                    let source = document.metadata.hasPendingWrites ? "Local" : "Server"
+                    
+                    print("checkNotificationStatusListener - source \(source)")
+                     chatNotificationPending = document.get("chatNotificationPending") as? Bool ?? false
+                     chatNotificationDateChosen = document.get("chatNotificationDateChosen") as? Bool ?? false
+                    eventNotificationPending = document.get("eventNotificationPending") as? Bool ?? false
+                    eventNotificationiDs.append(contentsOf: document.get("eventNotificationiDs") as? [String] ?? [""])
+                    let newChatIDs = document.get("chatNotificationEventIDs") as? [String] ?? [""]
+                    chatNotificationiDs = chatNotificationiDs + newChatIDs
+                    
+                    print("chatNotificationPending \(chatNotificationPending) chatNotificationDateChosen \(chatNotificationDateChosen) eventNotificationPending \(eventNotificationPending) eventNotificationiDs \(eventNotificationiDs) chatNotificationiDs \(chatNotificationiDs) newChatIDs \(newChatIDs)")
+                    
+                    
+                    print("checkNotificationStatusListener chatNotificationiDs \(chatNotificationiDs)")
+                    
+//                    for the new events with chats, we pull down the chat messages and write them to the DD
+//                    loop through the eventIDs
+                    for i in newChatIDs{
+//                        we need to check that the eventID isnt ""
+                        if i == ""{
+                        }
+                        else{
+                            print("checking eventID i \(i)")
+                    userMessagesRef = Database.database().reference().child("messages").child(i)
+//            create the listener to the node in the databse, we only listen for children added, we do not want to listen for anything else - we may need to add deleted etc at a later date
+                userMessagesRef.observe(.value, with: { (snapshot) in
+                guard let dictionary = snapshot.value as? [String: AnyObject] else {
+                    print("something went wrong checkNotificationStatusListener - \(snapshot.value)")
+                return
+                    }
+//                        print("checkNotificationStatusListener - chats dictionary \(dictionary)")
+//                    we need to loop through each of the messages and sabve them into CoreData
+//                    1. retrieve all chat messages for that event
+                    let predicate = NSPredicate(format: "eventID == %@", argumentArray: [i])
+                    let eventChats = CoreDataCode().serialiseChatMessages(predicate: predicate, usePredicate: true)
+
+                for message in dictionary{
+//                    we loop through each message and check if it is already in the database
+//                    unpack the message data itself
+                    let dict = Message(dictionary: message.value as! [String : Any])
+                    
+                    if eventChats.contains(where: {$0.messageID == message.key}){
+                      print("checkNotificationStatusListener - the message is already in the DB, we do nothing message.key \(message.key)")
+                    }
+                    else{
+                        self.commitSingleChatDB(fromId: dict.fromId!, text: dict.text!, fromName: dict.fromName!, timestamp: dict.timestamp as! Int64, toId: "", eventID: i, messageID: message.key)
+                    }
+                }
+                    print("checkNotificationStatusListener - .notificationsReloaded posted")
+                    NotificationCenter.default.post(name: .newChatDataLoaded, object: nil)
+                    
+//                once we have pulled down the new notification eventID data we need to remove the field
+                    dbStore.collection("userNotification").document(user!).updateData(["chatNotificationEventIDs" : FieldValue.delete(), "eventNotificationiDs" : FieldValue.delete()]){ err in
+                            if let err = err {
+                            print("Error updating document: \(err)")
+                            } else {
+                                print("Document successfully updated")
+                                }}
+                }, withCancel: nil)
+//                            we need to remove the observer to ensure we dont keep listening for changes
+            }
+        }
+//        save the chat notifications into the user defaults
+//                    UserDefaults.standard.setValue(chatNotificationiDs, forKey: "chatNotificationEventIDs")
+                    
+                    print("checkNotificationStatusListener - .notificationsReloaded posted")
+                    NotificationCenter.default.post(name: .notificationsReloaded, object: nil)
+                    
+//                    set to true so we dont keep engaging the listener
+                    notificationListenerEnagaged = true
+                    }}
+                }
+            }
+        }
         
     
-    
-    
-//    fucntion to update the chat notificaiton pending
-    func updatePendingNotificationStatus(){
+//    fucntion to update the  notificaiton for pending events
+    func updatePendingNotificationStatus(eventBool: Bool, eventID: String, eventNewNotification: Bool){
+        print("running func updatePendingNotificationStatus")
         
+//        reset the front page notifications
        chatNotificationPending = false
+    eventNotificationPending = false
         
         if user == nil{
         }
         else{
-     let docRef = dbStore.collection("userNotification").document(user!)
+        
+//        check to see if the event has been up
+        if eventNewNotification == true{
+           eventNotificationiDs.removeAll{$0 == eventID}
+            print("eventNotificationiDs - \(eventNotificationiDs)")
+            
+//                once we have pulled down the new notification eventID data we need to remove the field
+            dbStore.collection("userNotification").document(user!).updateData(["eventNotificationiDs" : FieldValue.delete()]){ err in
+            if let err = err {
+                print("Error updating document: \(err)")
+            } else {
+                print("Document successfully updated")
+                }}
+        }
+        
+//        used for removing the notifications of a specific event - i.e. when the user clicks on a chat notification
+        if eventBool == true{
+            chatNotificationiDs.removeAll{$0 == eventID}
+            print("chatNotificationiDs - \(chatNotificationiDs)")
+            
+//                once we have pulled down the new notification eventID data we need to remove the field
+            dbStore.collection("userNotification").document(user!).updateData(["chatNotificationEventIDs" : FieldValue.delete()]){ err in
+            if let err = err {
+                print("Error updating document: \(err)")
+            } else {
+                print("Document successfully updated")
+                }}
+            }}
+        
+        if user == nil{
+        }
+        else{
+            let docRef = dbStore.collection("userNotification").document(user!)
         
       docRef.setData(["chatNotificationPending" : false], merge: true)
-            
+    docRef.setData(["eventNotificationPending" : false], merge: true)
         }
     }
     
-    func updateDateChosenNotificationStatus(){
+    func updateDateChosenNotificationStatus(eventBool: Bool, eventID: String){
+        print("running func updateDateChosenNotificationStatus")
         
         chatNotificationDateChosen = false
         
+        if eventBool == true{
+        chatNotificationiDs.removeAll{$0 == eventID}
+        print("chatNotificationiDs - \(chatNotificationiDs)")
+            
+//                once we have pulled down the new notification eventID data we need to remove the field
+            dbStore.collection("userNotification").document(user!).updateData(["chatNotificationEventIDs" : FieldValue.delete()]){ err in
+            if let err = err {
+                print("Error updating document: \(err)")
+            } else {
+                print("Document successfully updated")
+                }}
+        }
+        
         if user == nil{
         }
         else{
         
-     let docRef = dbStore.collection("userNotification").document(user!)
+            let docRef = dbStore.collection("userNotification").document(user!)
         
       docRef.setData(["chatNotificationDateChosen" : false], merge: true)
         }
     }
     
-    
+//    gather the users availability and send to firebase
     func sendUserAvailability(eventID: String){
+        
+        if checkCalendarStatus2() == false{
+            print("sendUserAvailability - checkCalendarStatus2 = false")
+        }
         
         print("running sendUserAvailability with inputs - eventID: \(eventID)")
         
         let docRefUserEventStore = dbStore.collection("userEventStore")
         
-        docRefUserEventStore.whereField("eventID", isEqualTo: eventID).whereField("uid", isEqualTo: user!).getDocuments() { (querySnapshot, err) in
+        docRefUserEventStore.whereField("eventID", isEqualTo: eventID).whereField("uid", isEqualTo: user).getDocuments() { (querySnapshot, err) in
             
             print("querySnapshot: \(String(describing: querySnapshot))")
             print("is querySnapshot empty \(String(describing: querySnapshot?.isEmpty))")
@@ -237,7 +360,10 @@ extension UIViewController{
                         self.availabilityCreatedNotification(userIDs: users, availabilityDocumentID: userEventStoreID)
 //                        add the finalAvailabilityArray to the userEventStore
                         self.commitUserAvailbilityData(userEventStoreID: userEventStoreID, finalAvailabilityArray2: finalAvailabilityArray2, eventID: eventID)
+
                                 }}}}}
+    
+    
     
     func getUserPushTokenGlobal(){
         
@@ -249,21 +375,20 @@ extension UIViewController{
     print("Remote instance ID token: \(result.token)")
         
         if user == nil{
-            
             print("user hasn't signed-in yet")
-            
         }
         else{
-    
         dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments { (querySnapshot, error) in
             
-            print("querySnapshot \(String(describing: querySnapshot))")
+            print("getUserPushTokenGlobal - querySnapshot \(String(describing: querySnapshot))")
             
             if error != nil {
-                print("there was an error")
+                print("getUserPushTokenGlobal - there was an error")
             }
             else {
                 for document in querySnapshot!.documents {
+                    
+                    print("getUserPushTokenGlobal - no error")
                  
                     let documentID = document.documentID
                     let name = document.get("name")
@@ -271,12 +396,13 @@ extension UIViewController{
                     // Reference for the realtime database
                     let ref = Database.database().reference()
                     
+//                    delete the data then re-
+                    
                     dbStore.collection("users").document(documentID).setData(["tokenID" : result.token], merge: true)
+                    
                     
                     ref.child("users/\(user!)/\(result.token)").setValue(result.token)
                     ref.child("users/\(user!)/name").setValue(name)
-
-                    
                 }}}}}}}
     
     
@@ -340,7 +466,6 @@ extension UIViewController{
 //                    add the new users userID to the event,  add the notifiction for everyone invited to update their event
                     docRef.getDocument { (document, error) in
                         if let document = document, document.exists {
-                            
 //                            get the userIDs from the eventRequest table, post a new availability notification and event notification for the userIDs
                             var userIDs = document.get("users") as! [String]
                             userIDs.append(uid!)
@@ -365,9 +490,8 @@ extension UIViewController{
                             dbStore.collection("eventRequests").document(eventID).updateData(["nonUserNames" : nonUserNames])
                             
 //                          notify the users that the information has been updated
-                            self.eventAmendedNotification(userIDs: userIDs, eventID: eventID)
+                            self.eventAmendedNotification(userIDs: userIDs, eventID: eventID, amendWithAvailability: false)
                             self.availabilityAmendedNotification(userIDs: userIDs, availabilityDocumentID: availabilityID)
-                            
                         } else {
                             print("Document does not exist")
                         }
@@ -403,5 +527,84 @@ extension UIViewController{
                     docRefUserEventStore.document(documentID).delete()
                 }}}}
     
+    
+//    function to retrieve the users image and save down the profile pictures
+    func fetchUsersProfileImage(uid: String, completion: @escaping () -> Void){
+        print("running func fetchUsersProfileImage inputs- uid: \(uid)")
+        
+        // Create a reference to the file you want to download
+        // Get a reference to the storage service using the default Firebase App
+        let storage = Storage.storage()
+
+        // Create a storage reference from our storage service
+        let storageRef = storage.reference()
+        
+        // Create a child reference
+        // imagesRef now points to "images"
+        let imagesRef = storageRef.child("profileImages/\(uid)")
+        
+        // Download in memory with a maximum allowed size of 1MB (1 * 1024 * 1024 bytes)
+        imagesRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
+          if let error = error {
+            // Uh-oh, an error occurred!
+            completion()
+          } else {
+//            save the image in coreData
+            let image = UIImage(data: data!)
+            DataBaseHelper.shareInstance.saveImage(image: image!, userID: uid)
+            completion()
+          }
+        }
+        
+        
+    }
+    
+//    this function creates a listener for each node of the realTime database the user has a chat at
+//    func createChatListeners(){
+//        print("createChatListeners running")
+////       we loop through each of the users events
+//        
+//        
+//        
+//        for event in CDEevents{
+//            let eventID = event.eventID
+//            userMessagesRef = Database.database().reference().child("messages").child(eventID!)
+//            
+////            create the listener to the node in the databse, we only listen for children added, we do not want to listen for anything else - we may need to add deleted etc at a later date
+//            userMessagesRef.observe(.childAdded, with: { (snapshot) in
+//            print("chatMessageListener triggered chatListenerInt \(chatListenerInt)")
+//                     guard let dictionary = snapshot.value as? [String: AnyObject] else {
+//                         return
+//                     }
+//            let message = Message(dictionary: dictionary)
+////             serialise the message
+//                let CDNewMessage = CoreDataChatMessages(context: context)
+//                CDNewMessage.eventID = eventID
+//                CDNewMessage.fromId = message.fromId
+//                CDNewMessage.timestamp = message.timestamp as! Int64
+//                CDNewMessage.text = message.text
+//                CDNewMessage.fromName = message.fromName
+//                
+////        before we save the message we delete any message that is the same
+//            if let index = CDMessages.index(where: {$0.eventID == currentUserSelectedEvent.eventID && $0.fromId == message.fromId && $0.text == message.text && $0.timestamp == message.timestamp as! Int64}){
+//                context.delete(CDMessages[index])
+//                CDMessages.remove(at: index)
+//                self.CDSaveData()
+//                        }
+////        save the new message
+//                CDMessages.append(CDNewMessage)
+////        print("CDMessages \(CDMessages)")
+//                self.CDSaveData()
+//                
+//                
+//            }, withCancel: nil)
+//    }
+//    }
+    
     //    end of the code
+}
+
+//set notification names
+extension Notification.Name {
+     static let notificationsReloaded = Notification.Name("notificationsReloaded")
 }

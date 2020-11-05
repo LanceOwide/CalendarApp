@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="2iY-Pe-9SJ">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="2iY-Pe-9SJ">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -12,18 +13,18 @@
         <!--Home Page View Controller-->
         <scene sceneID="noE-Ju-nCe">
             <objects>
-                <viewController id="E4s-7M-IVf" customClass="HomePageViewController" customModule="Planr" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="HomePageViewController" id="E4s-7M-IVf" customClass="HomePageViewController" customModule="Planr" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="1eP-Zd-Anw">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qGW-pE-VTb">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qGW-pE-VTb">
                                 <rect key="frame" x="16" y="447" width="343" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="xtj-Bw-z0D"/>
                                 </constraints>
                                 <state key="normal" title="Register">
-                                    <color key="titleColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="titleColor" red="0.0" green="0.69019607843137254" blue="0.61176470588235299" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
                                     <action selector="loginButton:" destination="E4s-7M-IVf" eventType="touchUpInside" id="PgG-iY-o2J"/>
@@ -44,16 +45,16 @@
                                     <constraint firstAttribute="height" constant="50" id="nKn-6U-Oyp"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="italicSystem" pointSize="20"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="textColor" red="0.0" green="0.69019607843137254" blue="0.61176470588235299" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jcM-lD-CH2">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jcM-lD-CH2">
                                 <rect key="frame" x="16" y="507" width="343" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="0lY-yx-dCT"/>
                                 </constraints>
                                 <state key="normal" title="Log In">
-                                    <color key="titleColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="titleColor" red="0.0" green="0.69019607843137254" blue="0.61176470588235299" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
                                     <action selector="oldUserButtonPressed:" destination="E4s-7M-IVf" eventType="touchUpInside" id="eXQ-SF-0PJ"/>
@@ -61,15 +62,16 @@
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="View our Privacy and Data Policy" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="kOH-qR-LB0">
                                 <rect key="frame" x="16" y="601" width="343" height="30"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="D60-WK-1DK"/>
                                 </constraints>
-                                <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="7BU-eq-Vkc"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="7BU-eq-Vkc" firstAttribute="trailing" secondItem="jcM-lD-CH2" secondAttribute="trailing" constant="16" id="0rG-CK-dx8"/>
@@ -90,7 +92,6 @@
                             <constraint firstAttribute="trailing" secondItem="ejM-WQ-bJR" secondAttribute="trailing" constant="16" id="uK4-na-bOc"/>
                             <constraint firstItem="7BU-eq-Vkc" firstAttribute="trailing" secondItem="FLx-l6-hQm" secondAttribute="trailing" constant="16" id="xhw-zP-xsE"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="7BU-eq-Vkc"/>
                     </view>
                     <navigationItem key="navigationItem" id="TjW-p2-vzh" customClass="Home"/>
                     <connections>
@@ -123,7 +124,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Full Name" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="C91-B4-BSy">
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Full Name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="C91-B4-BSy">
                                 <rect key="frame" x="16" y="265.5" width="343" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="fbf-j3-3W1"/>
@@ -137,19 +138,20 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z4C-Hk-TFJ">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z4C-Hk-TFJ">
                                 <rect key="frame" x="16" y="385.5" width="343" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="po6-T6-mSh"/>
                                 </constraints>
                                 <state key="normal" title="Next">
-                                    <color key="titleColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
                                     <action selector="registerEmailNextButton:" destination="PCu-Ob-x8V" eventType="touchUpInside" id="w20-qi-Y4F"/>
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="aeo-nr-BzD"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="tintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -167,7 +169,6 @@
                             <constraint firstItem="aeo-nr-BzD" firstAttribute="trailing" secondItem="C91-B4-BSy" secondAttribute="trailing" constant="16" id="ppE-wS-ABN"/>
                             <constraint firstItem="aeo-nr-BzD" firstAttribute="trailing" secondItem="z4C-Hk-TFJ" secondAttribute="trailing" constant="16" id="rGl-jd-HrI"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="aeo-nr-BzD"/>
                     </view>
                     <navigationItem key="navigationItem" id="abd-0G-1UL"/>
                     <connections>
@@ -193,16 +194,16 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Let's verify your account" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IRe-pP-B4X">
                                 <rect key="frame" x="16" y="211.5" width="343" height="24"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="textColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yOc-hQ-bJS">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yOc-hQ-bJS">
                                 <rect key="frame" x="16" y="325.5" width="343" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="oVF-GL-5Nk"/>
                                 </constraints>
                                 <state key="normal" title="Get activation code">
-                                    <color key="titleColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
                                     <action selector="getActivationCodePressed:" destination="ELH-FK-R6A" eventType="touchUpInside" id="ah9-eW-8t7"/>
@@ -217,7 +218,8 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="DJH-0Q-AOg"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="yOc-hQ-bJS" firstAttribute="top" secondItem="dH6-VK-Tnh" secondAttribute="bottom" constant="10" id="9i2-T2-1ch"/>
                             <constraint firstItem="DJH-0Q-AOg" firstAttribute="trailing" secondItem="dH6-VK-Tnh" secondAttribute="trailing" constant="16" id="E4u-Rv-fVs"/>
@@ -229,7 +231,6 @@
                             <constraint firstItem="yOc-hQ-bJS" firstAttribute="leading" secondItem="DJH-0Q-AOg" secondAttribute="leading" constant="16" id="lKQ-bc-1Ed"/>
                             <constraint firstItem="IRe-pP-B4X" firstAttribute="centerY" secondItem="FVA-ZO-cdd" secondAttribute="centerY" constant="-100" id="syP-q2-a4u"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="DJH-0Q-AOg"/>
                     </view>
                     <navigationItem key="navigationItem" id="V6I-Ag-noi"/>
                     <connections>
@@ -256,7 +257,7 @@
                                     <constraint firstAttribute="height" constant="50" id="4Ic-ko-1T3"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="textColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <color key="highlightedColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter text code" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bNh-Vh-6gh">
@@ -268,32 +269,33 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BAc-qC-5TD">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BAc-qC-5TD">
                                 <rect key="frame" x="16" y="398.5" width="343" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="OU1-Xw-nhu"/>
                                 </constraints>
                                 <state key="normal" title="No Code? Click to resend">
-                                    <color key="titleColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
                                     <action selector="resendButtonPressed:" destination="JbF-Ep-w5Z" eventType="touchUpInside" id="yi4-VO-hRO"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="k9e-rr-aHG">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="k9e-rr-aHG">
                                 <rect key="frame" x="16" y="338.5" width="343" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="B6w-xh-F3E"/>
                                 </constraints>
                                 <state key="normal" title="Log In">
-                                    <color key="titleColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
                                     <action selector="loginButtonOldUser:" destination="JbF-Ep-w5Z" eventType="touchUpInside" id="b5s-4f-PgP"/>
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="uC5-dL-d1a"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="k9e-rr-aHG" firstAttribute="top" secondItem="bNh-Vh-6gh" secondAttribute="bottom" constant="30" id="4Ze-Wr-hdU"/>
                             <constraint firstItem="k9e-rr-aHG" firstAttribute="leading" secondItem="uC5-dL-d1a" secondAttribute="leading" constant="16" id="9H2-vc-mam"/>
@@ -308,7 +310,6 @@
                             <constraint firstItem="kYk-2y-y2i" firstAttribute="leading" secondItem="uC5-dL-d1a" secondAttribute="leading" constant="16" id="pxP-9V-Hkn"/>
                             <constraint firstItem="uC5-dL-d1a" firstAttribute="trailing" secondItem="bNh-Vh-6gh" secondAttribute="trailing" constant="16" id="rv0-0T-p9z"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="uC5-dL-d1a"/>
                     </view>
                     <navigationItem key="navigationItem" id="4by-1l-Jx9"/>
                     <connections>
@@ -316,7 +317,6 @@
                         <outlet property="resendCodeButton" destination="BAc-qC-5TD" id="pqj-T2-fys"/>
                         <outlet property="textCodeInput" destination="bNh-Vh-6gh" id="pRh-zb-SZW"/>
                         <segue destination="E4s-7M-IVf" kind="show" identifier="notAUserSegue" animates="NO" id="D0Y-YP-VHe"/>
-                        <segue destination="RHc-HB-ua9" kind="show" identifier="existingUserLoggedIn" id="SbD-vi-Jfa"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YZ9-DQ-cYE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -339,13 +339,13 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wGd-iR-8bK">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wGd-iR-8bK">
                                 <rect key="frame" x="16" y="315.5" width="343" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="0pp-N2-xoG"/>
                                 </constraints>
                                 <state key="normal" title="Get activation code">
-                                    <color key="titleColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
                                     <action selector="getActivationCodeButton:" destination="Z9K-Mf-EcI" eventType="touchUpInside" id="Kqa-Pj-QB4"/>
@@ -354,7 +354,7 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Let's verify your account" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e4b-vs-WjX">
                                 <rect key="frame" x="3" y="201.5" width="356" height="24"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="textColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This phone's number" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eYl-7h-swt">
@@ -369,7 +369,7 @@
 we'll link the number to your account 
 (Recommended if you have two numbers)</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="textColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <color key="highlightedColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hCy-tv-KC4" customClass="FPNTextField" customModule="FlagPhoneNumber">
@@ -381,6 +381,7 @@ we'll link the number to your account
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="jLU-DS-HA5"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="wGd-iR-8bK" firstAttribute="top" secondItem="y4B-Wc-KnK" secondAttribute="bottom" constant="10" id="0AL-f4-bDg"/>
@@ -402,7 +403,6 @@ we'll link the number to your account
                             <constraint firstItem="y4B-Wc-KnK" firstAttribute="top" secondItem="e4b-vs-WjX" secondAttribute="bottom" constant="30" id="rty-30-quP"/>
                             <constraint firstItem="wGd-iR-8bK" firstAttribute="leading" secondItem="jLU-DS-HA5" secondAttribute="leading" constant="16" id="s8q-dq-Lki"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="jLU-DS-HA5"/>
                     </view>
                     <navigationItem key="navigationItem" id="jPw-Zl-7th"/>
                     <connections>
@@ -439,56 +439,70 @@ we'll link the number to your account
                                     <constraint firstAttribute="height" constant="30" id="vQZ-dV-oBh"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="textColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GRr-kd-qaX">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GRr-kd-qaX">
                                 <rect key="frame" x="16" y="517" width="343" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="w9o-DI-WX6"/>
                                 </constraints>
                                 <state key="normal" title="No Code? Click to resend">
-                                    <color key="titleColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
                                     <action selector="resendButtonPressed:" destination="TmQ-OV-HcE" eventType="touchUpInside" id="d1U-zD-Mrd"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2YA-7M-GrZ">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2YA-7M-GrZ">
                                 <rect key="frame" x="16" y="433.5" width="343" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="rOe-vk-y0Y"/>
                                 </constraints>
                                 <state key="normal" title="Complete Registration">
-                                    <color key="titleColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
                                     <action selector="btnCompletePressed:" destination="TmQ-OV-HcE" eventType="touchUpInside" id="Ifa-U4-wiX"/>
                                 </connections>
                             </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="By registering you agree to our Terms of Service" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="wXo-iG-WCL">
+                                <rect key="frame" x="16" y="591" width="343" height="40"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="eF5-2j-QU2"/>
+                                </constraints>
+                                <color key="textColor" red="0.0" green="0.69019607839999997" blue="0.61176470589999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="R8p-xE-INQ"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="moa-uz-PqJ" firstAttribute="centerY" secondItem="HZk-fi-oq1" secondAttribute="centerY" constant="-100" id="3h4-rl-Hq2"/>
                             <constraint firstItem="2YA-7M-GrZ" firstAttribute="top" secondItem="FrY-Wi-xGG" secondAttribute="bottom" constant="115" id="4kQ-0O-4nl"/>
                             <constraint firstItem="2YA-7M-GrZ" firstAttribute="leading" secondItem="R8p-xE-INQ" secondAttribute="leading" constant="16" id="7NC-ak-JvH"/>
+                            <constraint firstItem="wXo-iG-WCL" firstAttribute="leading" secondItem="R8p-xE-INQ" secondAttribute="leading" constant="16" id="Apr-Nx-y02"/>
+                            <constraint firstItem="R8p-xE-INQ" firstAttribute="bottom" secondItem="wXo-iG-WCL" secondAttribute="bottom" constant="16" id="D8N-do-WHh"/>
                             <constraint firstItem="GRr-kd-qaX" firstAttribute="leading" secondItem="R8p-xE-INQ" secondAttribute="leading" constant="16" id="HIp-kn-KZM"/>
                             <constraint firstItem="GRr-kd-qaX" firstAttribute="top" secondItem="2YA-7M-GrZ" secondAttribute="bottom" constant="33.5" id="PBA-DV-xbe"/>
                             <constraint firstItem="R8p-xE-INQ" firstAttribute="trailing" secondItem="GRr-kd-qaX" secondAttribute="trailing" constant="16" id="RK1-kD-bzu"/>
                             <constraint firstItem="R8p-xE-INQ" firstAttribute="trailing" secondItem="2YA-7M-GrZ" secondAttribute="trailing" constant="16" id="U3r-Dw-62n"/>
                             <constraint firstItem="R8p-xE-INQ" firstAttribute="trailing" secondItem="moa-uz-PqJ" secondAttribute="trailing" constant="16" id="b5E-oi-ynM"/>
                             <constraint firstItem="R8p-xE-INQ" firstAttribute="trailing" secondItem="FrY-Wi-xGG" secondAttribute="trailing" constant="16" id="geQ-1s-QeG"/>
+                            <constraint firstItem="R8p-xE-INQ" firstAttribute="trailing" secondItem="wXo-iG-WCL" secondAttribute="trailing" constant="16" id="j73-0S-M93"/>
                             <constraint firstItem="FrY-Wi-xGG" firstAttribute="top" secondItem="moa-uz-PqJ" secondAttribute="bottom" constant="30" id="oYJ-Us-1BI"/>
                             <constraint firstItem="FrY-Wi-xGG" firstAttribute="leading" secondItem="R8p-xE-INQ" secondAttribute="leading" constant="16" id="w46-6K-U00"/>
                             <constraint firstItem="moa-uz-PqJ" firstAttribute="leading" secondItem="R8p-xE-INQ" secondAttribute="leading" constant="3" id="zkW-SH-VpP"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="R8p-xE-INQ"/>
                     </view>
                     <navigationItem key="navigationItem" id="V4A-9U-0BJ"/>
                     <connections>
                         <outlet property="btnCompleteSettings" destination="2YA-7M-GrZ" id="yeN-qP-p1M"/>
                         <outlet property="resendButton" destination="GRr-kd-qaX" id="4ls-JG-xhR"/>
                         <outlet property="textCodeInput" destination="FrY-Wi-xGG" id="lmU-N9-sqs"/>
+                        <outlet property="txtTermsOfService" destination="wXo-iG-WCL" id="XaO-5e-SjA"/>
                         <segue destination="RHc-HB-ua9" kind="show" identifier="userRegistered2" id="79k-bs-lwz"/>
                     </connections>
                 </viewController>
@@ -520,8 +534,8 @@ we'll link the number to your account
                                 </prototypes>
                             </tableView>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="Uqi-PY-qTS"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <navigationItem key="navigationItem" id="pdf-Ut-ar1"/>
                     <connections>
@@ -542,23 +556,23 @@ we'll link the number to your account
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="ngc-Mi-Mqu">
                                 <rect key="frame" x="16" y="26" width="343" height="50"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="rBN-jk-QOw"/>
                                 </constraints>
                                 <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
-                                <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="19"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="wON-aU-Yrf"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="ngc-Mi-Mqu" firstAttribute="top" secondItem="wON-aU-Yrf" secondAttribute="top" constant="26" id="B8X-3i-gZ2"/>
                             <constraint firstItem="wON-aU-Yrf" firstAttribute="trailing" secondItem="ngc-Mi-Mqu" secondAttribute="trailing" constant="16" id="LEg-E1-R5h"/>
                             <constraint firstItem="ngc-Mi-Mqu" firstAttribute="leading" secondItem="wON-aU-Yrf" secondAttribute="leading" constant="16" id="gtp-NC-I5X"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="wON-aU-Yrf"/>
                     </view>
                     <navigationItem key="navigationItem" id="HbD-TY-tBG"/>
                     <size key="freeformSize" width="375" height="1000"/>
@@ -590,14 +604,14 @@ we'll link the number to your account
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="BuM-1e-RHT">
-                                                    <rect key="frame" x="15" y="10" width="33.5" height="20.5"/>
+                                                    <rect key="frame" x="16" y="10" width="33" height="20.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="dBw-tK-Ma5">
-                                                    <rect key="frame" x="15" y="31.5" width="44" height="14.5"/>
+                                                    <rect key="frame" x="16" y="31.5" width="44" height="14.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                     <nil key="textColor"/>
@@ -609,6 +623,7 @@ we'll link the number to your account
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="dOg-Tq-VQ0"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="bZy-rm-tgw" firstAttribute="leading" secondItem="dOg-Tq-VQ0" secondAttribute="leading" id="K8r-aK-f8f"/>
@@ -616,7 +631,6 @@ we'll link the number to your account
                             <constraint firstItem="dOg-Tq-VQ0" firstAttribute="bottom" secondItem="bZy-rm-tgw" secondAttribute="bottom" id="kSZ-GH-lPM"/>
                             <constraint firstItem="dOg-Tq-VQ0" firstAttribute="trailing" secondItem="bZy-rm-tgw" secondAttribute="trailing" id="z8p-Vf-h9e"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="dOg-Tq-VQ0"/>
                     </view>
                     <navigationItem key="navigationItem" id="wiE-7E-kLS"/>
                     <connections>
@@ -661,7 +675,7 @@ we'll link the number to your account
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L8t-Uw-CeY">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L8t-Uw-CeY">
                                 <rect key="frame" x="16" y="122" width="100" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="100" id="5iG-XJ-blN"/>
@@ -675,7 +689,8 @@ we'll link the number to your account
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="z1f-N8-6Kd"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="z1f-N8-6Kd" firstAttribute="trailing" secondItem="Ia5-nE-xPY" secondAttribute="trailing" id="AKl-cB-BqU"/>
                             <constraint firstItem="R98-z8-kxJ" firstAttribute="leading" secondItem="WVf-39-aU5" secondAttribute="trailing" constant="8" id="DaC-Ew-cUg"/>
@@ -687,7 +702,6 @@ we'll link the number to your account
                             <constraint firstItem="L8t-Uw-CeY" firstAttribute="leading" secondItem="z1f-N8-6Kd" secondAttribute="leading" constant="16" id="d3b-cc-7gH"/>
                             <constraint firstItem="R98-z8-kxJ" firstAttribute="top" secondItem="z1f-N8-6Kd" secondAttribute="top" constant="40" id="nG9-Ls-P7E"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="z1f-N8-6Kd"/>
                     </view>
                     <navigationItem key="navigationItem" id="2wX-LH-hLW"/>
                     <connections>
@@ -710,7 +724,7 @@ we'll link the number to your account
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="ZkK-Ch-6ix">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="selectSaveCalendarCell" id="OvM-XZ-YnU">
                                         <rect key="frame" x="0.0" y="28" width="375" height="43.5"/>
@@ -723,14 +737,14 @@ we'll link the number to your account
                                 </prototypes>
                             </tableView>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="J3I-Di-XCM"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="ZkK-Ch-6ix" firstAttribute="top" secondItem="J3I-Di-XCM" secondAttribute="top" id="1U5-L1-wh8"/>
                             <constraint firstItem="J3I-Di-XCM" firstAttribute="trailing" secondItem="ZkK-Ch-6ix" secondAttribute="trailing" id="9gh-ri-5bP"/>
                             <constraint firstItem="J3I-Di-XCM" firstAttribute="bottom" secondItem="ZkK-Ch-6ix" secondAttribute="bottom" id="MaR-OR-bXI"/>
                             <constraint firstItem="ZkK-Ch-6ix" firstAttribute="leading" secondItem="J3I-Di-XCM" secondAttribute="leading" id="oDg-03-mlx"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="J3I-Di-XCM"/>
                     </view>
                     <navigationItem key="navigationItem" id="gVD-OG-gZT"/>
                     <connections>
@@ -786,7 +800,7 @@ we'll link the number to your account
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Primary phone number" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4lz-8b-Uvp">
-                                <rect key="frame" x="5" y="198" width="198" height="24"/>
+                                <rect key="frame" x="5" y="198" width="200" height="24"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -817,6 +831,7 @@ we'll link the number to your account
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="LMk-LY-JfE"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="T6Y-KM-wH2" firstAttribute="top" secondItem="4lz-8b-Uvp" secondAttribute="bottom" constant="10" id="0o0-au-JHA"/>
@@ -844,7 +859,6 @@ we'll link the number to your account
                             <constraint firstItem="LMk-LY-JfE" firstAttribute="trailing" secondItem="gRK-xT-pxa" secondAttribute="trailing" constant="5" id="zgt-0F-wGL"/>
                             <constraint firstItem="T6Y-KM-wH2" firstAttribute="leading" secondItem="LMk-LY-JfE" secondAttribute="leading" constant="5" id="ztz-tM-tRe"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="LMk-LY-JfE"/>
                     </view>
                     <navigationItem key="navigationItem" id="moc-BD-98Y"/>
                     <connections>
@@ -874,18 +888,18 @@ we'll link the number to your account
                                         <rect key="frame" x="0.0" y="28" width="375" height="55.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="JE3-6Y-Rqb" id="UHy-LM-f83">
-                                            <rect key="frame" x="0.0" y="0.0" width="349" height="55.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="348" height="55.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1ao-Om-xgL">
-                                                    <rect key="frame" x="15" y="10" width="33.5" height="20.5"/>
+                                                    <rect key="frame" x="16" y="10" width="33" height="20.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Detail" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="hOp-jx-xbD">
-                                                    <rect key="frame" x="15" y="31.5" width="33" height="14.5"/>
+                                                    <rect key="frame" x="16" y="31.5" width="33" height="14.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                     <nil key="textColor"/>
@@ -897,6 +911,7 @@ we'll link the number to your account
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="ZNr-hv-Bj7"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="ZNr-hv-Bj7" firstAttribute="bottom" secondItem="KJy-LG-Z8Y" secondAttribute="bottom" id="Ezr-xE-sVD"/>
@@ -904,7 +919,6 @@ we'll link the number to your account
                             <constraint firstItem="ZNr-hv-Bj7" firstAttribute="trailing" secondItem="KJy-LG-Z8Y" secondAttribute="trailing" id="ffh-2c-D5P"/>
                             <constraint firstItem="KJy-LG-Z8Y" firstAttribute="top" secondItem="ZNr-hv-Bj7" secondAttribute="top" id="zy5-gd-sS9"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="ZNr-hv-Bj7"/>
                     </view>
                     <navigationItem key="navigationItem" id="64E-Wq-100"/>
                     <connections>
@@ -940,34 +954,34 @@ we'll link the number to your account
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Person" translatesAutoresizingMaskIntoConstraints="NO" id="Uc4-16-TlP">
-                                                    <rect key="frame" x="0.0" y="40" width="70" height="70"/>
+                                                    <rect key="frame" x="0.0" y="37" width="70" height="70"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="D6M-Hd-1DZ">
-                                                    <rect key="frame" x="100" y="10" width="217" height="20"/>
+                                                    <rect key="frame" x="80" y="10" width="269" height="20"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uCW-Db-wvc">
-                                                    <rect key="frame" x="100" y="30" width="240" height="20"/>
+                                                    <rect key="frame" x="80" y="30" width="269" height="20"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qC0-NI-sRv">
-                                                    <rect key="frame" x="100" y="50" width="240" height="20"/>
+                                                    <rect key="frame" x="80" y="50" width="269" height="20"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="bJ3-bH-vrK">
-                                                    <rect key="frame" x="100" y="68" width="249" height="38"/>
+                                                    <rect key="frame" x="80" y="68" width="269" height="38"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="10w-DI-Rfk">
                                                         <size key="itemSize" width="50" height="50"/>
                                                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -984,7 +998,7 @@ we'll link the number to your account
                                                                 <subviews>
                                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yvk-jE-HRd">
                                                                         <rect key="frame" x="4" y="15" width="42" height="21"/>
-                                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                         <nil key="textColor"/>
                                                                         <nil key="highlightedColor"/>
                                                                     </label>
@@ -1003,9 +1017,9 @@ we'll link the number to your account
                                                     </cells>
                                                 </collectionView>
                                                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="587-60-Yz1">
-                                                    <rect key="frame" x="100" y="101" width="240" height="38"/>
+                                                    <rect key="frame" x="80" y="101" width="260" height="38"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="F7E-Jt-qde">
                                                         <size key="itemSize" width="50" height="50"/>
                                                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -1022,7 +1036,7 @@ we'll link the number to your account
                                                                 <subviews>
                                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="meb-FF-YhR">
                                                                         <rect key="frame" x="4" y="15" width="42" height="21"/>
-                                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                         <nil key="textColor"/>
                                                                         <nil key="highlightedColor"/>
                                                                     </label>
@@ -1047,14 +1061,32 @@ we'll link the number to your account
                                                         <constraint firstAttribute="height" constant="40" id="sl2-t7-OuE"/>
                                                     </constraints>
                                                 </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jzm-Ew-MjD">
+                                                    <rect key="frame" x="0.0" y="99" width="70" height="38"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icons8-notification-200" translatesAutoresizingMaskIntoConstraints="NO" id="Uo2-ya-zal">
+                                                    <rect key="frame" x="335" y="5" width="40" height="40"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="40" id="gVg-kL-d1C"/>
+                                                        <constraint firstAttribute="height" constant="40" id="qmU-7R-4Zo"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="Uo2-ya-zal" secondAttribute="trailing" id="0RH-MV-ne2"/>
                                                 <constraint firstItem="IUH-Xe-Buq" firstAttribute="top" secondItem="gIw-3P-5vh" secondAttribute="top" constant="5" id="BMa-me-uXU"/>
                                                 <constraint firstItem="IUH-Xe-Buq" firstAttribute="leading" secondItem="gIw-3P-5vh" secondAttribute="leading" constant="5" id="XLa-cJ-EWJ"/>
+                                                <constraint firstItem="Uo2-ya-zal" firstAttribute="top" secondItem="gIw-3P-5vh" secondAttribute="top" constant="5" id="mR9-zb-d62"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="imgChatNotification" destination="IUH-Xe-Buq" id="LC7-uP-mVw"/>
+                                            <outlet property="imgEventNotification" destination="Uo2-ya-zal" id="Zkc-aT-nql"/>
+                                            <outlet property="txtEventOwner" destination="Jzm-Ew-MjD" id="zAE-nF-c3H"/>
                                             <outlet property="userCreatedCellImage" destination="Uc4-16-TlP" id="VgC-Lw-fYz"/>
                                             <outlet property="userCreatedCellLabel1" destination="D6M-Hd-1DZ" id="ukC-fE-Lfs"/>
                                             <outlet property="userCreatedCellLabel2" destination="uCW-Db-wvc" id="J0w-YR-4wW"/>
@@ -1066,6 +1098,7 @@ we'll link the number to your account
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="XSZ-FW-6f1" secondAttribute="bottom" id="Njf-tf-8rC"/>
@@ -1073,7 +1106,6 @@ we'll link the number to your account
                             <constraint firstItem="XSZ-FW-6f1" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="kyT-Qw-1Sy"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="XSZ-FW-6f1" secondAttribute="trailing" id="qDO-Nq-2Bx"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" id="IVe-ca-i4o"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
@@ -1106,26 +1138,26 @@ we'll link the number to your account
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KWe-bx-oMi">
-                                                    <rect key="frame" x="100" y="30" width="225" height="20"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <rect key="frame" x="71" y="30" width="274" height="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="miW-3A-Yro">
-                                                    <rect key="frame" x="100" y="50" width="240" height="20.5"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <rect key="frame" x="71" y="47" width="268" height="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Person" translatesAutoresizingMaskIntoConstraints="NO" id="oeM-gW-jLR">
-                                                    <rect key="frame" x="15" y="40" width="70" height="70"/>
+                                                    <rect key="frame" x="-4" y="40" width="70" height="70"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="70" id="fr3-QS-0fb"/>
                                                     </constraints>
                                                 </imageView>
                                                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Dwc-sx-dss">
-                                                    <rect key="frame" x="100" y="96.5" width="260" height="40"/>
-                                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                    <rect key="frame" x="71" y="86" width="289" height="40"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="40" id="Wk3-jc-dJo"/>
                                                     </constraints>
@@ -1145,7 +1177,7 @@ we'll link the number to your account
                                                                 <subviews>
                                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MUp-6P-P9o">
                                                                         <rect key="frame" x="5" y="0.0" width="42" height="21"/>
-                                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                         <nil key="textColor"/>
                                                                         <nil key="highlightedColor"/>
                                                                     </label>
@@ -1164,13 +1196,13 @@ we'll link the number to your account
                                                     </cells>
                                                 </collectionView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hyl-Ow-5SU">
-                                                    <rect key="frame" x="100" y="70.5" width="225" height="21"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <rect key="frame" x="71" y="64" width="274" height="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LVH-Bz-Qvw">
-                                                    <rect key="frame" x="100" y="10" width="225" height="20"/>
+                                                    <rect key="frame" x="71" y="10" width="274" height="20"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -1182,26 +1214,33 @@ we'll link the number to your account
                                                         <constraint firstAttribute="height" constant="44" id="jT0-C6-NaO"/>
                                                     </constraints>
                                                 </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FXf-tC-PRj">
+                                                    <rect key="frame" x="1" y="103" width="70" height="38"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="trailing" secondItem="KWe-bx-oMi" secondAttribute="trailing" constant="50" id="4F7-HG-CXW"/>
+                                                <constraint firstAttribute="trailing" secondItem="KWe-bx-oMi" secondAttribute="trailing" constant="30" id="4F7-HG-CXW"/>
                                                 <constraint firstItem="KWe-bx-oMi" firstAttribute="top" secondItem="LVH-Bz-Qvw" secondAttribute="bottom" id="5bh-8b-PdJ"/>
                                                 <constraint firstItem="TLq-Hl-EcY" firstAttribute="leading" secondItem="CHJ-VJ-hOb" secondAttribute="leading" constant="5" id="AFv-Zl-UJM"/>
-                                                <constraint firstItem="KWe-bx-oMi" firstAttribute="leading" secondItem="oeM-gW-jLR" secondAttribute="trailing" constant="15" id="B9L-dT-X2L"/>
+                                                <constraint firstItem="KWe-bx-oMi" firstAttribute="leading" secondItem="oeM-gW-jLR" secondAttribute="trailing" constant="5" id="B9L-dT-X2L"/>
                                                 <constraint firstItem="LVH-Bz-Qvw" firstAttribute="top" secondItem="CHJ-VJ-hOb" secondAttribute="top" constant="10" id="Ilh-5S-yaV"/>
-                                                <constraint firstItem="LVH-Bz-Qvw" firstAttribute="leading" secondItem="CHJ-VJ-hOb" secondAttribute="leadingMargin" constant="85" id="J2b-co-N3j"/>
-                                                <constraint firstItem="Hyl-Ow-5SU" firstAttribute="leading" secondItem="oeM-gW-jLR" secondAttribute="trailing" constant="15" id="Jxl-Fy-eyv"/>
-                                                <constraint firstItem="oeM-gW-jLR" firstAttribute="leading" secondItem="CHJ-VJ-hOb" secondAttribute="leadingMargin" id="KL7-Fc-Sto"/>
-                                                <constraint firstItem="Dwc-sx-dss" firstAttribute="leading" secondItem="oeM-gW-jLR" secondAttribute="trailing" constant="15" id="Mes-xp-cbe"/>
-                                                <constraint firstAttribute="trailing" secondItem="LVH-Bz-Qvw" secondAttribute="trailing" constant="50" id="QLq-XM-yXM"/>
+                                                <constraint firstItem="LVH-Bz-Qvw" firstAttribute="leading" secondItem="CHJ-VJ-hOb" secondAttribute="leadingMargin" constant="55" id="J2b-co-N3j"/>
+                                                <constraint firstItem="Hyl-Ow-5SU" firstAttribute="leading" secondItem="oeM-gW-jLR" secondAttribute="trailing" constant="5" id="Jxl-Fy-eyv"/>
+                                                <constraint firstItem="oeM-gW-jLR" firstAttribute="leading" secondItem="CHJ-VJ-hOb" secondAttribute="leadingMargin" constant="-20" id="KL7-Fc-Sto"/>
+                                                <constraint firstItem="Dwc-sx-dss" firstAttribute="leading" secondItem="oeM-gW-jLR" secondAttribute="trailing" constant="5" id="Mes-xp-cbe"/>
+                                                <constraint firstAttribute="trailing" secondItem="LVH-Bz-Qvw" secondAttribute="trailing" constant="30" id="QLq-XM-yXM"/>
                                                 <constraint firstItem="Dwc-sx-dss" firstAttribute="top" secondItem="Hyl-Ow-5SU" secondAttribute="bottom" constant="5" id="Rcc-uU-fZo"/>
                                                 <constraint firstAttribute="trailing" secondItem="Dwc-sx-dss" secondAttribute="trailing" constant="15" id="VF3-Xq-1j0"/>
                                                 <constraint firstItem="TLq-Hl-EcY" firstAttribute="top" secondItem="CHJ-VJ-hOb" secondAttribute="top" constant="5" id="VY2-2F-1wX"/>
                                                 <constraint firstItem="miW-3A-Yro" firstAttribute="trailing" secondItem="CHJ-VJ-hOb" secondAttribute="trailingMargin" constant="-20" id="aLO-12-aQp"/>
                                                 <constraint firstItem="Hyl-Ow-5SU" firstAttribute="top" secondItem="miW-3A-Yro" secondAttribute="bottom" id="c9U-af-8RQ"/>
-                                                <constraint firstItem="miW-3A-Yro" firstAttribute="leading" secondItem="oeM-gW-jLR" secondAttribute="trailing" constant="15" id="dwl-dS-jH0"/>
+                                                <constraint firstItem="miW-3A-Yro" firstAttribute="leading" secondItem="oeM-gW-jLR" secondAttribute="trailing" constant="5" id="dwl-dS-jH0"/>
                                                 <constraint firstItem="miW-3A-Yro" firstAttribute="top" secondItem="KWe-bx-oMi" secondAttribute="bottom" id="ljd-aJ-GOE"/>
-                                                <constraint firstAttribute="trailing" secondItem="Hyl-Ow-5SU" secondAttribute="trailing" constant="50" id="p7Q-QP-8T3"/>
+                                                <constraint firstAttribute="trailing" secondItem="Hyl-Ow-5SU" secondAttribute="trailing" constant="30" id="p7Q-QP-8T3"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="oeM-gW-jLR" secondAttribute="bottom" constant="29" id="vxS-Sn-JAw"/>
                                                 <constraint firstItem="oeM-gW-jLR" firstAttribute="top" secondItem="CHJ-VJ-hOb" secondAttribute="topMargin" constant="29" id="xb4-hQ-Iey"/>
                                             </constraints>
@@ -1209,6 +1248,7 @@ we'll link the number to your account
                                         <connections>
                                             <outlet property="imgChatNotification" destination="TLq-Hl-EcY" id="QcA-mX-ZiM"/>
                                             <outlet property="inviteeCircledCollectionView" destination="Dwc-sx-dss" id="2FB-gZ-QyE"/>
+                                            <outlet property="txtEventOwner" destination="FXf-tC-PRj" id="K3m-eB-up9"/>
                                             <outlet property="userInvitedCellImage" destination="oeM-gW-jLR" id="ZZA-j9-e8g"/>
                                             <outlet property="userInvitedCellLabel1" destination="LVH-Bz-Qvw" id="2xi-MW-LmK"/>
                                             <outlet property="userInvitedCellLabel2" destination="KWe-bx-oMi" id="6bz-Ri-kB7"/>
@@ -1219,6 +1259,7 @@ we'll link the number to your account
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="VmP-Uo-vfG"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="VmP-Uo-vfG" firstAttribute="bottom" secondItem="jou-0N-CNQ" secondAttribute="bottom" id="WYS-Kq-4cn"/>
@@ -1226,7 +1267,6 @@ we'll link the number to your account
                             <constraint firstItem="jou-0N-CNQ" firstAttribute="top" secondItem="VmP-Uo-vfG" secondAttribute="top" id="od6-Tu-Xre"/>
                             <constraint firstItem="jou-0N-CNQ" firstAttribute="leading" secondItem="VmP-Uo-vfG" secondAttribute="leading" id="t0I-mI-lhH"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="VmP-Uo-vfG"/>
                     </view>
                     <navigationItem key="navigationItem" id="1Zl-mp-xaw"/>
                     <connections>
@@ -1247,26 +1287,26 @@ we'll link the number to your account
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b4g-sv-5rE">
-                                <rect key="frame" x="16" y="66" width="343" height="31.5"/>
+                                <rect key="frame" x="16" y="10" width="343" height="31.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="26"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XrQ-Pz-x9S">
-                                <rect key="frame" x="16" y="97.5" width="343" height="20.5"/>
+                                <rect key="frame" x="16" y="41.5" width="343" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5h6-hw-WqY">
-                                <rect key="frame" x="16" y="118" width="343" height="18"/>
+                                <rect key="frame" x="16" y="62" width="343" height="18"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="qgA-WM-X4z">
-                                <rect key="frame" x="5" y="233.5" width="365" height="393.5"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <rect key="frame" x="5" y="177.5" width="365" height="449.5"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <inset key="scrollIndicatorInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="3t4-xk-hA4">
                                     <size key="itemSize" width="70" height="70"/>
@@ -1291,9 +1331,9 @@ we'll link the number to your account
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DwZ-0u-2QZ">
-                                                    <rect key="frame" x="5" y="0.0" width="20" height="13.5"/>
+                                                    <rect key="frame" x="5" y="0.0" width="40" height="13.5"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="width" constant="20" id="uyl-ta-CNX"/>
+                                                        <constraint firstAttribute="width" constant="40" id="uyl-ta-CNX"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                                     <nil key="textColor"/>
@@ -1334,7 +1374,7 @@ we'll link the number to your account
                                 </collectionReusableView>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aEB-it-J0H">
-                                <rect key="frame" x="152.5" y="151" width="70" height="70"/>
+                                <rect key="frame" x="152.5" y="95" width="70" height="70"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="70" id="TKo-Y7-lt7"/>
                                     <constraint firstAttribute="width" constant="70" id="afx-by-V4c"/>
@@ -1345,7 +1385,7 @@ we'll link the number to your account
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Edit Your Availability" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F6Y-vi-QNT">
-                                <rect key="frame" x="147.5" y="216" width="80" height="24"/>
+                                <rect key="frame" x="147.5" y="160" width="80" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="80" id="2kZ-5H-la6"/>
                                 </constraints>
@@ -1354,7 +1394,7 @@ we'll link the number to your account
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Event Chat" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iWi-L1-3OC">
-                                <rect key="frame" x="27.5" y="216" width="80" height="12"/>
+                                <rect key="frame" x="27.5" y="160" width="80" height="12"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="80" id="2nG-cz-mkU"/>
                                 </constraints>
@@ -1363,7 +1403,7 @@ we'll link the number to your account
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rsL-QB-uGI">
-                                <rect key="frame" x="32.5" y="151" width="70" height="70"/>
+                                <rect key="frame" x="32.5" y="95" width="70" height="70"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="70" id="B8p-EN-p5h"/>
                                     <constraint firstAttribute="width" constant="70" id="NEC-ga-Urr"/>
@@ -1374,7 +1414,7 @@ we'll link the number to your account
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aQ1-ke-3Nj">
-                                <rect key="frame" x="272.5" y="151" width="70" height="70"/>
+                                <rect key="frame" x="272.5" y="95" width="70" height="70"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="70" id="NNc-Zs-LnA"/>
                                     <constraint firstAttribute="height" constant="70" id="zFx-cO-SNP"/>
@@ -1385,7 +1425,7 @@ we'll link the number to your account
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Invite non-users" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="90o-5b-36b">
-                                <rect key="frame" x="267.5" y="216" width="80" height="12"/>
+                                <rect key="frame" x="267.5" y="160" width="80" height="12"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="80" id="yCu-Jc-0GC"/>
                                 </constraints>
@@ -1394,34 +1434,26 @@ we'll link the number to your account
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icons8-like-message-200" translatesAutoresizingMaskIntoConstraints="NO" id="KXb-pZ-3jH">
-                                <rect key="frame" x="72" y="154" width="33" height="32"/>
+                                <rect key="frame" x="72" y="98" width="33" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="33" id="5Sr-Ru-Bvp"/>
                                     <constraint firstAttribute="height" constant="32" id="mDd-Wj-dvB"/>
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TaC-hW-tBT">
-                                <rect key="frame" x="320" y="66" width="45" height="45"/>
+                                <rect key="frame" x="320" y="10" width="45" height="45"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="45" id="0Qg-0Y-m4h"/>
                                     <constraint firstAttribute="height" constant="45" id="hHO-38-8xu"/>
                                 </constraints>
-                                <state key="normal" title="Button" image="Refresh-100"/>
+                                <state key="normal" title="Button" image="threeDots"/>
                                 <connections>
                                     <action selector="btnAutoResponPressed:" destination="rcN-zK-8lx" eventType="touchUpInside" id="lbm-QH-Kjz"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Auto Respond" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kWV-6m-4S8">
-                                <rect key="frame" x="310" y="111" width="65" height="8.5"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="65" id="Gi6-RS-CvS"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="7"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="Xgg-2s-PMT"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="aEB-it-J0H" firstAttribute="top" secondItem="5h6-hw-WqY" secondAttribute="bottom" constant="15" id="4FF-A6-yjM"/>
                             <constraint firstItem="aQ1-ke-3Nj" firstAttribute="leading" secondItem="aEB-it-J0H" secondAttribute="trailing" constant="50" id="6Q0-Jn-PQC"/>
@@ -1432,7 +1464,6 @@ we'll link the number to your account
                             <constraint firstItem="aEB-it-J0H" firstAttribute="leading" secondItem="KXb-pZ-3jH" secondAttribute="trailing" constant="47.5" id="GKT-ZQ-R2s"/>
                             <constraint firstItem="Xgg-2s-PMT" firstAttribute="trailing" secondItem="b4g-sv-5rE" secondAttribute="trailing" constant="16" id="KNs-gQ-BPm"/>
                             <constraint firstItem="qgA-WM-X4z" firstAttribute="leading" secondItem="Xgg-2s-PMT" secondAttribute="leading" constant="5" id="Mgx-h4-Kua"/>
-                            <constraint firstItem="kWV-6m-4S8" firstAttribute="top" secondItem="TaC-hW-tBT" secondAttribute="bottom" id="NpX-gu-i5Z"/>
                             <constraint firstItem="aQ1-ke-3Nj" firstAttribute="top" secondItem="5h6-hw-WqY" secondAttribute="bottom" constant="15" id="OwR-xH-AAp"/>
                             <constraint firstItem="5h6-hw-WqY" firstAttribute="top" secondItem="XrQ-Pz-x9S" secondAttribute="bottom" id="T25-g1-zLm"/>
                             <constraint firstItem="F6Y-vi-QNT" firstAttribute="centerX" secondItem="QFU-2i-6vK" secondAttribute="centerX" id="UV6-VV-f3r"/>
@@ -1452,10 +1483,8 @@ we'll link the number to your account
                             <constraint firstItem="XrQ-Pz-x9S" firstAttribute="leading" secondItem="Xgg-2s-PMT" secondAttribute="leading" constant="16" id="twa-rn-fso"/>
                             <constraint firstItem="iWi-L1-3OC" firstAttribute="top" secondItem="rsL-QB-uGI" secondAttribute="bottom" constant="-5" id="vcK-Pd-Gpz"/>
                             <constraint firstItem="F6Y-vi-QNT" firstAttribute="leading" secondItem="iWi-L1-3OC" secondAttribute="trailing" constant="40" id="ysj-lP-XuG"/>
-                            <constraint firstItem="Xgg-2s-PMT" firstAttribute="trailing" secondItem="kWV-6m-4S8" secondAttribute="trailing" id="znw-7b-oWo"/>
                             <constraint firstItem="Xgg-2s-PMT" firstAttribute="trailing" secondItem="5h6-hw-WqY" secondAttribute="trailing" constant="16" id="zyG-ng-8OA"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="Xgg-2s-PMT"/>
                     </view>
                     <navigationItem key="navigationItem" id="Yr4-P3-wpg"/>
                     <connections>
@@ -1473,7 +1502,7 @@ we'll link the number to your account
                         <segue destination="lrA-Cx-wiI" kind="show" identifier="splitEditButtonSegue" id="3Ns-ZF-dR6"/>
                         <segue destination="THq-A3-wmr" kind="show" identifier="splitViewEditAvailability" id="EEU-Sv-xUt"/>
                         <segue destination="RHc-HB-ua9" kind="show" identifier="issueWithArraySegue" id="qo0-DN-67N"/>
-                        <segue destination="fZO-Ui-e5p" kind="show" identifier="chatSegue" id="Yv7-9d-Gt7"/>
+                        <segue destination="hH8-xI-m7v" kind="show" identifier="chatSegue" id="Yv7-9d-Gt7"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="h21-By-py3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1488,8 +1517,8 @@ we'll link the number to your account
                         <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Om7-NS-6XY">
-                                <rect key="frame" x="247" y="30" width="68" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Om7-NS-6XY">
+                                <rect key="frame" x="248" y="30" width="67" height="30"/>
                                 <state key="normal" title="code Test"/>
                                 <connections>
                                     <action selector="testTheCode:" destination="RHc-HB-ua9" eventType="touchUpInside" id="Yws-CG-Gkm"/>
@@ -1532,9 +1561,18 @@ we'll link the number to your account
                                                         <constraint firstAttribute="width" constant="45" id="JAD-yp-nNI"/>
                                                     </constraints>
                                                 </imageView>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icons8-notification-200" translatesAutoresizingMaskIntoConstraints="NO" id="Eci-Oq-GfV">
+                                                    <rect key="frame" x="5" y="5" width="45" height="45"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="45" id="cbC-WV-o8S"/>
+                                                        <constraint firstAttribute="width" constant="45" id="l1V-fI-aQR"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                         </view>
                                         <constraints>
+                                            <constraint firstItem="Eci-Oq-GfV" firstAttribute="leading" secondItem="cWV-vZ-KYk" secondAttribute="leading" constant="5" id="1DV-ES-cHr"/>
+                                            <constraint firstItem="Eci-Oq-GfV" firstAttribute="top" secondItem="cWV-vZ-KYk" secondAttribute="top" constant="5" id="1Je-5p-nZe"/>
                                             <constraint firstItem="LNy-cm-yc9" firstAttribute="leading" secondItem="cWV-vZ-KYk" secondAttribute="leading" constant="5" id="41O-ry-x21"/>
                                             <constraint firstAttribute="trailing" secondItem="LNy-cm-yc9" secondAttribute="trailing" constant="5" id="52S-zh-cIp"/>
                                             <constraint firstAttribute="trailing" secondItem="foh-E2-ntP" secondAttribute="trailing" constant="7" id="Eaq-jb-VCT"/>
@@ -1546,6 +1584,7 @@ we'll link the number to your account
                                             <constraint firstItem="foh-E2-ntP" firstAttribute="top" secondItem="cWV-vZ-KYk" secondAttribute="top" constant="5" id="zMy-5f-uBv"/>
                                         </constraints>
                                         <connections>
+                                            <outlet property="imgNewEvent" destination="Eci-Oq-GfV" id="m7q-9b-x1B"/>
                                             <outlet property="imgNewMessage" destination="foh-E2-ntP" id="P2i-wR-Wt8"/>
                                             <outlet property="menuImage" destination="LNy-cm-yc9" id="Nyg-rC-c9Q"/>
                                             <outlet property="menuLabel" destination="sOu-i1-po3" id="WBS-j3-vXM"/>
@@ -1556,18 +1595,18 @@ we'll link the number to your account
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Menu" lineBreakMode="wordWrap" numberOfLines="10" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iUH-5j-0SS">
                                 <rect key="frame" x="16" y="20" width="343" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" systemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Today's events" lineBreakMode="wordWrap" numberOfLines="10" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xzt-eA-TXs">
                                 <rect key="frame" x="16" y="468" width="343" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" systemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="80" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Kgv-D4-HIy">
                                 <rect key="frame" x="16" y="496.5" width="343" height="145.5"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="daysEventsCell" rowHeight="80" id="Jra-QH-GlM" customClass="TableViewCellHomePage" customModule="Planr" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="343" height="80"/>
@@ -1613,6 +1652,7 @@ we'll link the number to your account
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="6UY-3L-4Bt"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="Om7-NS-6XY" firstAttribute="top" secondItem="6UY-3L-4Bt" secondAttribute="top" constant="30" id="7aq-Fg-mAq"/>
@@ -1631,7 +1671,6 @@ we'll link the number to your account
                             <constraint firstItem="6UY-3L-4Bt" firstAttribute="trailing" secondItem="4qZ-sF-NX5" secondAttribute="trailing" constant="16" id="tvw-oG-ANb"/>
                             <constraint firstItem="6UY-3L-4Bt" firstAttribute="trailing" secondItem="Kgv-D4-HIy" secondAttribute="trailing" constant="16" id="vP4-LJ-0wv"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="6UY-3L-4Bt"/>
                     </view>
                     <navigationItem key="navigationItem" id="ZRd-2r-1YP">
                         <barButtonItem key="rightBarButtonItem" title="Item" image="clear-settings-icon-44" id="D57-IX-Xe0">
@@ -1652,7 +1691,7 @@ we'll link the number to your account
                         <segue destination="E4s-7M-IVf" kind="show" identifier="userNotInDatabase" id="0B5-Yr-1G9"/>
                         <segue destination="XU5-sr-w4g" kind="show" identifier="planrSegue" id="Keu-mT-Lxc"/>
                         <segue destination="rcN-zK-8lx" kind="show" identifier="todaysEventsSegue" id="PIS-fn-f47"/>
-                        <segue destination="fZO-Ui-e5p" kind="show" identifier="newMessageNotification" id="2wf-ve-N4b"/>
+                        <segue destination="hH8-xI-m7v" kind="show" identifier="newMessageNotification" id="2wf-ve-N4b"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sS8-JE-VPc" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1672,7 +1711,7 @@ we'll link the number to your account
                                 <subviews>
                                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="S8e-Rj-3BB">
                                         <rect key="frame" x="16" y="35" width="343" height="250"/>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="250" id="Muy-1z-Cwb"/>
                                         </constraints>
@@ -1720,13 +1759,13 @@ we'll link the number to your account
                                     </collectionView>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DRH-mh-e4p">
                                         <rect key="frame" x="16" y="0.0" width="343" height="35"/>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="35" id="80x-Fw-l0e"/>
                                         </constraints>
                                     </view>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="DRH-mh-e4p" firstAttribute="leading" secondItem="Q5N-n7-Djy" secondAttribute="leading" constant="16" id="2D8-dg-AWL"/>
                                     <constraint firstItem="S8e-Rj-3BB" firstAttribute="top" secondItem="DRH-mh-e4p" secondAttribute="bottom" id="4bf-ge-bcJ"/>
@@ -1743,7 +1782,7 @@ we'll link the number to your account
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="1Tl-3B-JdR">
                                         <rect key="frame" x="0.0" y="10" width="375" height="357"/>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="planrTableViewCell" rowHeight="179" id="zBT-K7-kHO" customClass="PlanrTableViewCell" customModule="Planr" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="28" width="375" height="179"/>
@@ -1763,7 +1802,7 @@ we'll link the number to your account
                                                         </label>
                                                         <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="bCf-Aa-iqQ">
                                                             <rect key="frame" x="20" y="38" width="335" height="141"/>
-                                                            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                             <prototypes>
                                                                 <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="planrEventsCell" id="oEt-Ay-SaP" customClass="PlanEventsTableViewCell" customModule="Planr" customModuleProvider="target">
                                                                     <rect key="frame" x="0.0" y="28" width="335" height="43"/>
@@ -1773,7 +1812,7 @@ we'll link the number to your account
                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                         <subviews>
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bzF-bf-AKc">
-                                                                                <rect key="frame" x="15" y="11" width="100" height="21"/>
+                                                                                <rect key="frame" x="16" y="11" width="100" height="21"/>
                                                                                 <constraints>
                                                                                     <constraint firstAttribute="width" constant="100" id="EUx-i9-bPp"/>
                                                                                 </constraints>
@@ -1782,7 +1821,7 @@ we'll link the number to your account
                                                                                 <nil key="highlightedColor"/>
                                                                             </label>
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lST-WM-vdh">
-                                                                                <rect key="frame" x="123" y="11" width="197" height="21"/>
+                                                                                <rect key="frame" x="124" y="11" width="195" height="21"/>
                                                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                                                 <nil key="textColor"/>
                                                                                 <nil key="highlightedColor"/>
@@ -1824,7 +1863,7 @@ we'll link the number to your account
                                         </prototypes>
                                     </tableView>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="1Tl-3B-JdR" secondAttribute="trailing" id="ONg-MI-Vx1"/>
                                     <constraint firstItem="1Tl-3B-JdR" firstAttribute="top" secondItem="Hgw-pk-M5v" secondAttribute="top" constant="10" id="ObR-HH-R0v"/>
@@ -1833,7 +1872,8 @@ we'll link the number to your account
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="OA5-ga-iOr"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Q5N-n7-Djy" firstAttribute="top" secondItem="OA5-ga-iOr" secondAttribute="top" id="3Xn-fA-YnG"/>
                             <constraint firstAttribute="trailing" secondItem="Hgw-pk-M5v" secondAttribute="trailing" id="C7v-Ze-kq7"/>
@@ -1843,7 +1883,6 @@ we'll link the number to your account
                             <constraint firstItem="Q5N-n7-Djy" firstAttribute="leading" secondItem="ibh-gZ-t5U" secondAttribute="leading" id="uVW-Vz-Ut0"/>
                             <constraint firstItem="Hgw-pk-M5v" firstAttribute="top" secondItem="Q5N-n7-Djy" secondAttribute="bottom" constant="-20" id="zht-lP-C4m"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="OA5-ga-iOr"/>
                     </view>
                     <navigationItem key="navigationItem" id="q70-V3-w1s"/>
                     <connections>
@@ -2085,6 +2124,7 @@ we'll link the number to your account
                                 </constraints>
                             </scrollView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="9Wn-uS-3zI"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="9Wn-uS-3zI" firstAttribute="trailing" secondItem="gbL-ih-Nxj" secondAttribute="trailing" id="BA6-Xx-EN0"/>
@@ -2093,7 +2133,6 @@ we'll link the number to your account
                             <constraint firstItem="gbL-ih-Nxj" firstAttribute="leading" secondItem="9Wn-uS-3zI" secondAttribute="leading" id="foP-Hm-CuR"/>
                             <constraint firstItem="9Wn-uS-3zI" firstAttribute="top" secondItem="gbL-ih-Nxj" secondAttribute="top" constant="20" id="gze-wP-oGd"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="9Wn-uS-3zI"/>
                     </view>
                     <navigationItem key="navigationItem" id="UrS-jZ-Jf1"/>
                     <size key="freeformSize" width="375" height="1000"/>
@@ -2433,6 +2472,7 @@ we'll link the number to your account
                                 </constraints>
                             </scrollView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="2hp-c7-pIN"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="Nyb-KT-H6i" firstAttribute="width" secondItem="Weh-qQ-Kiu" secondAttribute="width" id="F8v-M2-aH0"/>
@@ -2441,7 +2481,6 @@ we'll link the number to your account
                             <constraint firstItem="2hp-c7-pIN" firstAttribute="trailing" secondItem="vgW-PK-Bge" secondAttribute="trailing" id="vZh-mu-z0O"/>
                             <constraint firstItem="2hp-c7-pIN" firstAttribute="top" secondItem="vgW-PK-Bge" secondAttribute="top" constant="20" id="wUA-D6-Eno"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="2hp-c7-pIN"/>
                     </view>
                     <navigationItem key="navigationItem" id="xgQ-zD-Rrw"/>
                     <value key="contentSizeForViewInPopover" type="size" width="375" height="900"/>
@@ -2486,14 +2525,14 @@ we'll link the number to your account
                                 </connections>
                             </mapView>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="9HJ-zy-cOY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="9HJ-zy-cOY" firstAttribute="trailing" secondItem="xgt-mB-6pL" secondAttribute="trailing" id="4MU-2V-wuD"/>
                             <constraint firstItem="9HJ-zy-cOY" firstAttribute="bottom" secondItem="xgt-mB-6pL" secondAttribute="bottom" id="7pg-aC-fLI"/>
                             <constraint firstItem="xgt-mB-6pL" firstAttribute="leading" secondItem="9HJ-zy-cOY" secondAttribute="leading" id="TDy-8E-AaQ"/>
                             <constraint firstItem="xgt-mB-6pL" firstAttribute="top" secondItem="9HJ-zy-cOY" secondAttribute="top" id="cXV-2v-BZF"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="9HJ-zy-cOY"/>
                     </view>
                     <navigationItem key="navigationItem" id="fKX-Nf-yof"/>
                     <connections>
@@ -2511,7 +2550,7 @@ we'll link the number to your account
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="8XE-ZJ-d4t">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" textLabel="AY7-SM-oMz" detailTextLabel="4Gv-a3-cVq" style="IBUITableViewCellStyleSubtitle" id="M2Q-xW-cej">
                                 <rect key="frame" x="0.0" y="28" width="375" height="55.5"/>
@@ -2521,7 +2560,7 @@ we'll link the number to your account
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="AY7-SM-oMz">
-                                            <rect key="frame" x="16" y="10" width="33.5" height="20.5"/>
+                                            <rect key="frame" x="16" y="10" width="33" height="20.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -2547,7 +2586,7 @@ we'll link the number to your account
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="N0C-a5-fyK" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3612" y="2790"/>
+            <point key="canvasLocation" x="4551.1999999999998" y="2789.9550224887557"/>
         </scene>
         <!--Event Summary View Controller-->
         <scene sceneID="PEV-wu-iRl">
@@ -2652,7 +2691,7 @@ we'll link the number to your account
                             </label>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Zjg-sB-sEh">
                                 <rect key="frame" x="16" y="439" width="343" height="128"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="inviteesCell" rowHeight="70" id="vek-SH-reH" customClass="SummaryCellTableViewCell" customModule="Planr" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="343" height="70"/>
@@ -2669,7 +2708,7 @@ we'll link the number to your account
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GdF-Wj-vwF">
-                                                    <rect key="frame" x="55" y="16" width="273" height="25"/>
+                                                    <rect key="frame" x="55" y="16" width="272" height="25"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="25" id="hWO-US-x9Z"/>
                                                     </constraints>
@@ -2758,7 +2797,8 @@ we'll link the number to your account
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="oca-tx-HUB"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Zjg-sB-sEh" firstAttribute="top" secondItem="ie0-ds-qo1" secondAttribute="bottom" id="0XF-HK-DRn"/>
                             <constraint firstItem="fcG-iT-Tev" firstAttribute="leading" secondItem="SfL-ht-D7X" secondAttribute="trailing" id="0ct-ru-YOz"/>
@@ -2822,7 +2862,6 @@ we'll link the number to your account
                             <constraint firstItem="Npu-dq-D9y" firstAttribute="leading" secondItem="235-GN-QGa" secondAttribute="trailing" id="x0M-zE-9Gh"/>
                             <constraint firstItem="WrT-w7-p1f" firstAttribute="top" secondItem="osX-hg-8ge" secondAttribute="bottom" id="zwc-Sr-F0m"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="oca-tx-HUB"/>
                     </view>
                     <navigationItem key="navigationItem" id="Ifo-Ry-TBu"/>
                     <connections>
@@ -2860,20 +2899,20 @@ we'll link the number to your account
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Person" translatesAutoresizingMaskIntoConstraints="NO" id="G2B-zf-ukR">
-                                                    <rect key="frame" x="15" y="11" width="50" height="50"/>
+                                                    <rect key="frame" x="16" y="11" width="50" height="50"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="50" id="FQx-VH-j2F"/>
                                                         <constraint firstAttribute="height" constant="50" id="aLd-Y0-2xb"/>
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6nN-2J-uSM">
-                                                    <rect key="frame" x="85" y="26" width="220" height="21"/>
+                                                    <rect key="frame" x="86" y="26" width="218" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NFf-yR-Jbz">
-                                                    <rect key="frame" x="310" y="6" width="50" height="50"/>
+                                                    <rect key="frame" x="309" y="6" width="50" height="50"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="50" id="4c1-2m-jXq"/>
                                                         <constraint firstAttribute="height" constant="50" id="QOj-on-ta5"/>
@@ -2915,6 +2954,7 @@ we'll link the number to your account
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="IBH-ld-rNf"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="szI-Cb-Tid" firstAttribute="top" secondItem="f1C-Y9-ifw" secondAttribute="bottom" constant="43" id="7M2-W6-wSB"/>
@@ -2924,7 +2964,6 @@ we'll link the number to your account
                             <constraint firstItem="f1C-Y9-ifw" firstAttribute="leading" secondItem="p4L-zn-zD4" secondAttribute="leading" id="qbp-j4-IGz"/>
                             <constraint firstItem="szI-Cb-Tid" firstAttribute="centerX" secondItem="p4L-zn-zD4" secondAttribute="centerX" id="tMX-Kw-zlg"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="IBH-ld-rNf"/>
                     </view>
                     <navigationItem key="navigationItem" id="hVF-mL-hmQ"/>
                     <connections>
@@ -3147,7 +3186,7 @@ we'll link the number to your account
                                 </constraints>
                                 <state key="normal" title="Button" image="icons8-pen-100"/>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RKc-WY-STN">
+                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RKc-WY-STN">
                                 <rect key="frame" x="77.5" y="503" width="220" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="220" id="2O2-x2-p1v"/>
@@ -3159,7 +3198,7 @@ we'll link the number to your account
                                     <action selector="automaticAvailabilityButtonPressed:" destination="ivj-T8-kbe" eventType="touchUpInside" id="Gbx-3Z-TcI"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iai-cM-GIa">
+                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iai-cM-GIa">
                                 <rect key="frame" x="77.5" y="548" width="220" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="220" id="AtL-aH-GRF"/>
@@ -3168,7 +3207,7 @@ we'll link the number to your account
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <state key="normal" title="Manually add/edit your availability"/>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tao-CK-OMO">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tao-CK-OMO">
                                 <rect key="frame" x="229" y="32" width="130" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="fWM-Sh-q3R"/>
@@ -3179,6 +3218,7 @@ we'll link the number to your account
                                 </state>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="aHM-QS-e3f"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="z3X-FT-7IS" firstAttribute="leading" secondItem="aHM-QS-e3f" secondAttribute="leading" constant="16" id="0hx-jC-9Td"/>
@@ -3226,7 +3266,6 @@ we'll link the number to your account
                             <constraint firstItem="owf-SX-UiY" firstAttribute="leading" secondItem="aHM-QS-e3f" secondAttribute="leading" constant="16" id="uxK-zR-9KZ"/>
                             <constraint firstItem="D88-5F-hEc" firstAttribute="top" secondItem="z3X-FT-7IS" secondAttribute="bottom" id="w6q-pk-lPm"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="aHM-QS-e3f"/>
                     </view>
                     <navigationItem key="navigationItem" id="ruR-Jt-IQM"/>
                     <connections>
@@ -3257,8 +3296,8 @@ we'll link the number to your account
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView autoresizesSubviews="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Agl-xo-aZx">
-                                <rect key="frame" x="50" y="156" width="275" height="441"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <rect key="frame" x="50" y="100" width="275" height="497"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="0rZ-g8-jPS">
                                     <size key="itemSize" width="50" height="50"/>
                                     <size key="headerReferenceSize" width="50" height="50"/>
@@ -3309,7 +3348,7 @@ we'll link the number to your account
                                 </collectionReusableView>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kLO-RB-Peo">
-                                <rect key="frame" x="50" y="106" width="50" height="50"/>
+                                <rect key="frame" x="50" y="50" width="50" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="pRH-Gu-gbN"/>
                                     <constraint firstAttribute="width" constant="50" id="rYP-aP-oSL"/>
@@ -3320,7 +3359,7 @@ we'll link the number to your account
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mfx-lC-YIS">
-                                <rect key="frame" x="275" y="106" width="50" height="50"/>
+                                <rect key="frame" x="275" y="50" width="50" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="CKJ-zx-XiA"/>
                                     <constraint firstAttribute="width" constant="50" id="TXU-kg-PVG"/>
@@ -3331,7 +3370,7 @@ we'll link the number to your account
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iGY-ml-HoQ">
-                                <rect key="frame" x="100" y="131" width="175" height="30"/>
+                                <rect key="frame" x="100" y="75" width="175" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="Baf-Qg-5Ia"/>
                                 </constraints>
@@ -3340,7 +3379,8 @@ we'll link the number to your account
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="nku-zn-Xik"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="nku-zn-Xik" firstAttribute="trailing" secondItem="Mfx-lC-YIS" secondAttribute="trailing" constant="50" id="3fL-ci-cgZ"/>
                             <constraint firstItem="kLO-RB-Peo" firstAttribute="leading" secondItem="nku-zn-Xik" secondAttribute="leading" constant="50" id="6bw-P7-ykb"/>
@@ -3355,7 +3395,6 @@ we'll link the number to your account
                             <constraint firstItem="Agl-xo-aZx" firstAttribute="centerX" secondItem="JFs-Rd-HnH" secondAttribute="centerX" id="oSf-9y-IFU"/>
                             <constraint firstItem="Agl-xo-aZx" firstAttribute="top" secondItem="nku-zn-Xik" secondAttribute="top" constant="100" id="sTD-wE-FJp"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="nku-zn-Xik"/>
                     </view>
                     <navigationItem key="navigationItem" id="wfW-fh-aMd"/>
                     <connections>
@@ -3376,7 +3415,7 @@ we'll link the number to your account
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="7dS-OK-dTo">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="gtz-I9-VBK">
                             <size key="itemSize" width="50" height="50"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -3402,7 +3441,7 @@ we'll link the number to your account
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XKd-CZ-kjp" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="9580" y="-747"/>
+            <point key="canvasLocation" x="10519.200000000001" y="-747.07646176911555"/>
         </scene>
         <!--Event Edit View Controller-->
         <scene sceneID="5iS-63-gBK">
@@ -3413,7 +3452,7 @@ we'll link the number to your account
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UKt-oM-p9Q">
-                                <rect key="frame" x="0.0" y="56" width="375" height="1200"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="1200"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0kK-2Z-Bhk">
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="1200"/>
@@ -3564,7 +3603,7 @@ we'll link the number to your account
                                                     <action selector="addUsersTapped:" destination="lrA-Cx-wiI" eventType="touchUpInside" id="E7i-MK-yia"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iWg-eR-uHj">
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iWg-eR-uHj">
                                                 <rect key="frame" x="0.0" y="830" width="375" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="Co0-rm-QT5"/>
@@ -3799,6 +3838,7 @@ we'll link the number to your account
                                 </constraints>
                             </scrollView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="Ybw-tp-dAb"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="UKt-oM-p9Q" secondAttribute="trailing" id="0zs-ta-4ss"/>
@@ -3809,7 +3849,6 @@ we'll link the number to your account
                             <constraint firstItem="UKt-oM-p9Q" firstAttribute="leading" secondItem="Ybw-tp-dAb" secondAttribute="leading" id="i5j-qy-pRe"/>
                             <constraint firstItem="UKt-oM-p9Q" firstAttribute="top" secondItem="Ybw-tp-dAb" secondAttribute="top" id="x83-E2-3Ud"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="Ybw-tp-dAb"/>
                     </view>
                     <navigationItem key="navigationItem" id="43Z-6C-cLV"/>
                     <size key="freeformSize" width="375" height="1300"/>
@@ -3845,7 +3884,7 @@ we'll link the number to your account
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Top-m2-3jx">
-                                <rect key="frame" x="0.0" y="56" width="375" height="591"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="selectContacts" id="ChP-2q-X4M">
@@ -3859,6 +3898,7 @@ we'll link the number to your account
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="6Dz-f9-Tnf"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="6Dz-f9-Tnf" firstAttribute="trailing" secondItem="Top-m2-3jx" secondAttribute="trailing" id="63z-F0-bFU"/>
@@ -3866,7 +3906,6 @@ we'll link the number to your account
                             <constraint firstItem="6Dz-f9-Tnf" firstAttribute="bottom" secondItem="Top-m2-3jx" secondAttribute="bottom" id="PgM-jG-zG0"/>
                             <constraint firstItem="Top-m2-3jx" firstAttribute="leading" secondItem="6Dz-f9-Tnf" secondAttribute="leading" id="soL-vz-TUK"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="6Dz-f9-Tnf"/>
                     </view>
                     <navigationItem key="navigationItem" id="jMY-82-jrd"/>
                     <connections>
@@ -3892,7 +3931,7 @@ we'll link the number to your account
                                 <view key="tableFooterView" contentMode="scaleToFill" id="wGG-6e-sNt">
                                     <rect key="frame" x="0.0" y="99.5" width="275" height="44"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 </view>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="chooseDateCell" id="9cH-K8-MLF">
@@ -3923,13 +3962,14 @@ we'll link the number to your account
                                     <constraint firstAttribute="width" constant="50" id="vS9-VJ-RDI"/>
                                 </constraints>
                                 <state key="normal" title="Select this Date" image="tickBox">
-                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <color key="titleColor" systemColor="darkTextColor"/>
                                 </state>
                                 <connections>
                                     <action selector="btnSelectDateSelected:" destination="7aN-su-dWd" eventType="touchUpInside" id="Q8w-u8-S7Z"/>
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="i36-w4-7KF"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="1sk-8t-7uz" firstAttribute="top" secondItem="i36-w4-7KF" secondAttribute="top" constant="100" id="GXV-Po-sgN"/>
@@ -3941,7 +3981,6 @@ we'll link the number to your account
                             <constraint firstItem="1sk-8t-7uz" firstAttribute="top" secondItem="SOS-vo-mr3" secondAttribute="bottom" id="xYe-DO-Snh"/>
                             <constraint firstItem="1sk-8t-7uz" firstAttribute="top" secondItem="s81-NT-jhm" secondAttribute="bottom" id="ytF-b2-xKI"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="i36-w4-7KF"/>
                     </view>
                     <navigationItem key="navigationItem" id="Cb6-QW-lEv"/>
                     <connections>
@@ -3978,6 +4017,7 @@ we'll link the number to your account
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="Lfr-Hb-bG1"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="Lfr-Hb-bG1" firstAttribute="trailing" secondItem="8UC-vA-Gh0" secondAttribute="trailing" id="Chg-FC-jV4"/>
@@ -3985,7 +4025,6 @@ we'll link the number to your account
                             <constraint firstItem="Lfr-Hb-bG1" firstAttribute="bottom" secondItem="8UC-vA-Gh0" secondAttribute="bottom" id="ssI-Zk-h7u"/>
                             <constraint firstItem="8UC-vA-Gh0" firstAttribute="leading" secondItem="Lfr-Hb-bG1" secondAttribute="leading" id="yNf-xZ-v93"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="Lfr-Hb-bG1"/>
                     </view>
                     <navigationItem key="navigationItem" id="96o-zn-0Qi"/>
                     <connections>
@@ -4015,15 +4054,52 @@ we'll link the number to your account
             </objects>
             <point key="canvasLocation" x="2846" y="2111"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="es3-Fv-1zb">
+            <objects>
+                <navigationController storyboardIdentifier="locationSearchTableNavigation" automaticallyAdjustsScrollViewInsets="NO" id="Tfn-hW-Xco" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="TZn-DH-UDT">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="55T-fx-SuO" kind="relationship" relationship="rootViewController" id="tDB-NG-WpG"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="y0l-bs-8Ve" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3612" y="2789.9550224887557"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="YAL-A8-6d1">
+            <objects>
+                <navigationController storyboardIdentifier="chatNavigation" automaticallyAdjustsScrollViewInsets="NO" id="hH8-xI-m7v" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="nvl-lE-mOv"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="xUj-NF-VXo">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="56"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="fZO-Ui-e5p" kind="relationship" relationship="rootViewController" id="O2w-os-Jyi"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="n4k-oy-Pjz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="9580" y="-747.07646176911555"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="3Ns-ZF-dR6"/>
         <segue reference="Yv7-9d-Gt7"/>
-        <segue reference="Pou-PR-wHf"/>
-        <segue reference="QdI-tw-fcm"/>
+        <segue reference="3Ns-ZF-dR6"/>
+        <segue reference="j5g-mX-T67"/>
+        <segue reference="6XA-gQ-hLu"/>
         <segue reference="oDS-dE-nIo"/>
-        <segue reference="6k5-52-kLk"/>
-        <segue reference="D0Y-YP-VHe"/>
+        <segue reference="PIS-fn-f47"/>
+        <segue reference="0B5-Yr-1G9"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="+" width="80" height="80"/>
@@ -4039,8 +4115,25 @@ we'll link the number to your account
         <image name="icons8-close-window-200" width="200" height="200"/>
         <image name="icons8-double-tick-200" width="200" height="200"/>
         <image name="icons8-like-message-200" width="200" height="200"/>
+        <image name="icons8-notification-200" width="200" height="200"/>
         <image name="icons8-pen-100" width="100" height="100"/>
         <image name="icons8-save-close-200" width="200" height="200"/>
+        <image name="threeDots" width="200" height="200"/>
         <image name="tickBox" width="500" height="500"/>
+        <systemColor name="darkTextColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="darkTextColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="darkTextColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>
