@@ -43,4 +43,8 @@ struct firebaseEvents{
     static var remoteNotificationRecieved = "remoteNotificationRecieved"
     
     
+//    issue tracking
+    static var errorUpdatingPhoneNumber = "errorUpdatingPhoneNumber"
+    
+    
 }

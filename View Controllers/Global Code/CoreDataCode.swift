@@ -1825,14 +1825,14 @@ func removeTheAvailabilityNotifications(){
             
             }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
         
-        let alertPayload = AlertPayload(title: "Something Went Wrong!", titleColor: UIColor.red, message: "Oops, something went wrong, please try again later, we are working to fix it!", messageColor: MyVariables.colourPlanrGreen, buttons: [button1], backgroundColor: UIColor.clear)
+        let alertPayload = AlertPayload(title: "Something Went Wrong!", titleColor: UIColor.red, message: "Oops, something went wrong, please try again later, we are working to fix it!", messageColor: MyVariables.colourPlanrGreen, buttons: [button1], backgroundColor: UIColor.clear, inputTextHidden: true)
         
         if self.presentedViewController == nil {
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
         }
         else {
             self.dismiss(animated: false, completion: nil)
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
         }
         
         

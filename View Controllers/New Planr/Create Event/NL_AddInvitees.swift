@@ -485,9 +485,9 @@ extension NL_AddInvitees: UITableViewDataSource, UITableViewDelegate {
                     print("OK clicked");
                 }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
             
-            let alertPayload = AlertPayload(title: "No Invitees!", titleColor: UIColor.red, message: "Please add invitees to your event", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+            let alertPayload = AlertPayload(title: "No Invitees!", titleColor: UIColor.red, message: "Please add invitees to your event", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
             
-                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
             }
             else{
                 performSegue(withIdentifier: "segueToSummary", sender: self)}

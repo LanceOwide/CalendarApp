@@ -49,9 +49,9 @@ class ActivationExistingUserViewController: UIViewController {
                 }}
             }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
                 
-            let alertPayload = AlertPayload(title: "Login Issue!", titleColor: UIColor.red, message: "We are having issues logging you in. Please ensure, you have entered the correct text code, your phone number is correct and that you have signal, then pease try again. If this continues, please contact issues@planr.me", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+            let alertPayload = AlertPayload(title: "Login Issue!", titleColor: UIColor.red, message: "We are having issues logging you in. Please ensure, you have entered the correct text code, your phone number is correct and that you have signal, then pease try again. If this continues, please contact issues@planr.me", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                 
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
                         
         }
         else{

@@ -1056,14 +1056,14 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                 print("user selected no")
             }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
                         
-            let alertPayload = AlertPayload(title: "Send Reminder!", titleColor: UIColor.red, message: "Would you like to send a reminder to \(userName) to respond?", messageColor: MyVariables.colourPlanrGreen, buttons: [button1,button2], backgroundColor: UIColor.clear)
+            let alertPayload = AlertPayload(title: "Send Reminder!", titleColor: UIColor.red, message: "Would you like to send a reminder to \(userName) to respond?", messageColor: MyVariables.colourPlanrGreen, buttons: [button1,button2], backgroundColor: UIColor.clear, inputTextHidden: true)
             
             if self.presentedViewController == nil {
-                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
             }
             else {
                 self.dismiss(animated: false, completion: nil)
-                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
             }
         }
     

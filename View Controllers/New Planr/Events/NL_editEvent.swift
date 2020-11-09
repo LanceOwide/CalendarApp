@@ -747,9 +747,9 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                           print("OK clicked");
                       }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                   
-                  let alertPayload = AlertPayload(title: "Event Title!", titleColor: UIColor.red, message: "Your event needs a Title, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                  let alertPayload = AlertPayload(title: "Event Title!", titleColor: UIColor.red, message: "Your event needs a Title, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                   
-                      utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+                      utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
               }
   //                2. did the user add a location
               else if self.locationInput.text == ""{
@@ -758,9 +758,9 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                           print("OK clicked");
                       }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                   
-                  let alertPayload = AlertPayload(title: "Event Location!", titleColor: UIColor.red, message: "Your event needs a Location, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                  let alertPayload = AlertPayload(title: "Event Location!", titleColor: UIColor.red, message: "Your event needs a Location, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                   
-                      utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+                      utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
                   
               }
   //            3.1 did the user add an event start time
@@ -769,9 +769,9 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                           print("OK clicked");
                       }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                   
-                  let alertPayload = AlertPayload(title: "Event Start Time!", titleColor: UIColor.red, message: "Your event needs a Start Time, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                  let alertPayload = AlertPayload(title: "Event Start Time!", titleColor: UIColor.red, message: "Your event needs a Start Time, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                   
-                      utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+                      utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
               }
               
   //            3.2 did the user add an event end time
@@ -780,9 +780,9 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                                      print("OK clicked");
                                  }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                              
-                             let alertPayload = AlertPayload(title: "Event End Time!", titleColor: UIColor.red, message: "Your event needs an End Time, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                             let alertPayload = AlertPayload(title: "Event End Time!", titleColor: UIColor.red, message: "Your event needs an End Time, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                              
-                                 utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+                                 utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
               }
   //            3.3 is the start date before the end date
               
@@ -792,9 +792,9 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                           print("OK clicked");
                       }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                   
-                  let alertPayload = AlertPayload(title: "Event Time!", titleColor: UIColor.red, message: "Your event End Time is before the Start Time, please amend.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                  let alertPayload = AlertPayload(title: "Event Time!", titleColor: UIColor.red, message: "Your event End Time is before the Start Time, please amend.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                   
-                      utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+                      utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
               }
   //            4.do the inputs chosen retrun any dates
   //            4.1 run the find dates prior to our check
@@ -803,9 +803,9 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                           print("OK clicked");
                       }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                   
-                  let alertPayload = AlertPayload(title: "No Event Dates!", titleColor: UIColor.red, message: "No dates in search period, ensure there are dates in the period.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                  let alertPayload = AlertPayload(title: "No Event Dates!", titleColor: UIColor.red, message: "No dates in search period, ensure there are dates in the period.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                   
-                      utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+                      utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
               }
               else{
   
@@ -1024,9 +1024,9 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                                                       self.dismiss(animated: true)
                                                   }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                                               
-                      let alertPayload11 = AlertPayload(title: "Event Saved!", titleColor: UIColor.red, message: "Your event has been saved.", messageColor: MyVariables.colourPlanrGreen, buttons: [button11], backgroundColor: UIColor.clear)
+                      let alertPayload11 = AlertPayload(title: "Event Saved!", titleColor: UIColor.red, message: "Your event has been saved.", messageColor: MyVariables.colourPlanrGreen, buttons: [button11], backgroundColor: UIColor.clear, inputTextHidden: true)
                                               
-                                  utils.showAlert(payload: alertPayload11, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+                                  utils.showAlert(payload: alertPayload11, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
                               
                               
                               
@@ -1048,14 +1048,14 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                                               self.dismiss(animated: true)
                                           }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                                       
-                      let alertPayload21 = AlertPayload(title: "Event Saved!", titleColor: UIColor.red, message: "Your event has been saved.", messageColor: MyVariables.colourPlanrGreen, buttons: [button21], backgroundColor: UIColor.clear)
+                      let alertPayload21 = AlertPayload(title: "Event Saved!", titleColor: UIColor.red, message: "Your event has been saved.", messageColor: MyVariables.colourPlanrGreen, buttons: [button21], backgroundColor: UIColor.clear, inputTextHidden: true)
                                       
-                          utils.showAlert(payload: alertPayload21, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+                          utils.showAlert(payload: alertPayload21, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
                           }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
                       
-                      let alertPayload = AlertPayload(title: "Event Timings Chnaged!", titleColor: UIColor.red, message: "Your event time or dates have changed, would you like Planr to refresh your invitee availability?", messageColor: MyVariables.colourPlanrGreen, buttons: [button,button2], backgroundColor: UIColor.clear)
+                      let alertPayload = AlertPayload(title: "Event Timings Chnaged!", titleColor: UIColor.red, message: "Your event time or dates have changed, would you like Planr to refresh your invitee availability?", messageColor: MyVariables.colourPlanrGreen, buttons: [button,button2], backgroundColor: UIColor.clear, inputTextHidden: true)
                       
-                          utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+                          utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
                           
                       }
                       
@@ -1067,9 +1067,9 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                                                               self.dismiss(animated: true)
                                                           }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                                                       
-                              let alertPayload11 = AlertPayload(title: "Event Saved!", titleColor: UIColor.red, message: "Your event has been saved.", messageColor: MyVariables.colourPlanrGreen, buttons: [button11], backgroundColor: UIColor.clear)
+                              let alertPayload11 = AlertPayload(title: "Event Saved!", titleColor: UIColor.red, message: "Your event has been saved.", messageColor: MyVariables.colourPlanrGreen, buttons: [button11], backgroundColor: UIColor.clear, inputTextHidden: true)
                                                       
-                              utils.showAlert(payload: alertPayload11, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+                              utils.showAlert(payload: alertPayload11, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
                       }
             
             //                            we need to check if the user deleted anyone from the event
@@ -1338,9 +1338,9 @@ func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) ->
                 print("OK clicked");
             }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
         
-        let alertPayload = AlertPayload(title: "Not Allowed!", titleColor: UIColor.red, message: "You can't delete yourself from the event", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+        let alertPayload = AlertPayload(title: "Not Allowed!", titleColor: UIColor.red, message: "You can't delete yourself from the event", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
         
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
         }
         else{
         

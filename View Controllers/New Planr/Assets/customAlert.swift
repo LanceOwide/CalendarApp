@@ -8,6 +8,8 @@
 
 import UIKit
 
+var verificationCode1 = String()
+
 struct AlertButton {
     var title: String!;
     var action: (() -> Swift.Void)? = nil;
@@ -16,41 +18,49 @@ struct AlertButton {
 }
 
 struct AlertPayload {
-    var title: String!;
+    var title: String!
     var titleColor: UIColor?
-    var message: String!;
+    var message: String!
     var messageColor: UIColor?
-    var buttons: [AlertButton]!;
+    var buttons: [AlertButton]!
     var backgroundColor: UIColor?
+    var inputTextHidden: Bool?
 }
 
 class customAlertController: UIViewController{
     
-    var payload: AlertPayload!;
+    var payload: AlertPayload!
     @IBOutlet var heading: UILabel!
     @IBOutlet var message: UILabel!
     @IBOutlet var button2: UIButton!
     @IBOutlet var button1: UIButton!
-    
+    @IBOutlet var inputText: UITextField!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        heading.text = payload.title;
-        message.text = payload.message;
-        
 //        setting for the ale
-        heading.font = UIFont.boldSystemFont(ofSize: 18)
-        message.font = UIFont.systemFont(ofSize: 14)
-        
-        
-        if (payload.buttons.count == 1) {
-            createButton(uiButton: button1, alertButton: payload.buttons[0]);
+
+        if (payload.buttons.count == 1 && payload.inputTextHidden == true) {
+            createButton(uiButton: button1, alertButton: payload.buttons[0])
+            heading.text = payload.title
+            message.text = payload.message
+            heading.font = UIFont.boldSystemFont(ofSize: 18)
+            message.font = UIFont.systemFont(ofSize: 14)
+        }
+        if (payload.buttons.count == 1 && payload.inputTextHidden == false) {
+            createButton(uiButton: button1, alertButton: payload.buttons[0])
+            heading.text = payload.title
+            heading.font = UIFont.boldSystemFont(ofSize: 18)
         }
         else if (payload.buttons.count == 2) {
-            createButton(uiButton: button1, alertButton: payload.buttons[0]);
-            createButton(uiButton: button2, alertButton: payload.buttons[1]);
+            createButton(uiButton: button1, alertButton: payload.buttons[0])
+            createButton(uiButton: button2, alertButton: payload.buttons[1])
+            heading.text = payload.title
+            message.text = payload.message
+            heading.font = UIFont.boldSystemFont(ofSize: 18)
+            message.font = UIFont.systemFont(ofSize: 14)
         }
         else if (payload.buttons.count == 0){
             
@@ -61,13 +71,12 @@ class customAlertController: UIViewController{
         }
     }
     
-    
     //MARK: Create custom alert buttons
     private func createButton(uiButton: UIButton, alertButton: AlertButton) {
         uiButton.setTitle(alertButton.title, for: .normal);
         
-//        uiButton.layer.borderWidth = 1
-//        uiButton.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
+        uiButton.layer.borderWidth = 1
+        uiButton.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
         uiButton.layer.cornerRadius = 6
         uiButton.translatesAutoresizingMaskIntoConstraints = false
         
@@ -83,7 +92,13 @@ class customAlertController: UIViewController{
     @IBAction func button1Tapped() {
         parent?.dismiss(animated: false, completion: nil);
         print("button 1 pressed")
-        payload.buttons[0].action?();
+        if payload.inputTextHidden == false{
+            print("button 1 pressed inputText.text \(inputText.text)")
+            if inputText.text != nil{
+            verificationCode1 = inputText.text!
+            }
+        }
+        payload.buttons[0].action?()  
     }
     
     @IBAction func button2Tapped() {
@@ -104,7 +119,7 @@ class customAlertController: UIViewController{
 //        print("OK clicked");
 //    }, titleColor: UIColor.blue, backgroundColor: UIColor.cyan);
 //    
-//    let alertPayload = AlertPayload(title: "One Button Alert", titleColor: UIColor.red, message: "This custom alert has just one action button", messageColor: UIColor.green, buttons: [button], backgroundColor: UIColor.black)
+//    let alertPayload = AlertPayload(title: "One Button Alert", titleColor: UIColor.red, message: "This custom alert has just one action button", messageColor: UIColor.green, buttons: [button], backgroundColor: UIColor.black, inputTextHidden: true)
 //    
 //    utils.showAlert(payload: alertPayload, parentViewController: self);
 //}
@@ -120,7 +135,7 @@ class customAlertController: UIViewController{
 //        print("No clicked");
 //    }, titleColor: UIColor.lightGray, backgroundColor: UIColor.clear);
 //    
-//    let alertPayload = AlertPayload(title: "Two Button Alert", titleColor: UIColor.red, message: "Are you sure you want to delete?", messageColor: UIColor.green, buttons: [button1, button2], backgroundColor: UIColor.yellow)
+//    let alertPayload = AlertPayload(title: "Two Button Alert", titleColor: UIColor.red, message: "Are you sure you want to delete?", messageColor: UIColor.green, buttons: [button1, button2], backgroundColor: UIColor.yellow, inputTextHidden: true)
 //    
 //    utils.showAlert(payload: alertPayload, parentViewController: self);
 //}

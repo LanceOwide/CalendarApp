@@ -547,9 +547,9 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
             print("cancel delete pressed")
                 }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                        
-        let alertPayload = AlertPayload(title: "Delete Event!", titleColor: UIColor.red, message: "Are you sure you would like to delete the event? (this can't be undone)", messageColor: MyVariables.colourPlanrGreen, buttons: [button,button2], backgroundColor: UIColor.clear)
+        let alertPayload = AlertPayload(title: "Delete Event!", titleColor: UIColor.red, message: "Are you sure you would like to delete the event? (this can't be undone)", messageColor: MyVariables.colourPlanrGreen, buttons: [button,button2], backgroundColor: UIColor.clear, inputTextHidden: true)
                        
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
         
         
     }

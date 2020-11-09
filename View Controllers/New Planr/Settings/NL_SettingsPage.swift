@@ -232,9 +232,9 @@ class NL_SettingsPage: UIViewController {
                 print("OK clicked");
             }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
         
-        let alertPayload = AlertPayload(title: "Log Out?", titleColor: UIColor.red, message: "Are you sure you want to log out?", messageColor: MyVariables.colourPlanrGreen, buttons: [button, button2], backgroundColor: UIColor.clear)
+        let alertPayload = AlertPayload(title: "Log Out?", titleColor: UIColor.red, message: "Are you sure you want to log out?", messageColor: MyVariables.colourPlanrGreen, buttons: [button, button2], backgroundColor: UIColor.clear, inputTextHidden: true)
         
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+        utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
         
     }
 

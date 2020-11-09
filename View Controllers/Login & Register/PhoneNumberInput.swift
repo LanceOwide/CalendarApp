@@ -73,6 +73,10 @@ class PhoneNumberInput: UIViewController {
 //        setup the navigation bar
         navigationBarSettings(navigationController: navigationController!, isBarHidden: false, isBackButtonHidden: false, tintColour: MyVariables.colourPlanrGreen)
         
+        
+//        we hide the secondary number because we dont want the user to add a secondary number
+        additionalPhoneNumberTextField.isHidden = true
+        
         view.backgroundColor = .white
         
         //        restrict the rotation of the device to portrait

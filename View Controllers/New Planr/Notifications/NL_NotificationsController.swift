@@ -367,9 +367,9 @@ extension NL_NotificationsController: UICollectionViewDelegate, UICollectionView
                 collectionView.reloadData()
                 }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
             
-            let alertPayload = AlertPayload(title: "Something went wrong!", titleColor: UIColor.red, message: "The organiser may have deleted the event", messageColor: MyVariables.colourPlanrGreen, buttons: [button1], backgroundColor: UIColor.clear)
+            let alertPayload = AlertPayload(title: "Something went wrong!", titleColor: UIColor.red, message: "The organiser may have deleted the event", messageColor: MyVariables.colourPlanrGreen, buttons: [button1], backgroundColor: UIColor.clear, inputTextHidden: true)
             
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
             
         }
         else{

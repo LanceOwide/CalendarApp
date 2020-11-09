@@ -723,9 +723,9 @@ func createNextButton(){
                         print("OK clicked")
                     }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                 
-                let alertPayload = AlertPayload(title: "Event Title!", titleColor: UIColor.red, message: "Your event needs a Title, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                let alertPayload = AlertPayload(title: "Event Title!", titleColor: UIColor.red, message: "Your event needs a Title, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                 
-                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: false)
             }
 //                2. did the user add a location
             else if self.locationInput.text == ""{
@@ -735,9 +735,9 @@ func createNextButton(){
                         print("OK clicked");
                     }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                 
-                let alertPayload = AlertPayload(title: "Event Location!", titleColor: UIColor.red, message: "Your event needs a Location, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                let alertPayload = AlertPayload(title: "Event Location!", titleColor: UIColor.red, message: "Your event needs a Location, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                 
-                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: false);
                 
             }
 //            3.1 did the user add an event start time
@@ -747,9 +747,9 @@ func createNextButton(){
                         print("OK clicked");
                     }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                 
-                let alertPayload = AlertPayload(title: "Event Start Time!", titleColor: UIColor.red, message: "Your event needs a Start Time, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                let alertPayload = AlertPayload(title: "Event Start Time!", titleColor: UIColor.red, message: "Your event needs a Start Time, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                 
-                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
             }
             
 //            3.2 did the user add an event end time
@@ -759,9 +759,9 @@ func createNextButton(){
                                    print("OK clicked");
                                }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                            
-                           let alertPayload = AlertPayload(title: "Event End Time!", titleColor: UIColor.red, message: "Your event needs an End Time, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                           let alertPayload = AlertPayload(title: "Event End Time!", titleColor: UIColor.red, message: "Your event needs an End Time, please add one.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                            
-                               utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+                               utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
             }
 //            3.3 is the start date before the end date
             
@@ -772,9 +772,9 @@ func createNextButton(){
                         print("OK clicked");
                     }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                 
-                let alertPayload = AlertPayload(title: "Event Time!", titleColor: UIColor.red, message: "Your event End Time is before the Start Time, please amend.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                let alertPayload = AlertPayload(title: "Event Time!", titleColor: UIColor.red, message: "Your event End Time is before the Start Time, please amend.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                 
-                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0);
+                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
             }
 //            4.do the inputs chosen retrun any dates
 //            4.1 run the find dates prior to our check
@@ -784,9 +784,9 @@ func createNextButton(){
                         print("OK clicked");
                     }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
                 
-                let alertPayload = AlertPayload(title: "No Event Dates!", titleColor: UIColor.red, message: "No dates in search period, ensure there are dates in the period.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear)
+                let alertPayload = AlertPayload(title: "No Event Dates!", titleColor: UIColor.red, message: "No dates in search period, ensure there are dates in the period.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
                 
-                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
             }
 //            if everything completes without issue we send the user to the next page
             else{

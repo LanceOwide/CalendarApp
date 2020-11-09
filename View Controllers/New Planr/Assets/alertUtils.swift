@@ -10,12 +10,15 @@ import UIKit
 
 class Utils {
     
-    func showAlert(payload: AlertPayload, parentViewController: UIViewController, autoDismiss: Bool, timeLag: Double) {
+    func showAlert(payload: AlertPayload, parentViewController: UIViewController, autoDismiss: Bool, timeLag: Double, hideInput: Bool) {
         
         print("showAlert - AlertPayload: \(payload) - autoDismiss: \(autoDismiss) - timeLag: \(timeLag)")
         var customAlertController: customAlertController!;
-        if (payload.buttons.count == 1) {
+        if (payload.buttons.count == 1 && payload.inputTextHidden == true) {
             customAlertController = self.instantiateViewController(storyboardName: "AlertScreens", viewControllerIdentifier: "OneButtonAlert") as? customAlertController
+        }
+        else if (payload.buttons.count == 1 && payload.inputTextHidden == false) {
+            customAlertController = self.instantiateViewController(storyboardName: "AlertScreens", viewControllerIdentifier: "OneButtonAlertInput") as? customAlertController
         }
         else if (payload.buttons.count == 2) {
             customAlertController = self.instantiateViewController(storyboardName: "AlertScreens", viewControllerIdentifier: "TwoButtonAlert") as? customAlertController
@@ -41,6 +44,7 @@ class Utils {
             }
         }    
     }
+    
     
     public func instantiateViewController(storyboardName: String, viewControllerIdentifier: String) -> UIViewController {
         let storyboard = UIStoryboard(name: storyboardName, bundle: Bundle.main);
