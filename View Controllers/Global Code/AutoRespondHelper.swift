@@ -122,9 +122,7 @@ class AutoRespondHelper {
     
     static func getCalendarData3Auto(startDate: Date, endDate: Date, completion: @escaping (_ datesOfTheEvents: Array<Date>, _ startDatesOfTheEvents: Array<Date>,_ endDatesOfTheEvents: Array<Date>)-> Void){
            
-           
            print("running func getCalendarData3Auto inputs - startDate: \(startDate) endDate: \(endDate)")
-           
            var datesOfTheEvents = Array<Date>()
            var startDatesOfTheEvents = Array<Date>()
            var endDatesOfTheEvents = Array<Date>()
@@ -132,21 +130,26 @@ class AutoRespondHelper {
            let eventStore = EKEventStore()
            var calendarArray = [EKEvent]()
            var calendarEventArray : [Event] = [Event]()
-           if SelectedCalendarsStruct.calendarsStruct.count == 0 {
-               calendarToUse = calendars}
-           else{
-               calendarToUse = SelectedCalendarsStruct.calendarsStruct}
+        if SelectedCalendarsStruct.selectedSearchCalendars.count == 0 {
+            print("getCalendarData3Auto - selectedSearchCalendars was empty")
+            checkCalendarStatusAuto()
+            calendarToUse = SelectedCalendarsStruct.selectedSearchCalendars
+            
+            print("getCalendarData3Auto - selectedSearchCalendars updated \(calendarToUse?.count)")
+        }
+        else{
+            calendarToUse = SelectedCalendarsStruct.selectedSearchCalendars
+            print("getCalendarData3Auto - SelectedCalendarsStruct selectedSearchCalendars there was data \(SelectedCalendarsStruct.selectedSearchCalendars.count)")
+        }
            datesOfTheEvents.removeAll()
            startDatesOfTheEvents.removeAll()
            endDatesOfTheEvents.removeAll()
            calendarArray = eventStore.events(matching: eventStore.predicateForEvents(withStart: startDate as Date, end: endDate as Date, calendars: calendarToUse))
            
-           print("Start date of the period to search \(startDate)")
-           print("End date of the period to search \(endDate)")
+           print("getCalendarData3Auto Start date of the period to search \(startDate)")
+           print("getCalendarData3Auto End date of the period to search \(endDate)")
            
            //                print(calendarArray)
-           
-           
            for event in calendarArray{
                
                //            appends new items into the array calendarEventsArray
@@ -969,6 +972,7 @@ class AutoRespondHelper {
             return false
         case EKAuthorizationStatus.authorized:
             print("We got access")
+            loadCalendars2Auto()
             return true
         case EKAuthorizationStatus.denied:
 //            requestAccessToCalendar2Auto()
@@ -1013,59 +1017,126 @@ class AutoRespondHelper {
     
 //    function for loading the calendars into the structs
     static func loadCalendars2Auto(){
+        print("running func loadCalendars2Auto - loadCalendars2AutoIsRunning \(loadCalendars2AutoIsRunning)")
 
 //        we only want this function to run once and not multiple times, as doing this can cause a crash. so we set a property to notify when the function is already being called
         if loadCalendars2AutoIsRunning == true{
+            print("running func loadCalendars2Auto = true")
 //            we dont run the function
         }
         else{
             loadCalendars2AutoIsRunning = true
-        
-        print("running func loadCalendars2")
-        var calendars: [EKCalendar]!
+            
+            var calendarIDArray = UserDefaults.standard.stringArray(forKey: "selectSaveCalendarIDs") ?? []
+            
+            print("loadCalendars2Auto - selectSaveCalendarIDs \(calendarIDArray) SelectedCalendarsStruct.calendarsStruct \(SelectedCalendarsStruct.calendarsStruct)")
+                
+            var calendars: [EKCalendar]!
             calendars = eventStore.calendars(for: EKEntityType.event)
             
     //        If the calendar array hasnt been created previously then then the function creates a new array, or if there are no selected calendars, we repopulate. we also check if this fucntion is already running
-        if SelectedCalendarsStruct.calendarsStruct.count == 0 || SelectedCalendarsStruct.selectedCalendarArray.count == 0 {
+        if SelectedCalendarsStruct.calendarsStruct.count == 0 && calendarIDArray.count == 0 {
                 
                 SelectedCalendarsStruct.calendarsStruct = calendars!
             
 //            we set the variable to true so that we do not run the function more than once
             loadCalendars2AutoIsRunning = true
             
-//            we loop through the calendars and add them to the selected calendar array
+            
+//            if we are having to reload the calendars for any reason we want to remove the save calendars to ensure we do not duplicate them
+                calendarIDArray.removeAll()
+                
             for calendar in calendars{
                 SelectedCalendarsStruct.selectedCalendarArray.append(1)
+//                we append the ID of each calendar to the array
+                calendarIDArray.append(calendar.calendarIdentifier)
             }
                 
 //                BUG: we loop through the list of calendars we don't want to use - this should be made a struct, we also remove them from the list of selected calendars
                 if let index = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "US Holidays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index)
+                    calendarIDArray.remove(at: index)
                 }
                 if let index1 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "UK Holidays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index1)
+                    calendarIDArray.remove(at: index1)
                 }
                 if let index2 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Birthdays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index2)
+                    calendarIDArray.remove(at: index2)
                 }
                 if let index3 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "South Korean Holidays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index3)
+                    calendarIDArray.remove(at: index3)
                 }
                 if let index4 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Hong Kong Holidays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index4)
+                    calendarIDArray.remove(at: index4)
                 }
                 if let index5 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Holidays in United Kingdom"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index5)
+                    calendarIDArray.remove(at: index5)
                 }
-                
-                print("SelectedCalendarsStruct: \(SelectedCalendarsStruct.calendarsStruct)")
+//            we save the calendar ID array into userDefaults
+        UserDefaults.standard.setValue(calendarIDArray, forKey: "selectSaveCalendarIDs")
+            
+//            we add the selected calendars to the selected calendars array, first we remove all
+                SelectedCalendarsStruct.selectedSearchCalendars.removeAll()
+                    for calendar in SelectedCalendarsStruct.calendarsStruct{
+                        if calendarIDArray.contains(calendar.calendarIdentifier){
+                            SelectedCalendarsStruct.selectedSearchCalendars.append(calendar)
+                            print("loadCalendars2 - SelectedCalendarsStruct.selectedSearchCalendars \(SelectedCalendarsStruct.selectedSearchCalendars.count)")
+                        }
+                    }
+                            
+        print("SelectedCalendarsStruct: \(SelectedCalendarsStruct.calendarsStruct) calendarIDArray \(calendarIDArray)")
             loadCalendars2AutoIsRunning = false
    
             }
-                else{
-                    
-                    
-                }
+
+//        here we do have the list of selected calendars, but we do not have the calendar struct, so we build it
+                        else if SelectedCalendarsStruct.calendarsStruct.count == 0 && calendarIDArray.count != 0{
+                            print("we have a save calendar ID but no calendarStruct")
+                            
+//                    make the calendar struct a list of all calendars
+                            SelectedCalendarsStruct.calendarsStruct = calendars!
+                            
+//                    we want to check that the ID the user wants to save into is still on the list of calendars available. We need to loop through the array items
+                            for ID in calendarIDArray{
+                                if SelectedCalendarsStruct.calendarsStruct.contains(where: {$0.calendarIdentifier == ID}){
+        //                            the ID is in our calendar struct, we dont need to do anything
+                                }
+                                else{
+        //                            the id is not in our calendar struct so we remove it
+                                    calendarIDArray.removeAll(where: {$0 == ID})
+                                }
+                            }
+        //                    if the calendar ID array no doesnt contain anything, we need to rebuild it, otherwise we wont have any calendars to check
+                            if calendarIDArray.count == 0{
+        //            we loop through the calendars and add them to the selected calendar array
+                        for calendar in calendars{
+        //                we append the ID of each calendar to the array
+                        calendarIDArray.append(calendar.calendarIdentifier)
+                                            }
+        //            we save the calendar ID array into userDefaults
+                        UserDefaults.standard.setValue(calendarIDArray, forKey: "selectSaveCalendarIDs")
+                            }
+                            else{
+        //                        there were IDs left, we save them down
+        //            we save the calendar ID array into userDefaults
+                            UserDefaults.standard.setValue(calendarIDArray, forKey: "selectSaveCalendarIDs")
+                            }
+                            
+//            we add the selected calendars to the selected calendars array, first we remove all
+                    SelectedCalendarsStruct.selectedSearchCalendars.removeAll()
+                        for calendar in SelectedCalendarsStruct.calendarsStruct{
+                            if calendarIDArray.contains(calendar.calendarIdentifier){
+                                SelectedCalendarsStruct.selectedSearchCalendars.append(calendar)
+                                print("loadCalendars2 - SelectedCalendarsStruct.selectedSearchCalendars \(SelectedCalendarsStruct.selectedSearchCalendars.count)")
+                                }
+                        }
+                loadCalendars2AutoIsRunning = false
+            }
         }
             }
     
@@ -1283,9 +1354,6 @@ class AutoRespondHelper {
     //        if we don't have access to the calendar we stop
             if checkCalendarStatusAuto() == false{
                    print("uploadCurrentUsersAvailability - checkCalendarStatusAuto = false")
-                
-                
-                
                }
             else{
             
@@ -1301,7 +1369,7 @@ class AutoRespondHelper {
             }
             else{
                 let eventData = predicateReturned[0]
-            print("uploadCurrentUsersAvailability documentID: \(eventData)")
+            print("uploadCurrentUsersAvailabilityAuto documentID: \(eventData)")
             
     //        2. retrieve the documentID for the users eventStore ID
             let availabilityData = serialiseAvailabilityAuto(eventID: eventID)
@@ -1312,7 +1380,7 @@ class AutoRespondHelper {
                 else{
             let documentID = filteredAvailabilityData[0].documentID
             let calendarID = filteredAvailabilityData[0].calendarEventID
-            print("uploadCurrentUsersAvailability documentID: \(documentID)")
+            print("uploadCurrentUsersAvailabilityAuto documentID: \(documentID)")
             
     //        3. calcaulte the users availability
             

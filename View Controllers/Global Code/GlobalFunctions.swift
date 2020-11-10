@@ -2296,8 +2296,6 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
 //        function to get the events from the users calendar for the dates we are searching in. We remove any events that are shown as free.
     func getCalendarData3(startDate: Date, endDate: Date) -> (datesOfTheEvents: Array<Date>, startDatesOfTheEvents: Array<Date>, endDatesOfTheEvents: Array<Date>){
         
-        checkCalendarStatus2()
-        
         print("running func getCalendarData3 inputs - startDate: \(startDate) endDate: \(endDate)")
         
         var datesOfTheEvents = Array<Date>()
@@ -2308,10 +2306,17 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
         let eventStore = EKEventStore()
         var calendarArray = [EKEvent]()
         var calendarEventArray : [Event] = [Event]()
-        if SelectedCalendarsStruct.calendarsStruct.count == 0 {
-            calendarToUse = calendars}
+        if SelectedCalendarsStruct.selectedSearchCalendars.count == 0 {
+            print("getCalendarData3 - SelectedCalendarsStruct.selectedSearchCalendars == 0")
+            checkCalendarStatus2()
+            calendarToUse = SelectedCalendarsStruct.selectedSearchCalendars
+            
+            print("getCalendarData3 - SelectedCalendarsStruct.selectedSearchCalendars updated \(calendarToUse?.count)")
+        }
         else{
-            calendarToUse = SelectedCalendarsStruct.calendarsStruct}
+            calendarToUse = SelectedCalendarsStruct.selectedSearchCalendars
+            print("getCalendarData3 - there was data \(calendarToUse?.count)")
+        }
         datesOfTheEvents.removeAll()
         startDatesOfTheEvents.removeAll()
         endDatesOfTheEvents.removeAll()
@@ -2406,43 +2411,105 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
         print("running func loadCalendars2")
         var calendars: [EKCalendar]!
             calendars = eventStore.calendars(for: EKEntityType.event)
+        
+        
+//        get the list of calendars from user defaults
+        
+        var calendarIDArray = UserDefaults.standard.stringArray(forKey: "selectSaveCalendarIDs") ?? []
+        
+        print("loadCalendars2 - selectSaveCalendarIDs \(calendarIDArray) SelectedCalendarsStruct.calendarsStruct \(SelectedCalendarsStruct.calendarsStruct)")
+        
             
     //        If the calendar array hasnt been created previously then then the function creates a new array, or if there are no selected calendars, we repopulate
-        if SelectedCalendarsStruct.calendarsStruct.count == 0 || SelectedCalendarsStruct.selectedCalendarArray.count == 0 {
+        if SelectedCalendarsStruct.calendarsStruct.count == 0 && calendarIDArray.count == 0 {
+            print("loadCalendars2 SelectedCalendarsStruct.count = 0")
+//            if we are having to reload the calendars for any reason we want to remove the save calendars to ensure we do not duplicate them
+            calendarIDArray.removeAll()
                 
                 SelectedCalendarsStruct.calendarsStruct = calendars!
             
 //            we loop through the calendars and add them to the selected calendar array
             for calendar in calendars{
                 SelectedCalendarsStruct.selectedCalendarArray.append(1)
+//                we append the ID of each calendar to the array
+                calendarIDArray.append(calendar.calendarIdentifier)
             }
                 
 //                BUG: we loop through the list of calendars we don't want to use - this should be made a struct, we also remove them from the list of selected calendars
                 if let index = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "US Holidays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index)
+                    calendarIDArray.remove(at: index)
                 }
                 if let index1 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "UK Holidays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index1)
+                    calendarIDArray.remove(at: index1)
                 }
                 if let index2 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Birthdays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index2)
+                    calendarIDArray.remove(at: index2)
                 }
                 if let index3 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "South Korean Holidays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index3)
+                    calendarIDArray.remove(at: index3)
                 }
                 if let index4 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Hong Kong Holidays"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index4)
+                    calendarIDArray.remove(at: index4)
                 }
                 if let index5 = SelectedCalendarsStruct.calendarsStruct.index(where: {$0.title == "Holidays in United Kingdom"}){
                     SelectedCalendarsStruct.calendarsStruct.remove(at: index5)
+                    calendarIDArray.remove(at: index5)
                 }
+            
+//            we save the calendar ID array into userDefaults
+            UserDefaults.standard.setValue(calendarIDArray, forKey: "selectSaveCalendarIDs")
+            
+//            we add the selected calendars to the selected calendars array, first we remove all
+            SelectedCalendarsStruct.selectedSearchCalendars.removeAll()
+            for calendar in SelectedCalendarsStruct.calendarsStruct{
+                if calendarIDArray.contains(calendar.calendarIdentifier){
+                    SelectedCalendarsStruct.selectedSearchCalendars.append(calendar)
+                }
+            }
+            
                 
-                print("SelectedCalendarsStruct: \(SelectedCalendarsStruct.calendarsStruct)")
+                print("SelectedCalendarsStruct: \(SelectedCalendarsStruct.calendarsStruct) calendarIDArray \(calendarIDArray)")
    
             }
-                else{
+//        here we do have the list of selected calendars, but we do not have the calendar struct, so we build it
+                else if SelectedCalendarsStruct.calendarsStruct.count == 0 && calendarIDArray.count != 0{
                     
+//                    make the calendar struct a list of all calendars
+                    SelectedCalendarsStruct.calendarsStruct = calendars!
                     
+//                    we want to check that the ID the user wants to save into is still on the list of calendars available
+                    
+//                    we need to loop through the array items
+                    
+                    for ID in calendarIDArray{
+                        if SelectedCalendarsStruct.calendarsStruct.contains(where: {$0.calendarIdentifier == ID}){
+//                            the ID is in our calendar struct, we dont need to do anything
+                        }
+                        else{
+//                            the id is not in our calendar struct so we remove it
+                            calendarIDArray.removeAll(where: {$0 == ID})
+                        }
+                    }
+//                    if the calendar ID array no doesnt contain anything, we need to rebuild it, otherwise we wont have any calendars to check
+                    if calendarIDArray.count == 0{
+//            we loop through the calendars and add them to the selected calendar array
+                for calendar in calendars{
+//                we append the ID of each calendar to the array
+                calendarIDArray.append(calendar.calendarIdentifier)
+                                    }
+//            we save the calendar ID array into userDefaults
+                UserDefaults.standard.setValue(calendarIDArray, forKey: "selectSaveCalendarIDs")
+                    }
+                    else{
+//                        there were IDs left, we save them down
+//            we save the calendar ID array into userDefaults
+                    UserDefaults.standard.setValue(calendarIDArray, forKey: "selectSaveCalendarIDs")
+                    }
                 }
             }
     

@@ -1810,7 +1810,7 @@ func removeTheAvailabilityNotifications(){
     
 //    function to handle any errors with the data for an event.
 //    this function takes in an eventID and eventInfo or availabilityBool and deletes either all the event data or availability data, to then download it again from the sever
-    func somethingWentWrong(eventID: String, eventInfo: Bool, availabilityInfo: Bool, loginfo: String){
+    func somethingWentWrong(eventID: String, eventInfo: Bool, availabilityInfo: Bool, loginfo: String, viewController: UIViewController){
         print("running func somethingWentWrong")
         Crashlytics.crashlytics().log("running func somethingWentWrong")
         Crashlytics.crashlytics().log("running func somethingWentWrong - logs sent to func - loginfo \(loginfo)")
@@ -1825,14 +1825,14 @@ func removeTheAvailabilityNotifications(){
             
             }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
         
-        let alertPayload = AlertPayload(title: "Something Went Wrong!", titleColor: UIColor.red, message: "Oops, something went wrong, please try again later, we are working to fix it!", messageColor: MyVariables.colourPlanrGreen, buttons: [button1], backgroundColor: UIColor.clear)
+        let alertPayload = AlertPayload(title: "Something Went Wrong!", titleColor: UIColor.red, message: "Oops, something went wrong, please open and close the app, we are working to fix it!", messageColor: MyVariables.colourPlanrGreen, buttons: [button1], backgroundColor: UIColor.clear)
         
         if self.presentedViewController == nil {
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+            utils.showAlert(payload: alertPayload, parentViewController: viewController, autoDismiss: false, timeLag: 0.0)
         }
         else {
             self.dismiss(animated: false, completion: nil)
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0)
+            utils.showAlert(payload: alertPayload, parentViewController: viewController, autoDismiss: false, timeLag: 0.0)
         }
         
         

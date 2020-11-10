@@ -1572,7 +1572,7 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
 //        1. get the list of all the events
                 let events = confirmedEventList[selectedDate! - 1]
 //        1.1 get the current event
-                 event = events[collectionView.tag]!
+                let event = events[collectionView.tag]!
 //        1.2 we combine the current user and non user names
                 allNames = event.currentUserNames + event.nonUserNames
                 }
@@ -1738,7 +1738,11 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
         //        1. get the list of all the events
                         let events = confirmedEventList[selectedDate! - 1]
         //        1.1 get the current event
-                         event = events[collectionView.tag]!
+                    guard let event = events[collectionView.tag] else{
+                        CoreDataCode().somethingWentWrong(eventID: "", eventInfo: false, availabilityInfo: false, loginfo: "The user tried to select an event that didnt exist", viewController: NL_HomePage.init())
+                        
+                        return
+                            }
         //        1.2 we combine the current user and non user names
                         allNames = event.currentUserNames + event.nonUserNames
                         }
