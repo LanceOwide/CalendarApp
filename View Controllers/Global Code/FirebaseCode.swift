@@ -180,7 +180,19 @@ extension UIViewController{
 //            create the listener to the node in the databse, we only listen for children added, we do not want to listen for anything else - we may need to add deleted etc at a later date
                 userMessagesRef.observe(.value, with: { (snapshot) in
                 guard let dictionary = snapshot.value as? [String: AnyObject] else {
+//                    it is likely the evnt was deleted, at the point we need to remove the newChatIDs adn remove them from Firebase
+                    chatNotificationiDs.removeAll(where: {$0 == i})
+//                    delete the notificaiton from Firebase
+                    dbStore.collection("userNotification").document(user!).updateData(["chatNotificationEventIDs" : FieldValue.delete(), "eventNotificationiDs" : FieldValue.delete()]){ err in
+                            if let err = err {
+                            print("Error updating document: \(err)")
+                            } else {
+                                print("Document successfully updated")
+                                }}
+                    
+                    
                     print("something went wrong checkNotificationStatusListener - \(snapshot.value)")
+                    
                 return
                     }
 //                        print("checkNotificationStatusListener - chats dictionary \(dictionary)")
