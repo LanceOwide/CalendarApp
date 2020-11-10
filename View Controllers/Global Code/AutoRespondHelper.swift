@@ -725,6 +725,31 @@ class AutoRespondHelper {
         }
     
     
+         //    fetch availability for a specific event and serialise the data
+    static func serialiseAvailabilitywUserAuto(eventID: String, userID: String) -> [AvailabilityStruct]{
+         print("running func serialiseAvailabilitywUserAuto inputs - eventID \(eventID)")
+            var filteredAvailability = [CoreDataAvailability]()
+            var serialisedAvailability = [AvailabilityStruct]()
+        
+            let request : NSFetchRequest<CoreDataAvailability> = CoreDataAvailability.fetchRequest()
+            request.predicate = NSPredicate(format: "eventID == %@ AND uid == %@", eventID, userID)
+            filteredAvailability = CDFetchFilteredAvailabilityDataFromDBAuto(with: request)
+            
+            for i in filteredAvailability{
+                var nextAvailability = AvailabilityStruct()
+                nextAvailability.documentID = i.documentID ?? ""
+                nextAvailability.eventID = i.eventID ?? ""
+                nextAvailability.uid = i.uid ?? ""
+                nextAvailability.userAvailability = i.userAvailability ?? [99]
+                nextAvailability.userName = i.userName ?? ""
+                nextAvailability.calendarEventID = i.calendarEventID ?? ""
+    //            print("nextAvailability \(nextAvailability)")
+                serialisedAvailability.append(nextAvailability)
+            }
+            return serialisedAvailability
+        }
+    
+    
     
     
     //    function to retrieve all the availability from Firebase, this should only be used if the coredata is currently empty

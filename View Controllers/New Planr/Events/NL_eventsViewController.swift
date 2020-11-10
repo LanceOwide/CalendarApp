@@ -119,7 +119,10 @@ class NL_eventsViewController: UIViewController {
     }
     
     @objc func updateTables(){
-        reloadTheEvents()
+        
+        DispatchQueue.main.async {
+            self.reloadTheEvents()
+        }
     }
     
     @objc func inviteSelected(notification: [AnyHashable : Any]){
@@ -300,7 +303,9 @@ class NL_eventsViewController: UIViewController {
                 if self.collectionViewEvents == nil{
                 }
                 else{
+                    DispatchQueue.main.async {
                 self.collectionViewEvents.reloadData()}
+                }
             }
         }
         else if currentView == "Upcoming"{
@@ -310,7 +315,9 @@ class NL_eventsViewController: UIViewController {
                 if self.collectionViewEvents == nil{
                 }
                 else{
+                    DispatchQueue.main.async {
                     self.collectionViewEvents.reloadData()}
+                }
             }
         }
         else if currentView == "Past"{
@@ -320,7 +327,9 @@ class NL_eventsViewController: UIViewController {
                 if self.collectionViewEvents == nil{
                 }
                 else{
+                    DispatchQueue.main.async {
                     self.collectionViewEvents.reloadData()}
+                }
             }
         }
     }

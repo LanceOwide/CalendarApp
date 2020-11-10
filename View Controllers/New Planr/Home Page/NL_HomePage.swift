@@ -125,6 +125,9 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
 //        add an observer to detect when the tutorial is closed and show the relevant coachmarks
         NotificationCenter.default.addObserver(self, selector: #selector(tutorialClosed), name: .tutorialClosed, object: nil)
         
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadHomePage), name: .newDataLoaded, object: nil)
+        
 //        AutoRespondHelper.registerForPushNotificationsAuto()
         
 //        add the tabBar
@@ -186,6 +189,17 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
         if notificationListenerEnagaged == false{FirebaseCode().checkNotificationStatusListener()}
         
         
+    }
+//    function to refresh the page when the user changes the event
+    @objc func reloadHomePage(){
+        print("running func reloadHomePage")
+        DispatchQueue.main.async {
+            self.getEventsForMonth{
+//        refresh the collectionview when the user moves to the next month
+            self.collectionViewDates.reloadData()
+            self.collectionViewEvents.reloadData()
+        }
+        }
     }
     
 //    function to remove the observer for the invite non user to the app
@@ -456,8 +470,10 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
 //        log the change event
         Analytics.logEvent(firebaseEvents.homePageTogglePressed, parameters: ["toggleSetTo" : menuBtn2.isOn])
         
-        collectionViewDates.reloadData()
-        collectionViewEvents.reloadData()
+        DispatchQueue.main.async {
+            self.collectionViewDates.reloadData()
+            self.collectionViewEvents.reloadData()
+        }
         
 //        set the visible headers
         
@@ -653,8 +669,10 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
 //        run the date change process to get the events for the new month
         getEventsForMonth{
 //        refresh the collectionview when the user moves to the next month
+            DispatchQueue.main.async {
             self.collectionViewDates.reloadData()
             self.collectionViewEvents.reloadData()
+            }
         }
     }
     
@@ -1074,6 +1092,7 @@ extension NL_HomePage: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             selectedDate = indexPath.row-firstWeekDayOfMonth+2
             
 //            reload the tables
+            
             collectionViewDates.reloadData()
             collectionViewEvents.reloadData()
         }
@@ -1418,7 +1437,7 @@ extension NL_HomePage{
 
 //       MARK: 1. get all events
         let predicate = NSPredicate(format: "eventID == %@", argumentArray: [eventIDChosen])
-        let filteredEvents = CoreDataCode().serialiseEvents(predicate: predicate, usePredicate: false)
+        let filteredEvents = AutoRespondHelper.serialiseEventsAuto(predicate: predicate, usePredicate: false)
         
 //        MARK: 1.1 if there are no events returned, we need to set the empty arrays equal to the confirmed and pending events
         if filteredEvents.count == 0{
@@ -1558,6 +1577,9 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        print("cellForItemAt - pendingState \(pendingState)")
+        
         let cellId2 = "cellId2"
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId2, for: indexPath) as! NL_inviteesCell
         
@@ -1570,11 +1592,12 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
                 }
                 else if pendingState == false{
 //        1. get the list of all the events
-                let events = confirmedEventList[selectedDate! - 1]
+                events = confirmedEventList[selectedDate! - 1]
 //        1.1 get the current event
-                let event = events[collectionView.tag]!
+                event = events[collectionView.tag]!
 //        1.2 we combine the current user and non user names
                 allNames = event.currentUserNames + event.nonUserNames
+                    print("event \(event) allNames \(allNames)")
                 }
                 else if pendingState == true{
                     if confirmedEventList[selectedDate! - 1] == [nil] && pendingEventList[selectedDate! - 1] == [nil] {
@@ -1622,15 +1645,17 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
         cell.layer.borderWidth = 0
         cell.layer.cornerRadius = 0
         
+//        the person is a user
+        print("cellFotItem event.currentUserNames.count \(event.currentUserNames.count)")
         if indexPath.row <= event.currentUserNames.count - 1{
 //        we want to set the images for the event invitees
             let currentUserId = event.users[indexPath.row]
             
 //                    we want to check if the user has responded and if not display the hourglass
-            let availability = CoreDataCode().serialiseAvailabilitywUser(eventID: event.eventID, userID: currentUserId)
+            let availability = AutoRespondHelper.serialiseAvailabilitywUserAuto(eventID: event.eventID, userID: currentUserId)
             
 // get the users image
-                let imageList = CoreDataCode().fetchImage(uid: currentUserId)
+            let imageList = CoreDataCode().fetchImage(uid: currentUserId)
             
             var image = Data()
             if imageList.count != 0{
@@ -1638,16 +1663,23 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
             }
 //                    loop through each possible user itteration and set the image and status accordingly
             
-//                    1. they are not a user and we want to invite them
-            if availability.count == 0{
+            print("cellForItem availability.count \(availability.count) indexPath.row \(indexPath.row)")
+            
+//                    1. the user doesnt have an availability, we show them as not responded
+            if availability.count == 0 && imageList.count != 0{
                 cell.inviteeStatus.isHidden = false
                 cell.inviteeStatus.image = UIImage(named: "hourGlassCodeCircle")
                 cell.inviteePicture.image = UIImage(data: image)?.alpha(0.5)
                 cell.inviteePicture.isHidden = false
-                
+            }
+            else if availability.count == 0 && imageList.count == 0{
+                cell.inviteeStatus.isHidden = false
+                cell.inviteeStatus.image = UIImage(named: "hourGlassCodeCircle")
+                cell.inviteePicture.image = .none
+                cell.inviteePicture.isHidden = false
             }
 //                    2. They are a user
-            if availability.count != 0{
+            else if availability.count != 0{
 //                        check if the user has responded
                 let userAvailabilityArray = availability[0].userAvailability
 //                       2.1 the user has not responded and they have a picture, we set their image and blur it
@@ -1693,6 +1725,7 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
         }
 //                    this invitee isnt a user yet
         else{
+            print("cellForItem - no availability - invite the user")
 //            the invitee isnt a user yet
             cell.inviteePicture.image = .none
             cell.inviteeStatus.isHidden = false

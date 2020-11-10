@@ -1512,11 +1512,9 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
             return newDaysOfTheWeek
             
         }
-    
-        
         
     //        adds the event to the calendar
-        func addEventToCalendar(title: String, description: String?, startDate: String, endDate: String, location: String, eventOwner: String, startDateDisplay: String, eventOwnerID: String, locationLongitude: Double, locationLatitude: Double, userEventStoreID: String, calendarEventIDInput: String, completion: ((_ success: Bool, _ error: NSError?) -> Void)? = nil) {
+        func addEventToCalendar(title: String, description: String?, startDate: String, endDate: String, location: String, eventOwner: String, startDateDisplay: String, eventOwnerID: String, locationLongitude: Double, locationLatitude: Double, userEventStoreID: String, calendarEventIDInput: String, completion: @escaping (_ success: Bool, _ error: NSError?) -> Void){
             
             
             var calendarEventID = String()
@@ -1617,7 +1615,7 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                     
                             print("Trying to save down event")
                         } catch let e as NSError {
-                            completion?(false, e)
+                            completion(false, e)
                             return
                         }
                     calendarEventID = event.eventIdentifier ?? ""
@@ -1625,9 +1623,8 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                         self.saveItemAvailabilty(userEventStoreID: userEventStoreID, key: "calendarEventID", value: calendarEventID)
 //                        write the calendarEventID to the userEventStore
                         dbStore.collection("userEventStore").document(userEventStoreID).setData(["calendarEventID" : calendarEventID, "chosenDateSeen" : true], merge: true)
-                        completion?(true, nil)
                         print("event saved for date \(startDate)")
-                    
+                        completion(true, nil)
                 }
                 else{
 //                        there is already an event in the calendar
@@ -1673,18 +1670,19 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                     
                             print("Trying to save down event")
                         } catch let e as NSError {
-                            completion?(false, e)
+                            completion(false, e)
                             return
                         }
 //                        if error leave the ID blank, we have a protocal to ignore it if blank
                         calendarEventID = event.eventIdentifier ?? ""
                         dbStore.collection("userEventStore").document(userEventStoreID).setData(["chosenDateSeen" : true], merge: true)
-                        completion?(true, nil)
-                        print("event saved for date \(startDate)")
+                    print("event saved for date \(startDate)")
+                        completion(true, nil)
+                        
                 }
                 }
                 else {
-                    completion?(false, error as NSError?)
+                    completion(false, error as NSError?)
                     print(error ?? "no error message")
                     print("error saving event")
                 }

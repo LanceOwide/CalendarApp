@@ -1756,7 +1756,10 @@ func removeTheAvailabilityNotifications(){
             let calendarEventIDInput = availabilityData.calendarEventID ?? ""
             
             //                    Adds the event to the users calendar
-            self.addEventToCalendar(title: eventData.eventDescription, description: eventData.eventDescription, startDate: eventData.startDateArray[chosenDatePosition], endDate: eventData.endDateArray[chosenDatePosition], location: eventData.eventLocation, eventOwner: eventData.eventOwnerName, startDateDisplay: eventData.startDatesDisplay[chosenDatePosition], eventOwnerID: eventData.eventOwnerID, locationLongitude: eventData.locationLongitude, locationLatitude: eventData.locationLatitue, userEventStoreID: availabilityData.documentID!, calendarEventIDInput: calendarEventIDInput)
+            
+            self.addEventToCalendar(title: eventData.eventDescription, description: eventData.eventDescription, startDate: eventData.startDateArray[chosenDatePosition], endDate: eventData.endDateArray[chosenDatePosition], location: eventData.eventLocation, eventOwner: eventData.eventOwnerName, startDateDisplay: eventData.startDatesDisplay[chosenDatePosition], eventOwnerID: eventData.eventOwnerID, locationLongitude: eventData.locationLongitude, locationLatitude: eventData.locationLatitue, userEventStoreID: availabilityData.documentID!, calendarEventIDInput: calendarEventIDInput){_,_ in 
+                
+            }
         }}
     
     
