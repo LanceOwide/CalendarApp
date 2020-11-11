@@ -80,7 +80,10 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
         
         setup()
         
-        cvEventInviteesCollectionView.reloadData()
+        DispatchQueue.main.async {
+            self.cvEventInviteesCollectionView.reloadData()
+        }
+
         
         
 //        MARK: listener to detect when the event availability has been udpated by the user
@@ -430,6 +433,8 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 //    fucntion to reload the page, this can be triggered anywhere
     
     @objc func updateTables(){
+        
+        DispatchQueue.main.async {
         print("results page func updateTables - updated availability notification triggered - eventIDChosen: \(currentUserSelectedEvent.eventID)")
         //        need to refresh the event data, we can also check if the user has deleted the event
                 let predicate = NSPredicate(format: "eventID = %@", currentUserSelectedEvent.eventID)
@@ -440,10 +445,12 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                 else{
                     currentUserSelectedEvent = predicateReturned[0]
         //        need to pull the new availability data from CoreData
-                currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+                    currentUserSelectedAvailability = self.serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
                 self.prepareForEventDetailsPageCD(segueName: "", isSummaryView: summaryView, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
+                    DispatchQueue.main.async {
                     self.cvEventResponses.reloadData()
                     self.cvEventInviteesCollectionView.reloadData()
+                    }
         //            check if the user has responded and adjust the image accordingly
                     self.checkIfUserHasResponded()
                     
@@ -462,6 +469,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                     
                     }
                 }
+        }
     }
     
     
@@ -777,7 +785,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     //        we set the global variable coachmarkHelperText just before we launch the coachMarks, this tell it what we are running
                     if coachmarkHelperText == "newEventCreated"{
                         
-                        hintLabels = ["Your friends have been notified of the event, a tick means they've responded","Once you've chosen the date for your event, select it and press save, Planr will notify your friends","If Planr has access to your calendar, your availability will be automatically added, you can also update or override it"]
+                        hintLabels = ["Your friends have been notified of the event, a tick means we've collected their availability","Once you've chosen the date for your event, select it and press save, Planr will notify your friends","If Planr has access to your calendar, your availability will be automatically added, you can also update or override it"]
                         
                         coachViews.bodyView.hintLabel.text = hintLabels[index]
     //                    coachViews.bodyView.nextLabel.text = nextlabels[index]
@@ -1024,6 +1032,7 @@ extension NL_eventController: UICollectionViewDelegate, UICollectionViewDataSour
                     cell.layer.cornerRadius = 5
                     cell.layer.masksToBounds = true
                     
+                    
 //                check if the date has been chosen for this event
                     if currentUserSelectedEvent.chosenDate != ""{
                     let stringDate = dateTZToShortDisplayDate(date: currentUserSelectedEvent.chosenDate)
@@ -1054,6 +1063,9 @@ extension NL_eventController: UICollectionViewDelegate, UICollectionViewDataSour
                     cell.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
                     cell.layer.cornerRadius = 5
                     cell.layer.masksToBounds = true
+                    cell.label2.backgroundColor = .white
+                    cell.label3.backgroundColor = .white
+                    
                     
 //                check if the date has been chosen for this event
                     if currentUserSelectedEvent.chosenDate != ""{

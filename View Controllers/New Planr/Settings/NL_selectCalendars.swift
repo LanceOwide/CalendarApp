@@ -203,7 +203,7 @@ extension NL_selectCalendars: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var calendars = [EKCalendar]()
         
-        calendars = eventStore.calendars(for: EKEntityType.event)
+        calendars = SelectedCalendarsStruct.calendarsStruct
         
         return (calendars.count)
     }
@@ -211,11 +211,16 @@ extension NL_selectCalendars: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableViewCalendar.dequeueReusableCell(withIdentifier: cellId) as! NL_contactTableViewCell
         
+//        pull the selected calendars from the user defaults
+        
+        let calendarIDArray = UserDefaults.standard.stringArray(forKey: "selectSaveCalendarIDs") ?? []
+        
+        
         var calendars = [EKCalendar]()
         
-        calendars = eventStore.calendars(for: EKEntityType.event)
+        calendars = SelectedCalendarsStruct.calendarsStruct
         
-        let calendarName = calendars[(indexPath as NSIndexPath).row].title
+        let calendarName = calendars[indexPath.row].title
         
         cell.textLabel?.text = calendarName
         cell.tintColor = UIColor.black
@@ -223,7 +228,7 @@ extension NL_selectCalendars: UITableViewDelegate, UITableViewDataSource{
         cell.eventImageView.isHidden = true
         
         
-        if SelectedCalendarsStruct.selectedCalendarArray[indexPath.row] == 1 {
+        if calendarIDArray.contains(SelectedCalendarsStruct.calendarsStruct[indexPath.row].calendarIdentifier) {
             cell.accessoryType = .checkmark
         }
         else {
@@ -235,21 +240,28 @@ extension NL_selectCalendars: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var calendars = [EKCalendar]()
         calendars = eventStore.calendars(for: EKEntityType.event)
-
-        if SelectedCalendarsStruct.selectedCalendarArray[indexPath.row] == 1 {
+        
+        var calendarIDArray = UserDefaults.standard.stringArray(forKey: "selectSaveCalendarIDs") ?? []
+        
+        if calendarIDArray.contains(SelectedCalendarsStruct.calendarsStruct[indexPath.row].calendarIdentifier) {
             
+            calendarIDArray.removeAll(where: {$0 == SelectedCalendarsStruct.calendarsStruct[indexPath.row].calendarIdentifier})
             
-            SelectedCalendarsStruct.calendarsStruct.removeAll(where: {$0.title == calendars[indexPath.row].title})
+            SelectedCalendarsStruct.selectedSearchCalendars.removeAll(where: {$0.calendarIdentifier == SelectedCalendarsStruct.calendarsStruct[indexPath.row].calendarIdentifier})
             
-            SelectedCalendarsStruct.selectedCalendarArray[indexPath.row] = 0
         }
         else {
-            SelectedCalendarsStruct.calendarsStruct.append(calendars[indexPath.row])
-            SelectedCalendarsStruct.selectedCalendarArray[indexPath.row] = 1
+//            we append the calendar identifier
+            calendarIDArray.append(SelectedCalendarsStruct.calendarsStruct[indexPath.row].calendarIdentifier)
+//            we add the selected calendar to the list to search for
+            SelectedCalendarsStruct.selectedSearchCalendars.append(SelectedCalendarsStruct.calendarsStruct[indexPath.row])
+            
         }
 //        used to remvove the calendars that have been deselected
-        print("final array \(SelectedCalendarsStruct.calendarsStruct)")
-//        createCalendarArray()
+        
+        UserDefaults.standard.setValue(calendarIDArray, forKey: "selectSaveCalendarIDs")
+        
+        
         tableViewCalendar.deselectRow(at: indexPath, animated: true)
         tableViewCalendar.reloadData()
     }

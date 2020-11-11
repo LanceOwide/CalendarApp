@@ -221,27 +221,26 @@ extension NL_saveCalendars: UITableViewDelegate, UITableViewDataSource{
         
         var currentSaveCalendar = [EKCalendar]()
         
+//        get the default save calendar from user defautls
+        let calendarIDSave = UserDefaults.standard.string(forKey: "saveToCalendar") ?? ""
         
-        let defaultSaveEvents = eventStore.defaultCalendarForNewEvents
+        print("calendarIDSave \(calendarIDSave)")
         
-        print("defaultSaveEvents: \(String(describing: defaultSaveEvents))")
-        
-        if defaultSaveCalendar.isEmpty == true{
-            
-            print("no default calendar selected")
-
-            currentSaveCalendar.append(defaultSaveEvents!)
-            
-            
+//        we add either the default to save new events, or we add the identifier saved in the user defaults to  the currentSaveCalendar
+        if calendarIDSave == ""{
+            currentSaveCalendar.append(eventStore.defaultCalendarForNewEvents!)
         }
         else{
-            
-            currentSaveCalendar = defaultSaveCalendar
+            if let saveCalendarIndex = calendarsList.index(where: {$0.calendarIdentifier == calendarIDSave}){
+                currentSaveCalendar.append(calendarsList[saveCalendarIndex])
+            }
+            else{
+                currentSaveCalendar.append(eventStore.defaultCalendarForNewEvents!)
+            }
             
         }
         
-        calendars = eventStore.calendars(for: EKEntityType.event)
-        
+                
         let calendarName = calendarsList[indexPath.row].title
         
         cell.textLabel?.text = calendarName

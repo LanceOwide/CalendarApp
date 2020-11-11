@@ -151,7 +151,7 @@ import FirebaseStorage
             print("applicationDidEnterBackground - disabling notificationListenerRegistration")
             notificationListenerEnagaged = false
         }
-        
+        print("willEnterBackground - saving chatNotificationiDs \(chatNotificationiDs)")
 //        save the chat notifications into the user defaults
         UserDefaults.standard.setValue(chatNotificationiDs, forKey: "chatNotificationEventIDs")
   

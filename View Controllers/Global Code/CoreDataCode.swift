@@ -1756,7 +1756,10 @@ func removeTheAvailabilityNotifications(){
             let calendarEventIDInput = availabilityData.calendarEventID ?? ""
             
             //                    Adds the event to the users calendar
-            self.addEventToCalendar(title: eventData.eventDescription, description: eventData.eventDescription, startDate: eventData.startDateArray[chosenDatePosition], endDate: eventData.endDateArray[chosenDatePosition], location: eventData.eventLocation, eventOwner: eventData.eventOwnerName, startDateDisplay: eventData.startDatesDisplay[chosenDatePosition], eventOwnerID: eventData.eventOwnerID, locationLongitude: eventData.locationLongitude, locationLatitude: eventData.locationLatitue, userEventStoreID: availabilityData.documentID!, calendarEventIDInput: calendarEventIDInput)
+            
+            self.addEventToCalendar(title: eventData.eventDescription, description: eventData.eventDescription, startDate: eventData.startDateArray[chosenDatePosition], endDate: eventData.endDateArray[chosenDatePosition], location: eventData.eventLocation, eventOwner: eventData.eventOwnerName, startDateDisplay: eventData.startDatesDisplay[chosenDatePosition], eventOwnerID: eventData.eventOwnerID, locationLongitude: eventData.locationLongitude, locationLatitude: eventData.locationLatitue, userEventStoreID: availabilityData.documentID!, calendarEventIDInput: calendarEventIDInput){_,_ in 
+                
+            }
         }}
     
     
@@ -1810,7 +1813,7 @@ func removeTheAvailabilityNotifications(){
     
 //    function to handle any errors with the data for an event.
 //    this function takes in an eventID and eventInfo or availabilityBool and deletes either all the event data or availability data, to then download it again from the sever
-    func somethingWentWrong(eventID: String, eventInfo: Bool, availabilityInfo: Bool, loginfo: String){
+    func somethingWentWrong(eventID: String, eventInfo: Bool, availabilityInfo: Bool, loginfo: String, viewController: UIViewController){
         print("running func somethingWentWrong")
         Crashlytics.crashlytics().log("running func somethingWentWrong")
         Crashlytics.crashlytics().log("running func somethingWentWrong - logs sent to func - loginfo \(loginfo)")

@@ -119,7 +119,10 @@ class NL_eventsViewController: UIViewController {
     }
     
     @objc func updateTables(){
-        reloadTheEvents()
+        
+        DispatchQueue.main.async {
+            self.reloadTheEvents()
+        }
     }
     
     @objc func inviteSelected(notification: [AnyHashable : Any]){
@@ -300,7 +303,9 @@ class NL_eventsViewController: UIViewController {
                 if self.collectionViewEvents == nil{
                 }
                 else{
+                    DispatchQueue.main.async {
                 self.collectionViewEvents.reloadData()}
+                }
             }
         }
         else if currentView == "Upcoming"{
@@ -310,7 +315,9 @@ class NL_eventsViewController: UIViewController {
                 if self.collectionViewEvents == nil{
                 }
                 else{
+                    DispatchQueue.main.async {
                     self.collectionViewEvents.reloadData()}
+                }
             }
         }
         else if currentView == "Past"{
@@ -320,7 +327,9 @@ class NL_eventsViewController: UIViewController {
                 if self.collectionViewEvents == nil{
                 }
                 else{
+                    DispatchQueue.main.async {
                     self.collectionViewEvents.reloadData()}
+                }
             }
         }
     }
@@ -753,14 +762,6 @@ class InnerCollectionViewDelegate2: NSObject, UICollectionViewDataSource, UIColl
             }
 //                    loop through each possible user itteration and set the image and status accordingly
             
-//                    1. they are not a user and we want to invite them
-            if availability.count == 0{
-                cell.inviteeStatus.isHidden = false
-                cell.inviteeStatus.image = UIImage(named: "hourGlassCodeCircle")
-                cell.inviteePicture.image = UIImage(data: image)?.alpha(0.5)
-                cell.inviteePicture.isHidden = false
-                cell.eventImageView.isHidden = true
-            }
             
 //                    2. They are a user
             if availability.count != 0{

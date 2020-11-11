@@ -202,7 +202,7 @@ class NL_editAvailability: UIViewController {
 //            check that the user has an availability for the event if not we run somehting went wrong
             if t.count == 0{
                 completionHandler()
-                somethingWentWrong(eventID: currentUserSelectedEvent.eventID, eventInfo: true, availabilityInfo: true, loginfo: "running func - createArrayIfUserHasntResponded - no availability returned for the user")
+                somethingWentWrong(eventID: currentUserSelectedEvent.eventID, eventInfo: true, availabilityInfo: true, loginfo: "running func - createArrayIfUserHasntResponded - no availability returned for the user", viewController: self)
                 
             }
             else{

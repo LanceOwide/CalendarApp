@@ -10,7 +10,11 @@ import EventKit
 
 struct SelectedCalendarsStruct {
     static var calendarsStruct = [EKCalendar]()
-    static var selectedCalendarArray = [Int]()  
+    static var selectedCalendarArray = [Int]()
+    static var selectedCalendarID = [String]()
+    static var selectedSearchCalendars = [EKCalendar]()
+    static var selectedSaveCalendar = [EKCalendar]()
+    static var selectedSaveCalendarID = [String]()
 }
 
 

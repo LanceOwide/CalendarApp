@@ -256,7 +256,6 @@ class NL_chatLogController: UIViewController {
                         combination.append(attributedQuote2)
                         
                         lastChatDict[i.eventID!] = combination
-//                        print("lastChatDict \(lastChatDict)")
                 }}
                 
 //                loop through each eventID in the chatNotificationiD and check it isnt "" or no longer exists as an event, this ensures we dont keep a chat notification for an event that no longer exists
