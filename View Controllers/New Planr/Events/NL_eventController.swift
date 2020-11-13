@@ -38,6 +38,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     var imgEventType = UIImageView()
     var lblstatus = UILabel()
     var lbleventDate = UILabel()
+    var btnCalendar = UIButton()
     
 //    add the collectionViews
     var cvEventInviteesCollectionView: UICollectionView!
@@ -61,9 +62,6 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-//        MARK: remove when pushing to prod
-//        newEventCreated = true
         
         title = "Details"
         
@@ -127,6 +125,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     let respondHeight = CGFloat(30)
     let respondBtnHeight = CGFloat(30)
     let respondBtnWidth = CGFloat(70)
+    let calendarSize = CGFloat(25)
     
     //   setup the view for holding the progress bar and title
     let containerView = UIView()
@@ -242,8 +241,24 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     lbleventTime.text = "12:00 - 13:00"
     
     
-//    add the invitee collectionView
+////    add the button for the calendar
+//    topView.addSubview(btnCalendar)
+//    btnCalendar.topAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset + titleHeight*2 + pageTitleHeight).isActive = true
+//    btnCalendar.rightAnchor.constraint(equalTo: topView.rightAnchor,constant: -sideInset).isActive = true
+//    btnCalendar.widthAnchor.constraint(equalToConstant: calendarSize).isActive = true
+//    btnCalendar.heightAnchor.constraint(equalToConstant: calendarSize).isActive = true
+//    btnCalendar.setImage(UIImage(named:"CalendarCode"), for: .normal)
+//    btnCalendar.translatesAutoresizingMaskIntoConstraints = false
+//
+////    we only want to show this if the date has been chosen for the event
+//    if currentUserSelectedEvent.chosenDate == ""{
+//        btnCalendar.isHidden = true
+//    }
+//    else{
+//        btnCalendar.isHidden = false
+//    }
     
+
     //        setup the collectionView
      let layout = UICollectionViewFlowLayout()
      layout.scrollDirection = .horizontal
@@ -466,32 +481,35 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 //    function to show the instructions for a newly created event
     
     func showInstructions(){
-        let firstTimeUser = UserDefaults.standard.string(forKey: "firstCreatingOpeningv2.0001.4") ?? ""
+        let firstTimeUser = UserDefaults.standard.string(forKey: "firstCreatingOpeningv2.0001.8") ?? ""
         
 //        let firstTimeUser = ""
-        
+//        newEventCreated = true
 //        if the user hasnt seen the instructions  before and they have been sent to the event from the create event page
         if firstTimeUser == "" && newEventCreated == true{
         coachmarkHelperText = "newEventCreated"
         coachMarksController.start(in: .window(over: self))
-//        if the user has invited non users, we show them the popup
-            if currentUserSelectedEvent.nonUserNames.count != 0{
+//        if the user has invited non users, we show them the popup, we also check that this user is the user who created the event
+            if currentUserSelectedEvent.nonUserNames.count != 0 && currentUserSelectedEvent.eventOwnerID == user!{
         self.inviteFriendsPopUp(notExistingUserArray: currentUserSelectedEvent.nonUserNames, nonExistingNameArray: currentUserSelectedEvent.nonUserNames)
+//                we reset the newCreated variable to ensure the pop doenst get shown each time we open the event
+                newEventCreated = false
             }
 //            set this back to the false status
         newEventCreated = false
 //            set the user default so that it doesnt show again
-        UserDefaults.standard.setValue("shown", forKey: "firstCreatingOpeningv2.0001.4")
+        UserDefaults.standard.setValue("shown", forKey: "firstCreatingOpeningv2.0001.8")
         }
-        else if newEventCreated == true && currentUserSelectedEvent.nonUserNames.count != 0{
+        else if newEventCreated == true && currentUserSelectedEvent.nonUserNames.count != 0 && currentUserSelectedEvent.eventOwnerID == user!{
             self.inviteFriendsPopUp(notExistingUserArray: currentUserSelectedEvent.nonUserNames, nonExistingNameArray: currentUserSelectedEvent.nonUserNames)
+//                we reset the newCreated variable to ensure the pop doenst get shown each time we open the event
+            newEventCreated = false
         }
     }
     
 //    fucntion to reload the page, this can be triggered anywhere
     
     @objc func updateTables(){
-        
         DispatchQueue.main.async {
         print("results page func updateTables - updated availability notification triggered - eventID: \(currentUserSelectedEvent.eventID)")
         //        need to refresh the event data, we can also check if the user has deleted the event
@@ -1003,10 +1021,9 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     //        we set the global variable coachmarkHelperText just before we launch the coachMarks, this tell it what we are running
                     if coachmarkHelperText == "newEventCreated"{
                         
-                        hintLabels = ["Your friends have been notified of the event, a tick means we've collected their availability","Once you've chosen the date for your event, select it and press save, Planr will notify your friends","If Planr has access to your calendar, your availability will be automatically added, you can also update or override it"]
+                        hintLabels = ["Your friends have been notified of the event, a tick means we've collected their availability, a double tick means they've confirmed they're coming","Once you've chosen the date for your event, select it and press save, Planr will notify your friends","If Planr has access to your calendar, your availability will be automatically calculated, you can also update or override it"]
                         
                         coachViews.bodyView.hintLabel.text = hintLabels[index]
-    //                    coachViews.bodyView.nextLabel.text = nextlabels[index]
                     }
                      
                      return (bodyView: coachViews.bodyView, arrowView: coachViews.arrowView)
@@ -1020,7 +1037,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                     
                     if coachmarkHelperText == "newEventCreated"{
     //                    we set where the coachmarks will appear
-                        let hintPositions = [CGRect(x: 0, y: topDistance + 170, width: screenWidth, height: 75),CGRect(x: 0, y: topDistance + 250, width: screenWidth, height: 250),CGRect(x: screenWidth/2, y: screenHeight - 100, width: screenWidth/4, height: screenWidth/4)]
+                        let hintPositions = [CGRect(x: 0, y: topDistance + 170, width: screenWidth, height: 75),CGRect(x: 0, y: topDistance + 300, width: screenWidth, height: 250),CGRect(x: screenWidth/2, y: screenHeight - 100, width: screenWidth/4, height: screenWidth/4)]
                         
                         pointOfInterest.frame = hintPositions[index]
                     }

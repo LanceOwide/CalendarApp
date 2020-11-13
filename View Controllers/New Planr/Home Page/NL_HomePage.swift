@@ -68,6 +68,7 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
     var separatorLine = UIView()
     var topView = UIView()
     let coachMarksController = CoachMarksController()
+    var instructionsTriggered = false
     
     //setting the delegate to be used for the invitee collectionView
     var innerDelegate = InnerCollectionViewDelegate()
@@ -240,14 +241,20 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
     @objc func tutorialClosed(){
         print("tutorialClosed")
         
+//        there appears to be a bug where this is being triggered twice, to stop this we set a variable to say the instructions are showing
+        if instructionsTriggered == false{
+            
 //        check if the new user had an event invite already, if show show them the events page
         if CDEevents.count != 0{
+            instructionsTriggered = true
         coachmarkHelperText = "firstTimeUserHasBeenInvited"
         coachMarksController.start(in: .window(over: self))
         }
         if CDEevents.count == 0{
+            instructionsTriggered = true
         coachmarkHelperText = "firstTimeUserNoEvent"
         coachMarksController.start(in: .window(over: self))
+        }
         }
         
     }
@@ -423,7 +430,7 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
     
     func showTutorial(){
         
-    let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningv2.0001.4") ?? ""
+    let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningv2.0001.8") ?? ""
     var createEventCoachMarksPermenant = UserDefaults.standard.bool(forKey: "permenantToolTips")
         
 //        MARK: remove this when pushing to prod

@@ -1561,12 +1561,12 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
             if calendarEventIDInput == ""{
                 
                 alertTitle = "Event Date Chosen"
-                alertText = ("\(eventOwnerName) chosen the date for event \( description!), on \(displayDate), would you like to add it to your phone calendar? The event can now be found in Confirmed Events") 
+                alertText = ("\(eventOwnerName) chosen the date for event \( description!), on \(displayDate), would you like to add it to your phone calendar?")
             }
             else{
                 
                 alertTitle = "Event Updated"
-               alertText = ("\(eventOwnerName) has changed the date of event \( description!), now on \(displayDate), would you like to update it in your phone calendar?")
+               alertText = ("\(eventOwnerName) has changed the date of event \( description!), now on \(displayDate), would you like to update it in your calendar?")
             }
     
         
