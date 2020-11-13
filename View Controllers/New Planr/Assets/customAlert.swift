@@ -40,6 +40,8 @@ class customAlertController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print("creating the alert payload.messageColor \(payload.messageColor)  payload.titleColor \(payload.titleColor) payload.backgroundColor \(payload.backgroundColor)")
+        
 //        setting for the ale
 
         if (payload.buttons.count == 1 && payload.inputTextHidden == true) {
@@ -84,7 +86,7 @@ class customAlertController: UIViewController{
             uiButton.setTitleColor(alertButton.titleColor, for: .normal);
         }
         if (alertButton.backgroundColor != nil) {
-            uiButton.backgroundColor = alertButton.backgroundColor;
+            uiButton.backgroundColor = alertButton.backgroundColor
         }
     }
     

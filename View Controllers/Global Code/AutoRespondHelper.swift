@@ -646,6 +646,7 @@ class AutoRespondHelper {
             nextAvailability.userAvailability = i.userAvailability ?? [99]
             nextAvailability.userName = i.userName ?? ""
             nextAvailability.calendarEventID = i.calendarEventID ?? ""
+            nextAvailability.responded = i.responded ?? "nr"
 //            print("nextAvailability \(nextAvailability)")
             serialisedAvailability.append(nextAvailability)
         }
@@ -702,6 +703,7 @@ class AutoRespondHelper {
                 n.nonUserNames = CDNewEvent.nonUserNames ?? [""]
                 n.startDatesDisplay = CDNewEvent.startDatesDisplay!
                 n.users = CDNewEvent.users ?? [""]
+                n.eventType = CDNewEvent.eventType ?? ""
                 
 //            adding the final date in the search array
                 let lastDate = n.endDateArray.last!
@@ -727,7 +729,7 @@ class AutoRespondHelper {
     
          //    fetch availability for a specific event and serialise the data
     static func serialiseAvailabilitywUserAuto(eventID: String, userID: String) -> [AvailabilityStruct]{
-         print("running func serialiseAvailabilitywUserAuto inputs - eventID \(eventID)")
+         print("running func serialiseAvailabilitywUserAuto inputs - eventID \(eventID) userID \(userID)")
             var filteredAvailability = [CoreDataAvailability]()
             var serialisedAvailability = [AvailabilityStruct]()
         
@@ -743,6 +745,7 @@ class AutoRespondHelper {
                 nextAvailability.userAvailability = i.userAvailability ?? [99]
                 nextAvailability.userName = i.userName ?? ""
                 nextAvailability.calendarEventID = i.calendarEventID ?? ""
+                nextAvailability.responded = i.responded ?? "nr"
     //            print("nextAvailability \(nextAvailability)")
                 serialisedAvailability.append(nextAvailability)
             }
@@ -800,6 +803,7 @@ class AutoRespondHelper {
                                 CDNewAvailability.uid = documentEventData.get("uid") as? String
                                 CDNewAvailability.userName = documentEventData.get("userName") as? String
                                 CDNewAvailability.userAvailability = documentEventData.get("userAvailability") as? [Int] ?? [99]
+                                CDNewAvailability.responded = documentEventData.get("responded") as? String ?? "nr"
 
         //                        append the new event onto CDAvailability
                                 CDAvailability.append(CDNewAvailability)
@@ -1835,6 +1839,213 @@ class AutoRespondHelper {
                 rRef.child("userEventLink/\(userID)/eventReminder/\(eventID)").setValue(eventID)
                 
             }
+    
+//    function to upload the users attendance response to the event
+//        this links to the notifications
+    static func userAttendanceResponse(eventID: String, userEventStoreID: String, response: String, userIDs: [String]){
+        print("running func userAttendanceResponse eventID \(eventID) userEventStoreID \(userEventStoreID) response \(response) userIDs \(userIDs)")
+        
+//        1. we need to push the repsonse to the users availability
+        let dbStoreInd = Firestore.firestore()
+        dbStoreInd.collection("userEventStore").document(userEventStoreID).setData(["responded": response], merge: true)
+        
+//       2. we let the users of the event know there is updated information for them to pick up
+        CoreDataCode().availabilityAmendedNotification(userIDs: userIDs, availabilityDocumentID: userEventStoreID)
+        
+//        3. we push to the realtime database to trigger a APN for the user
+        userRespondedAttendanceNotification(eventID: eventID)
+    }
+    
+    
+    
+    //    function used to saved save a notificaiton that the user has responded to the database, this is used to trigger a notification to the event owner and the responder, we set the vaule being written to now, such that it is always updated
+        static func userRespondedAttendanceNotification(eventID: String){
+            print("running func userRespondedAttendanceNotification eventID \(eventID)")
+    //        we use the userdefault to ensure a new number is always written to the database, if the same value is written nothing is actually written and the listener will not be tirggered
+            let notificationNumber = UserDefaults.standard.integer(forKey: "notificationNumber")
+            let notificationNumberNew = notificationNumber + 1
+            
+            print(" running func userRespondedAttendanceNotification - eventID: \(eventID) notificationNumberNew \(notificationNumberNew)")
+            let ref = Database.database().reference()
+            let fromId = user!
+            ref.child("userRespondedAttendance").child(eventID).child(fromId).setValue(notificationNumberNew)
+            UserDefaults.standard.set(notificationNumberNew, forKey: "notificationNumber")
+            
+        }
+    
+    static func removeSingleUserFromEvent(eventID: String, user: String){
+        print("running func removeSingleUserFromEvent")
+        
+//        1. update the eventStoreRequest
+        
+//        1.1 remove the current user from the event list
+        var currentUserNameList = currentUserSelectedEvent.currentUserNames
+        var currentUserList = currentUserSelectedEvent.users
+        
+//        get the current users name so that we can remove it
+        getUserNameAuto{ (usersName) in
+        
+            currentUserNameList.removeAll(where: {$0 == usersName})
+            currentUserList.removeAll(where: {$0 == user})
+            print("removeSingleUserFromEvent currentUserNameList \(currentUserNameList) currentUserList \(currentUserList)")
+            
+        let dbStoreInd = Firestore.firestore()
+    
+        dbStoreInd.collection("eventRequests").document(eventID).setData(["currentUserNames" : currentUserNameList,"currentUserList": currentUserList], merge: true)
+        }
+//        2. we run the delete to remove everything else
+        deletedUsersAuto(deletedUserIDs: [user], newUserIDList: currentUserList){
+//            we tell the users there is a new udpate available
+            eventAmendedNotificationAuto(userIDs: currentUserList, eventID: currentUserSelectedEvent.eventID)
+        }
+    }
+    
+    
+    //        function to get the user name from defaults, confirm it is populated and if not get it from the web
+           static func getUserNameAuto(completion: @escaping (_ usersName: String) -> Void){
+            print("running func getUserName")
+                
+            let userName = UserDefaults.standard.string(forKey: "name") ?? ""
+    //        print("userName \(userName)")
+            
+            if userName == "" {
+                
+                if user == nil{
+                  completion("")
+                }
+                else{
+                
+                dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments { (querySnapshot, error) in
+                
+                                print("querySnapshot from user check \(String(describing: querySnapshot))")
+                
+                                if error != nil {
+                                    print("there was an error")
+                                }
+                                else {
+                                    for documents in querySnapshot!.documents{
+                                    
+                                    let name = documents.get("name") as! String
+                                        
+                                        UserDefaults.standard.set(name, forKey: "name")
+                                        
+                                        completion(name)
+                                    }
+                    } }}
+                }
+            else{
+                completion(userName)
+            }}
+    
+    
+    //    delete data for users of the app that have been removed
+    static func deletedUsersAuto(deletedUserIDs: [String], newUserIDList: [String], completion: @escaping () -> Void){
+            
+                        print("user deleted invitees that are already users \(deletedUserIDs)")
+                  
+            //            1. deletes the userEventStore
+                deleteUserEventLinkArrayAuto(userID: deletedUserIDs, eventID: currentUserSelectedEvent.eventID)
+            //            2. clear the user
+//                                deleteEventStoreAvailability(eventID: currentUserSelectedEvent.eventID)
+            //            3. post a deleted notification for these users, so their app deletes the event
+                eventDeletedNotificationAuto(userIDs: deletedUserIDs, eventID: currentUserSelectedEvent.eventID)
+
+            //            4. post delete notification for the users availability, so other users delete the removed users thier availability deleted
+                        for i in deletedUserIDs{
+                            let filteredAvailability = currentUserSelectedAvailability.filter {$0.uid == i}
+                            let filteredAvailabilityDocumentID = filteredAvailability[0].documentID
+                            availabilityDeletedNotificationAuto(userIDs: newUserIDList, availabilityDocumentID: filteredAvailabilityDocumentID)
+//                                        we also need to tell the deleted user to remove the availability for the event
+                            deleteRemoveUserAvailabilityNotificationAuto(userID: i)
+                                        
+//                              delete the users ID in the messages tree of the DB
+                        let ref = Database.database().reference()
+                        ref.child("messageNotifications/\(currentUserSelectedEvent.eventID)/\(i)").removeValue()
+                                    }
+            completion()
+            
+        }
+    
+    
+    //    notification function for new availability
+            static func availabilityDeletedNotificationAuto(userIDs: [String], availabilityDocumentID: String){
+              print("running func availabilityDeletedNotification- adding notificaitons to userAvailabilityUpdates - inputs - userIDs \(userIDs) availabilityString \(availabilityDocumentID)")
+                
+                for i in userIDs{
+        //            add the eventID and an updated notification to the userEventUpdates tbales
+                    dbStore.collection("userAvailabilityUpdates").document(i).setData([availabilityDocumentID: "Delete"], merge: true)
+                }
+            }
+    
+    
+    //    notification function for new availability
+            static func deleteRemoveUserAvailabilityNotificationAuto(userID: String){
+              print("running func deleteRemoveUserAvailabilityNotification - userID \(userID)")
+                
+//                get all availability for the event
+                let allAvailability = currentUserSelectedAvailability
+                
+                for i in allAvailability{
+        //            add the eventID and an updated notification to the userEventUpdates tbales
+                    dbStore.collection("userAvailabilityUpdates").document(userID).setData([i.documentID: "Delete"], merge: true)
+                }
+            }
+    
+    
+    //    notification function for deleted events
+           static func eventDeletedNotificationAuto(userIDs: [String], eventID: String){
+              print("running func eventDeletedNotification- adding notificaitons to userEventUpdates - inputs - userIDs \(userIDs)")
+                
+                for i in userIDs{
+        //            add the eventID and an updated notification to the userEventUpdates tbales
+                    dbStore.collection("userEventUpdates").document(i).setData([eventID: "delete"], merge: true)
+                }
+            
+            }
+    
+    
+    //    notification function for amended events
+           static func eventAmendedNotificationAuto(userIDs: [String], eventID: String){
+              print("running func eventAmendedNotificationAuto- adding notificaitons to userEventUpdates - inputs - userIDs \(userIDs)")
+                
+                for i in userIDs{
+        //            add the eventID and an updated notification to the userEventUpdates tbales
+                    dbStore.collection("userEventUpdates").document(i).setData([eventID: "amend"], merge: true)
+                }
+            
+            }
+    
+    
+    //    Deletes the users entry in the UserEventStore table
+       static func deleteUserEventLinkArrayAuto(userID: [String], eventID: String){
+            
+            print("running func deleteuserEventLinkArray - inputs userID: \(userID) eventID: \(eventID)")
+            
+            let docRefUserEventStore = dbStore.collection("userEventStore")
+            
+             for users in userID{
+            
+            let filteredAvailability = currentUserSelectedAvailability.filter { $0.uid == users}
+                let documentID = filteredAvailability[0].documentID
+                if documentID == ""{
+                    print("something went wrong in deleteuserEventLinkArray documentID is blank for user \(users)")
+                }
+                else{
+                    
+    //                delete the useravailability first
+                    docRefUserEventStore.document(documentID).updateData(["userAvailability" : FieldValue.delete()]){ err in
+                    if let err = err {
+                        print("Error updating document: \(err)")
+                    } else {
+                        print("Document successfully updated")
+                    }
+                }
+    //            delete the document itself
+                  docRefUserEventStore.document(documentID).delete()
+        
+            }
+            }
+        }
 
     
 //    helper end

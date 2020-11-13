@@ -32,6 +32,13 @@ struct MyVariables {
     
 //    orange color for the notification circles
     static var notificationOrange = UIColor(red: 255, green: 163, blue: 24)
+    
+//    light red for button #FFF4F4 -     255, 244, 244
+    static var lightRed = UIColor(red: 255, green: 244, blue: 244)
+    
+    
+//    dark red for text FF6C6C - 255, 108, 108
+    static var darkRed = UIColor(red: 255, green: 108, blue: 108)
   
 
 }

@@ -51,6 +51,9 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     var lblDelete = UILabel()
     var lblEdit = UILabel()
     let coachMarksController = CoachMarksController()
+    var btnYesAttend = UIButton()
+    var btnNoAttend = UIButton()
+    var lblRespond = UILabel()
     
     let cellId = "cellId"
     let cellId2 = "cellId2"
@@ -121,6 +124,9 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     let lblHeight = CGFloat(10)
     let statusWidth = CGFloat(60)
     let statusHeight = CGFloat(60)
+    let respondHeight = CGFloat(30)
+    let respondBtnHeight = CGFloat(30)
+    let respondBtnWidth = CGFloat(70)
     
     //   setup the view for holding the progress bar and title
     let containerView = UIView()
@@ -236,24 +242,6 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     lbleventTime.text = "12:00 - 13:00"
     
     
-//    topView.addSubview(lbleventDate)
-//    lbleventDate.topAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset + titleHeight*2 + pageTitleHeight).isActive = true
-//    lbleventDate.leftAnchor.constraint(equalTo: topView.leftAnchor,constant: sideInset*2 + imgSize + 150 + 10).isActive = true
-//    lbleventDate.widthAnchor.constraint(equalToConstant: 150).isActive = true
-//    lbleventDate.heightAnchor.constraint(equalToConstant: timeHeight).isActive = true
-//    lbleventDate.font = UIFont.boldSystemFont(ofSize: 17)
-//    lbleventDate.text = "12:00 - 13:00"
-//    lbleventDate.textAlignment = .center
-//    lbleventDate.font = UIFont.boldSystemFont(ofSize: 14)
-//    lbleventDate.textColor = MyVariables.colourPlanrGreen
-//    lbleventDate.backgroundColor = MyVariables.colourSelected
-//    lbleventDate.layer.cornerRadius = 3
-//    lbleventDate.layer.masksToBounds = true
-//    lbleventDate.widthAnchor.constraint(equalToConstant: 120).isActive = true
-//    lbleventDate.translatesAutoresizingMaskIntoConstraints = false
-//    lbleventDate.isHidden = true
-    
-    
 //    add the invitee collectionView
     
     //        setup the collectionView
@@ -274,6 +262,76 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     cvEventInviteesCollectionView.heightAnchor.constraint(equalToConstant: cvInviteeHeight).isActive = true
     cvEventInviteesCollectionView.translatesAutoresizingMaskIntoConstraints = false
     
+//    add the buttons for the user to respond with whether they are coming
+    
+    lblRespond.text = "Will you be joining?"
+    lblRespond.translatesAutoresizingMaskIntoConstraints = false
+    lblRespond.adjustsFontSizeToFitWidth = true
+    lblRespond.textAlignment = .left
+    lblRespond.font = UIFont.boldSystemFont(ofSize: 13)
+    lblRespond.textColor = .black
+    topView.addSubview(lblRespond)
+    lblRespond.leftAnchor.constraint(equalTo: topView.leftAnchor,constant: sideInset).isActive = true
+    lblRespond.topAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset + titleHeight*2 + timeHeight + spacer + pageTitleHeight + cvInviteeHeight + 5).isActive = true
+    lblRespond.widthAnchor.constraint(equalToConstant: 150).isActive = true
+    lblRespond.heightAnchor.constraint(equalToConstant: respondBtnHeight).isActive = true
+    lblRespond.translatesAutoresizingMaskIntoConstraints = false
+    
+    
+    
+    btnYesAttend.setImage(UIImage(named: "greenTickCode"), for: .normal)
+    btnYesAttend.imageEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 50)
+    btnYesAttend.setTitle("Yes", for: .normal)
+    btnYesAttend.titleLabel?.font = UIFont.boldSystemFont(ofSize: 13)
+    btnYesAttend.setTitleColor(MyVariables.colourPlanrGreen, for: .normal)
+    btnYesAttend.titleLabel?.textAlignment = .left
+    btnYesAttend.titleEdgeInsets = UIEdgeInsets(top: 5, left: 30, bottom: 5, right: 5)
+    btnYesAttend.backgroundColor = MyVariables.colourSelected
+    btnYesAttend.translatesAutoresizingMaskIntoConstraints = false
+    topView.addSubview(btnYesAttend)
+    btnYesAttend.rightAnchor.constraint(equalTo: topView.rightAnchor,constant: -sideInset - respondBtnWidth - 20).isActive = true
+    btnYesAttend.topAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset + titleHeight*2 + timeHeight + spacer + pageTitleHeight + cvInviteeHeight + 5).isActive = true
+    btnYesAttend.widthAnchor.constraint(equalToConstant: respondBtnWidth).isActive = true
+    btnYesAttend.heightAnchor.constraint(equalToConstant: respondBtnHeight).isActive = true
+    btnYesAttend.translatesAutoresizingMaskIntoConstraints = false
+    btnYesAttend.addTarget(self, action: #selector(btnYesAttendTapped), for: .touchUpInside)
+//    btnYesAttend.layer.borderWidth = 1
+//    btnYesAttend.layer.borderColor = MyVariables.colourLight.cgColor
+    btnYesAttend.layer.cornerRadius = 5
+    
+    
+    btnNoAttend.setImage(UIImage(named: "declineCode"), for: .normal)
+    btnNoAttend.imageEdgeInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 40)
+    btnNoAttend.setTitle("No", for: .normal)
+    btnNoAttend.titleLabel?.font = UIFont.boldSystemFont(ofSize: 13)
+    btnNoAttend.setTitleColor(MyVariables.darkRed, for: .normal)
+    btnNoAttend.titleLabel?.textAlignment = .left
+    btnNoAttend.titleEdgeInsets = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 5)
+    btnNoAttend.backgroundColor = MyVariables.lightRed
+    btnNoAttend.translatesAutoresizingMaskIntoConstraints = false
+    topView.addSubview(btnNoAttend)
+    btnNoAttend.rightAnchor.constraint(equalTo: topView.rightAnchor,constant: -sideInset ).isActive = true
+    btnNoAttend.topAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset + titleHeight*2 + timeHeight + spacer + pageTitleHeight + cvInviteeHeight + 5).isActive = true
+    btnNoAttend.widthAnchor.constraint(equalToConstant: respondBtnWidth).isActive = true
+    btnNoAttend.heightAnchor.constraint(equalToConstant: respondBtnHeight).isActive = true
+    btnNoAttend.translatesAutoresizingMaskIntoConstraints = false
+    btnNoAttend.addTarget(self, action: #selector(btnNoAttendTapped), for: .touchUpInside)
+//    btnNoAttend.layer.borderWidth = 1
+//    btnNoAttend.layer.borderColor = MyVariables.colourLight.cgColor
+    btnNoAttend.layer.cornerRadius = 5
+    
+//    we only want to show the respond buttons if the user doesnt respond
+    if currentUserSelectedEvent.eventOwnerID == user{
+        btnNoAttend.isHidden = true
+        btnYesAttend.isHidden = true
+        lblRespond.isHidden = true
+    }
+    else{
+        btnNoAttend.isHidden = false
+        btnYesAttend.isHidden = false
+        lblRespond.isHidden = false
+    }
+    
     
     //        setup the collectionView
      let layout2 = UICollectionViewFlowLayout()
@@ -289,7 +347,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     cvEventResponses.dataSource = self
     topView.addSubview(cvEventResponses)
     cvEventResponses.leftAnchor.constraint(equalTo: topView.leftAnchor,constant: sideInset).isActive = true
-    cvEventResponses.topAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset + titleHeight*2 + timeHeight + cvInviteeHeight + spacer*2 + pageTitleHeight).isActive = true
+    cvEventResponses.topAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset + titleHeight*2 + timeHeight + cvInviteeHeight + spacer*2 + pageTitleHeight + respondHeight).isActive = true
     cvEventResponses.widthAnchor.constraint(equalToConstant: screenWidth - sideInset*2).isActive = true
     cvEventResponses.bottomAnchor.constraint(equalTo: topView.bottomAnchor, constant: -bottomButtonHeight).isActive = true
     cvEventResponses.translatesAutoresizingMaskIntoConstraints = false
@@ -435,7 +493,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     @objc func updateTables(){
         
         DispatchQueue.main.async {
-        print("results page func updateTables - updated availability notification triggered - eventIDChosen: \(currentUserSelectedEvent.eventID)")
+        print("results page func updateTables - updated availability notification triggered - eventID: \(currentUserSelectedEvent.eventID)")
         //        need to refresh the event data, we can also check if the user has deleted the event
                 let predicate = NSPredicate(format: "eventID = %@", currentUserSelectedEvent.eventID)
                 let predicateReturned = self.serialiseEvents(predicate: predicate, usePredicate: true)
@@ -467,6 +525,42 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                         self.imgEventType.image = UIImage(named: "customColoredCode")
                         }
                     
+                    self.setup()
+                    
+////                get the availability
+//                    let availability = AutoRespondHelper.serialiseAvailabilitywUserAuto(eventID: currentUserSelectedEvent.eventID, userID: user!)
+////                the user isnt a user, we could not fund them so we set to 0
+//                if availability.count == 0 {
+//                    print("updateTables - availability not returned")
+//
+//                    }
+//                    else{
+//
+//                    if availability[0].responded == "yes"{
+//                        print("updateTables - responded = yes")
+////                            if the user has responded we cahnge the button
+//                        self.lblRespond.text = "You are joining"
+//                        self.btnYesAttend.layer.borderWidth = 2
+//                        self.btnYesAttend.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
+////                            in case the user changed anything we also need to adjust the other button settings
+//                        self.btnNoAttend.layer.borderWidth = 1
+//                        self.btnNoAttend.layer.borderColor = MyVariables.colourSelected.cgColor
+//                    }
+//                    else if availability[0].responded == "no"{
+//                        print("updateTables - responded = no")
+//                        self.lblRespond.text = "You aren't joining"
+//                        self.btnNoAttend.layer.borderWidth = 2
+//                        self.btnNoAttend.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
+////                            in case the user changed anything we also need to adjust the other button settings
+//                        self.btnYesAttend.layer.borderWidth = 1
+//                        self.btnYesAttend.layer.borderColor = MyVariables.colourSelected.cgColor
+//                    }
+//                    else{
+//                        print("updateTables - responded = nr")
+//
+//                    }
+//                    }
+                    
                     }
                 }
         }
@@ -479,6 +573,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     //        get the current event availability
             let availabilityResults = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
     //        get this users availability
+            print("checkIfUserHasResponded filter user \(user!)")
             let filter = availabilityResults.filter {$0.uid == user!}
     //        determine if the user has responded
             if filter.count == 0{
@@ -511,6 +606,57 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
             
         }
     
+    @objc func btnNoAttendTapped(){
+        print("btnNoAttendTapped")
+        
+        //        get the current event availability
+                let availabilityResults = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+        print("btnNoAttendTapped - availabilityResults \(availabilityResults)")
+        //        get this users availability
+                let filter = availabilityResults.filter {$0.uid == user!}
+        if filter.count == 0{
+          print("user doesnt have an availability")
+            AutoRespondHelper.nonRespondedEventsAuto()
+        }
+        else{
+          let availability = filter[0]
+        
+            AutoRespondHelper.userAttendanceResponse(eventID: currentUserSelectedEvent.eventID, userEventStoreID: availability.documentID, response: "no", userIDs: currentUserSelectedEvent.users)
+        }
+        
+        
+        //            utils for calling the alert
+        let utils = Utils()
+        let button = AlertButton(title: "OK", action: {
+                               print("OK clicked")
+        })
+        
+        let alertPayload = AlertPayload(title: "Not Attending", titleColor: UIColor.red, message: "The organiser has been notified you won't be attending. You will continue to receive updates or you can delete the event", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
+        
+        utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
+        
+    }
+    
+    @objc func btnYesAttendTapped(){
+        print("btnYesAttendTapped")
+        
+        //        get the current event availability
+                let availabilityResults = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+        //        get this users availability
+                let filter = availabilityResults.filter {$0.uid == user!}
+        if filter.count == 0{
+          print("user doesnt have an availability")
+            AutoRespondHelper.nonRespondedEventsAuto()
+        }
+        else{
+          let availability = filter[0]
+        
+            AutoRespondHelper.userAttendanceResponse(eventID: currentUserSelectedEvent.eventID, userEventStoreID: availability.documentID, response: "yes", userIDs: currentUserSelectedEvent.users)
+        }
+        
+        
+    }
+    
 //    function to dismiss the event view on pressing the close button
     @objc func closeSeclected(){
         
@@ -524,13 +670,19 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     @objc func btnDeletePressed(){
         print("button delete pressed")
         
-//            utils for calling the alert
-                    let utils = Utils()
+//        there are two separate workflows, if the user owns the event, they can delete it, if not they are only removing themselves from the event
         
+        //            utils for calling the alert
+        let utils = Utils()
+        
+//        1. the user owns the event
+        
+        if currentUserSelectedEvent.eventOwnerID == user{
+    
         
         let button = AlertButton(title: "OK", action: {
                                print("OK clicked")
-            print("User yes on the event delete")
+            print("User yes on the event delete the event")
             
             AutoRespondHelper.deleteEventStore(eventID: currentUserSelectedEvent.eventID)
             AutoRespondHelper.deleteEventRequest(eventID: currentUserSelectedEvent.eventID)
@@ -557,7 +709,38 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                        
         let alertPayload = AlertPayload(title: "Delete Event!", titleColor: UIColor.red, message: "Are you sure you would like to delete the event? (this can't be undone)", messageColor: MyVariables.colourPlanrGreen, buttons: [button,button2], backgroundColor: UIColor.clear, inputTextHidden: true)
                        
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true);
+            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
+            
+        }
+//        the user doesnt own the event and they only remove themselves from the event
+        else{
+            
+            let button = AlertButton(title: "OK", action: {
+                                   print("OK clicked")
+                print("User pressed yes on remove themselves from the event")
+                
+                AutoRespondHelper.removeSingleUserFromEvent(eventID: currentUserSelectedEvent.eventID, user: user!)
+                
+    //            post a notification to say there is new data
+                    NotificationCenter.default.post(name: .newDataLoaded, object: nil)
+                
+    // we need to dismiss the pop-up and reload whatever the user was looking at
+                self.dismiss(animated: true)
+
+                
+                
+            }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
+            
+            let button2 = AlertButton(title: "Cancel", action: {
+                print("cancel delete pressed")
+                    }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
+                           
+            let alertPayload = AlertPayload(title: "Delete Event!", titleColor: UIColor.red, message: "Are you sure you would like to remove yourself from this event? (this can't be undone)", messageColor: MyVariables.colourPlanrGreen, buttons: [button,button2], backgroundColor: UIColor.clear, inputTextHidden: true)
+            
+                           
+                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
+    
+        }
         
         
     }
@@ -570,6 +753,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 // present the popover
         self.present(popController, animated: true, completion: nil)
                 }
+        
    
     }
     
@@ -644,40 +828,68 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 //        hide the edit and delete buttons if the user isnt the owner
         if currentUserSelectedEvent.eventOwnerID != user!{
             btnEdit.isHidden = true
-            btnDelete.isHidden = true
-            lblDelete.isHidden = true
+//            btnDelete.isHidden = true
+//            lblDelete.isHidden = true
             lblEdit.isHidden = true
         }
         
 //        set the text and color for the status label
         if currentUserSelectedEvent.chosenDate != ""{
-          lblstatus.text = "Confirmed"
+          lblstatus.text = "Date Confirmed"
             lblstatus.textColor = MyVariables.colourPlanrGreen
             lblstatus.backgroundColor = MyVariables.colourSelected
-//                convert the date into a display date DD MMM
-//            let displayDate = dateTZToShortDisplayDate(date: currentUserSelectedEvent.chosenDate)
-//            lbleventDate.text = displayDate
-//            lbleventDate.isHidden = true
-            
         }
         else{
 //            we need to check if every user has responded, this can be done, 1. there should be no non user names, 2.we need to loop through each user in the event and check if no every one has responded
             
 //            tracking bool for a user not having responded
             var notResponded = false
+            var declined = false
             
-            for user in currentUserSelectedEvent.users{
+            for uid in currentUserSelectedEvent.users{
                 print("eventController looping through availability")
 //                get the availability
-                let availability = CoreDataCode().serialiseAvailabilitywUser(eventID: currentUserSelectedEvent.eventID, userID: user)
-//                the user isnt a user, we could not fund them so we set to 0
-                if availability.count == 0 || currentUserSelectedEvent.nonUserNames.count != 0{
+                let availability = CoreDataCode().serialiseAvailabilitywUser(eventID: currentUserSelectedEvent.eventID, userID: uid)
+//                the user isnt a user, we could not find them so we set to 0
+                if availability.count == 0 {
                     notResponded = true
                 }
                 else{
 //                    we check what was retruned
                     let userAvailabilityArray = availability[0].userAvailability
                     print("eventController userAvailabilityArray \(userAvailabilityArray)")
+                    
+//                    check if this is the current user, so we can set the event buttons
+                    if uid == user{
+                        if availability[0].responded == "yes"{
+                            print("setup - responded = yes")
+//                            if the user has responded we cahnge the button
+                            lblRespond.text = "You are joining"
+                            btnYesAttend.layer.borderWidth = 2
+                            btnYesAttend.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
+//                            in case the user changed anything we also need to adjust the other button settings
+                            btnNoAttend.layer.borderWidth = 1
+                            btnNoAttend.layer.borderColor = MyVariables.colourSelected.cgColor
+                        }
+                        else if availability[0].responded == "no"{
+                            print("setup - responded = no")
+                            lblRespond.text = "You aren't joining"
+                            btnNoAttend.layer.borderWidth = 2
+                            btnNoAttend.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
+//                            in case the user changed anything we also need to adjust the other button settings
+                            btnYesAttend.layer.borderWidth = 1
+                            btnYesAttend.layer.borderColor = MyVariables.colourSelected.cgColor
+                            
+                            declined = true
+                        }
+                        else{
+                            
+                        }
+                    }
+                    if currentUserSelectedEvent.nonUserNames.count != 0{
+                        notResponded = true
+                    }
+                    
     //                       2.1 the user has not responded and they have a picture
                     if userAvailabilityArray[0] == 11 ||  userAvailabilityArray[0] == 99{
                         notResponded = true
@@ -686,7 +898,13 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
             }
 
 //            if the not responded is now set to true we are awaiting responses
-            if notResponded == true{
+            if declined == true{
+                lblstatus.text = "Declined"
+                lblstatus.textColor = MyVariables.darkRed
+                lblstatus.backgroundColor = MyVariables.lightRed
+                lbleventDate.isHidden = true
+            }
+            else if notResponded == true{
                 lblstatus.text = "Awaiting Responses"
                 lblstatus.textColor = MyVariables.colourPendingText
                 lblstatus.backgroundColor = MyVariables.colourPendingBackground
@@ -945,11 +1163,20 @@ extension NL_eventController: UICollectionViewDelegate, UICollectionViewDataSour
 //                    loop through each possible user itteration and set the image and status accordingly
                     
 //                    1. they are not a user and we want to invite them
-                    if availability.count == 0{
+                    if availability.count == 0 && imageList.count != 0{
                         cell.inviteeStatus.isHidden = false
                         cell.inviteeStatus.image = UIImage(named: "hourGlassCodeCircle")
                         cell.inviteePicture.image = UIImage(data: image)?.alpha(0.5)
                         cell.inviteePicture.isHidden = false
+                        cell.respondedTickView.isHidden = true
+                        cell.eventImageView.isHidden = true
+                    }
+                    else if availability.count == 0 && imageList.count == 0{
+                        cell.inviteeStatus.isHidden = false
+                        cell.inviteeStatus.image = UIImage(named: "hourGlassCodeCircle")
+                        cell.inviteePicture.image = .none
+                        cell.inviteePicture.isHidden = false
+                        cell.respondedTickView.isHidden = true
                         cell.eventImageView.isHidden = true
                     }
                     
@@ -987,8 +1214,31 @@ extension NL_eventController: UICollectionViewDelegate, UICollectionViewDataSour
                             cell.inviteePicture.isHidden = false
                             cell.eventImageView.isHidden = true
                             }
+                        
+//            we check if the user has responded and show the double tick if they have responded
+//            holding whether the user has responded
+                    let respondedType = availability[0].responded
+                        if respondedType == "yes"{
+                            cell.respondedTickView.isHidden = false
+                            }
+                            else if respondedType == "no" && imageList.count != 0{
+                            cell.respondedTickView.isHidden = true
+                            cell.inviteeStatus.isHidden = false
+                            cell.inviteePicture.image = UIImage(data: image)?.alpha(0.5)
+                            cell.inviteeStatus.image = UIImage(named: "declineCode")
+                            cell.eventImageView.isHidden = true
+                            }
+                            else if respondedType == "no" && imageList.count == 0{
+                                cell.inviteePicture.image = .none
+                                cell.inviteeStatus.image = UIImage(named: "declineCode")
+                                cell.eventImageView.isHidden = true
+                                cell.respondedTickView.isHidden = true
+                                cell.inviteeStatus.isHidden = false
+                            }
+                            else{
+                                cell.respondedTickView.isHidden = true
+                            }
                     }
-                    
                 }
 //                    this invitee isnt a user yet
                 else{
@@ -998,11 +1248,16 @@ extension NL_eventController: UICollectionViewDelegate, UICollectionViewDataSour
 //                    set the status image to say invite to Planr
                     let inviteImage = imageWith(name: "Invite", width: 100, height: 100, fontSize: 20, textColor: MyVariables.colourPlanrGreen)
                     cell.inviteeStatus.image = inviteImage
+                    cell.respondedTickView.isHidden = true
+                    cell.eventImageView.isHidden = true
                                     }
 
         //        show the host label for the first invitee
                 if indexPath.row == 0{
                     cell.lblHost.isHidden = false
+                    cell.lblHost.textColor = MyVariables.colourPlanrGreen
+                    cell.lblHost.font = UIFont.boldSystemFont(ofSize: 10)
+                    cell.respondedTickView.isHidden = false
                 }
                 
     //        return the cell of the invitee
@@ -1272,3 +1527,15 @@ class ResultsSectionHeader: UICollectionReusableView {
              fatalError("init(coder:) has not been implemented")
          }
      }
+
+
+//class ButtonWithImage: UIButton {
+//
+//    override func layoutSubviews() {
+//        super.layoutSubviews()
+//        if imageView != nil {
+//            imageEdgeInsets = UIEdgeInsets(top: 5, left: (bounds.width - 35), bottom: 5, right: 5)
+//            titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: (imageView?.frame.width)!)
+//        }
+//    }
+//}

@@ -78,6 +78,17 @@ class NL_inviteesCell: UICollectionViewCell {
     }()
     
     
+    //    setup the image for each event type
+        let respondedTickView: UIImageView = {
+            let imageView = UIImageView()
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            imageView.layer.cornerRadius = 16
+            imageView.layer.masksToBounds = true
+            imageView.contentMode = .scaleAspectFill
+            return imageView
+        }()
+    
+    
     //    setup the views
     override init(frame: CGRect) {
       super.init(frame: frame)
@@ -159,7 +170,7 @@ class NL_inviteesCell: UICollectionViewCell {
         //        setup the event image view constraints
         //        center the image
         cellView.addSubview(eventImageView)
-        eventImageView.rightAnchor.constraint(equalTo: self.rightAnchor,constant: -8).isActive = true
+        eventImageView.rightAnchor.constraint(equalTo: self.rightAnchor,constant: -12).isActive = true
         eventImageView.backgroundColor = UIColor.clear
         //        make the imageView round
         eventImageView.layer.borderWidth = 1.0
@@ -173,6 +184,26 @@ class NL_inviteesCell: UICollectionViewCell {
         eventImageView.translatesAutoresizingMaskIntoConstraints = false
         eventImageView.isHidden = true
         eventImageView.image = UIImage(named: "greenTickCode")
+        
+        
+        cellView.addSubview(respondedTickView)
+        respondedTickView.rightAnchor.constraint(equalTo: self.rightAnchor,constant: -6).isActive = true
+        respondedTickView.backgroundColor = UIColor.clear
+        //        make the imageView round
+        respondedTickView.layer.borderWidth = 1.0
+        respondedTickView.layer.masksToBounds = true
+        //       create the circle
+        respondedTickView.layer.cornerRadius = 1
+        respondedTickView.layer.borderColor = UIColor.clear.cgColor
+        respondedTickView.topAnchor.constraint(equalTo: self.topAnchor, constant: CGFloat(imageBubbleSize) - 5).isActive = true
+        respondedTickView.widthAnchor.constraint(equalToConstant: CGFloat(responseImgSize)).isActive = true
+        respondedTickView.heightAnchor.constraint(equalToConstant: CGFloat(responseImgSize)).isActive = true
+        respondedTickView.translatesAutoresizingMaskIntoConstraints = false
+        respondedTickView.isHidden = true
+        respondedTickView.image = UIImage(named: "greenTickCode")
+        
+        
+        
         
     }
     

@@ -524,21 +524,28 @@ class GlobalFunctions: UIViewController {
         let semaphore = DispatchSemaphore(value: 0)
         let queue = DispatchQueue.global()
         var n = 0
+        var respondedString = String()
         
 //        we use the semaphore signal wait process to ensure the while statement waits for the data to be written to the database before continuing
         queue.async {
         while n <= numberOfUsers{
-        
             var refFireStore: DocumentReference? = nil
+            
+            if userID[n] == user{
+                respondedString = "yes"
+            }
+            else{
+                respondedString = "nr"
+            }
         
-            refFireStore = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": userID[n], "userName": userName[n], "userResponded": false]){ err in
+            refFireStore = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": userID[n], "userName": userName[n], "userResponded": false, "responded": respondedString]){ err in
             if let err = err {
                 print("Error adding document: \(err)")
                 semaphore.signal()
             } else {
                 print("Document added with ID: \(refFireStore!.documentID)")
 //                add the userAvailability to CoreData
-                self.commitSinlgeAvailabilityToCD(documentID: refFireStore!.documentID, eventID: eventID, uid: userID[n], userName: userName[n], userAvailability: [99])
+                self.commitSinlgeAvailabilityToCD(documentID: refFireStore!.documentID, eventID: eventID, uid: userID[n], userName: userName[n], userAvailability: [99], responded: respondedString)
                 
                 //            We don't want to send notifications to the user who added the event
                             if userID[n] == user!{
@@ -550,7 +557,6 @@ class GlobalFunctions: UIViewController {
 //                                update the realtime DB with the new event notification information
                             dbStore.collection("userNotification").document(userID[n]).setData(["eventNotificationPending" : true], merge: true)
                             dbStore.collection("userNotification").document(userID[n]).setData(["eventNotificationiDs" : [eventID]], merge: true)
-                                
                             }
                 semaphore.signal()
                 if n == numberOfUsers{

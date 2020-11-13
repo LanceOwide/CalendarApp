@@ -998,12 +998,12 @@ extension NL_HomePage: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             
 //            set the event image, check that we have an eventType currently listed in our event and present in the array of images
             if let index = eventTypeImages.userEventChoices.index(of: event!.eventType){
-                let imageName = eventTypeImages.userEventChoicesImagesColored[index]
-                cell.eventImage.image = UIImage(named: imageName)
+                    let imageName = eventTypeImages.userEventChoicesImagesColored[index]
+                    cell.eventImage.image = UIImage(named: imageName)
             }
             else{
                 cell.eventImage.image = UIImage(named: "customColoredCode")
-            }
+                }
             
 //          if the user has chosen the date we want to display that date in the time slot
         if event?.chosenDate != ""{
@@ -1042,18 +1042,32 @@ extension NL_HomePage: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             
 //            tracking bool for a user not having responded
             var notResponded = false
+            var declined = false
             
-            for user in event!.users{
+//            if there are any non users we want to show not responded
+            if event?.nonUserNames.count != 0{
+                notResponded = true
+            }
+            
+            for uid in event!.users{
                 print("looping through availability")
 //                get the availability
-                let availability = CoreDataCode().serialiseAvailabilitywUser(eventID: event!.eventID, userID: user)
+                let availability = CoreDataCode().serialiseAvailabilitywUser(eventID: event!.eventID, userID: uid)
 //                the user isnt a user, we could not fund them so we set to 0
-                if availability.count == 0 || event?.nonUserNames.count != 0{
+                if availability.count == 0{
                     notResponded = true
                 }
                 else{
-//                    we check what was retruned
+//                    check if the user is the current user and if they declined the event
                     let userAvailabilityArray = availability[0].userAvailability
+                    
+                    if uid == user{
+                        if availability[0].responded == "no"{
+                            declined = true
+                        }
+                    }
+//                    we check what was retruned
+                    
     //                       2.1 the user has not responded and they have a picture, we set their image and blur it
                     if userAvailabilityArray[0] == 11 ||  userAvailabilityArray[0] == 99{
                         notResponded = true
@@ -1062,7 +1076,13 @@ extension NL_HomePage: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             }
 
 //            if the not responded is now set to true we are awaiting responses
-            if notResponded == true{
+            if declined == true{
+                cell.lblstatus.text = "Declined"
+                cell.lblstatus.textColor = MyVariables.darkRed
+                cell.lblstatus.backgroundColor = MyVariables.lightRed
+                cell.lbleventDate.isHidden = true
+            }
+            else if notResponded == true{
                 cell.lblstatus.text = "Awaiting Responses"
                 cell.lblstatus.textColor = MyVariables.colourPendingText
                 cell.lblstatus.backgroundColor = MyVariables.colourPendingBackground
@@ -1074,7 +1094,7 @@ extension NL_HomePage: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 cell.lblstatus.backgroundColor = MyVariables.colourPendingBackground
                 cell.lbleventDate.isHidden = true
             }
-                    }
+        }
                 
             return cell
         }
@@ -1664,24 +1684,29 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
 //                    loop through each possible user itteration and set the image and status accordingly
             
             print("cellForItem availability.count \(availability.count) indexPath.row \(indexPath.row)")
-            
+                        
 //                    1. the user doesnt have an availability, we show them as not responded
             if availability.count == 0 && imageList.count != 0{
                 cell.inviteeStatus.isHidden = false
                 cell.inviteeStatus.image = UIImage(named: "hourGlassCodeCircle")
                 cell.inviteePicture.image = UIImage(data: image)?.alpha(0.5)
                 cell.inviteePicture.isHidden = false
+                cell.respondedTickView.isHidden = true
+                cell.eventImageView.isHidden = true
             }
             else if availability.count == 0 && imageList.count == 0{
                 cell.inviteeStatus.isHidden = false
                 cell.inviteeStatus.image = UIImage(named: "hourGlassCodeCircle")
                 cell.inviteePicture.image = .none
                 cell.inviteePicture.isHidden = false
+                cell.respondedTickView.isHidden = true
+                cell.eventImageView.isHidden = true
             }
 //                    2. They are a user
             else if availability.count != 0{
 //                        check if the user has responded
                 let userAvailabilityArray = availability[0].userAvailability
+                
 //                       2.1 the user has not responded and they have a picture, we set their image and blur it
                 if userAvailabilityArray[0] == 11 ||  userAvailabilityArray[0] == 99 && imageList.count != 0{
                     cell.inviteeStatus.isHidden = false
@@ -1720,8 +1745,31 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
                     cell.inviteePicture.isHidden = false
                     cell.eventImageView.isHidden = true
                 }
+                
+//            we check if the user has responded and show the double tick if they have responded
+//            holding whether the user has responded
+                let respondedType = availability[0].responded
+                if respondedType == "yes"{
+                    cell.respondedTickView.isHidden = false
+                    }
+                    else if respondedType == "no" && imageList.count != 0{
+                    cell.respondedTickView.isHidden = true
+                    cell.inviteeStatus.isHidden = false
+                    cell.inviteePicture.image = UIImage(data: image)?.alpha(0.5)
+                    cell.inviteeStatus.image = UIImage(named: "declineCode")
+                    cell.eventImageView.isHidden = true
+                    }
+                    else if respondedType == "no" && imageList.count == 0{
+                        cell.inviteePicture.image = .none
+                        cell.inviteeStatus.image = UIImage(named: "declineCode")
+                        cell.eventImageView.isHidden = true
+                        cell.respondedTickView.isHidden = true
+                        cell.inviteeStatus.isHidden = false
+                    }
+                    else{
+                        cell.respondedTickView.isHidden = true
+                    }
             }
-            
         }
 //                    this invitee isnt a user yet
         else{
@@ -1732,11 +1780,16 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
 //                    set the status image to say invite to Planr
             let inviteImage = CoreDataCode().imageWith(name: "Invite", width: 100, height: 100, fontSize: 20, textColor: MyVariables.colourPlanrGreen)
             cell.inviteeStatus.image = inviteImage
+            cell.respondedTickView.isHidden = true
+            cell.eventImageView.isHidden = true
                             }
 
 //        show the host label for the first invitee
         if indexPath.row == 0{
             cell.lblHost.isHidden = false
+            cell.lblHost.textColor = MyVariables.colourPlanrGreen
+            cell.lblHost.font = UIFont.boldSystemFont(ofSize: 10)
+            cell.respondedTickView.isHidden = false
         }
 
         cell.lblInviteeName.text = allNames[indexPath.row]

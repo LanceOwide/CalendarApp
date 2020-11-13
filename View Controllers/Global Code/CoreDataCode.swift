@@ -45,13 +45,11 @@ extension UIViewController{
         if isSummaryView == false{
           summaryView = isSummaryView
         }
-        
             summaryView = isSummaryView
         
 //       get the non users availability array
         let nonUserArray = self.noResultArrayCompletion2(numberOfDatesInArray: userSelectedEvent.startDateArray.count + 1).nonUserArray
         
-            
 //        set whether the user can edit the event
         if userSelectedEvent.eventOwnerID == user{
             selectEventToggle = 1
@@ -865,6 +863,7 @@ extension UIViewController{
                             CDNewAvailability.uid = documentEventData.get("uid") as? String
                             CDNewAvailability.userName = documentEventData.get("userName") as? String
                             CDNewAvailability.userAvailability = documentEventData.get("userAvailability") as? [Int] ?? [99]
+                            CDNewAvailability.responded = documentEventData.get("responded") as? String ?? "nr"
 
     //                        append the new event onto CDAvailability
                             CDAvailability.append(CDNewAvailability)
@@ -876,9 +875,9 @@ extension UIViewController{
         }}
     
 //    commit a single Availability into CoreData
-    func commitSinlgeAvailabilityToCD(documentID: String, eventID: String, uid: String, userName: String, userAvailability: [Int]){
+    func commitSinlgeAvailabilityToCD(documentID: String, eventID: String, uid: String, userName: String, userAvailability: [Int], responded: String){
         
-        print("running func commitSinlgeAvailabilityToCD wiht inputs - documentID: \(documentID) eventID: \(eventID), uid: \(uid), userName: \(userName), userAvailability \(userAvailability)")
+        print("running func commitSinlgeAvailabilityToCD wiht inputs - documentID: \(documentID) eventID: \(eventID), uid: \(uid), userName: \(userName), userAvailability \(userAvailability) responded \(responded)")
         
        let CDNewAvailability = CoreDataAvailability(context: context)
         
@@ -896,6 +895,7 @@ extension UIViewController{
         CDNewAvailability.uid = uid
         CDNewAvailability.userName = userName
         CDNewAvailability.userAvailability = userAvailability
+        CDNewAvailability.responded = responded
 
 //                        append the new event onto CDAvailability
         CDAvailability.append(CDNewAvailability)
@@ -958,6 +958,7 @@ extension UIViewController{
                             CDNewAvailability.userAvailability = querySnapshot!.get("userAvailability") as? [Int] ?? [99]
                             CDNewAvailability.calendarEventID = querySnapshot!.get("calendarEventID") as? String ?? ""
     //                        append the new event onto CDAvailability
+                        CDNewAvailability.responded = querySnapshot!.get("responded") as? String ?? "nr"
                             CDAvailability.append(CDNewAvailability)
                         self.CDSaveData()
                         print("CDRetrieveSingleAvailabilityFB - update complete")
@@ -1259,6 +1260,7 @@ func removeTheAvailabilityNotifications(){
             nextAvailability.userAvailability = i.userAvailability ?? [99]
             nextAvailability.userName = i.userName ?? ""
             nextAvailability.calendarEventID = i.calendarEventID ?? ""
+            nextAvailability.responded = i.responded ?? "nr"
 //            print("nextAvailability \(nextAvailability)")
             serialisedAvailability.append(nextAvailability)
         }
@@ -1283,35 +1285,13 @@ func removeTheAvailabilityNotifications(){
                 nextAvailability.userAvailability = i.userAvailability ?? [99]
                 nextAvailability.userName = i.userName ?? ""
                 nextAvailability.calendarEventID = i.calendarEventID ?? ""
+                nextAvailability.responded = i.responded ?? "nr"
     //            print("nextAvailability \(nextAvailability)")
                 serialisedAvailability.append(nextAvailability)
             }
             return serialisedAvailability
         }
     
-    
-    
-//    //    fetch availability for a specific event and serialise the data
-//        func serialiseChats(eventID: String) -> [CDMessage]{
-//         print("running func ChatMessages inputs - eventID \(eventID)")
-//            var filteredChat = [CoreDataChatMessages]()
-//            var serialisedChat = [CDMessage]()
-//
-//            let request : NSFetchRequest<CoreDataAvailability> = CoreDataAvailability.fetchRequest()
-//            request.predicate = NSPredicate(format: "eventID == %@", eventID)
-//            filteredChat = CDFetchFilteredAvailabilityDataFromDB(with: request)
-//
-//            for i in filteredChat{
-//                var nextChat = CDMessage()
-//                nextChat.eventID = i.eventID ?? ""
-//                nextChat.fromName = i.fromName
-//                nextChat.fromId = i.fromId
-//                nextChat.text = i.text
-//                nextChat.timestamp = NSNumber(i.timestamp)
-//                serialisedChat.append(nextChat)
-//            }
-//            return serialisedChat
-//        }
     
 //    create availability array for current users of the app
     func createArrayForResults(availabilityArray: [AvailabilityStruct]) -> [[Any]]{
