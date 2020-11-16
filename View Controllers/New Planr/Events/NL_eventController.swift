@@ -39,6 +39,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     var lblstatus = UILabel()
     var lbleventDate = UILabel()
     var btnCalendar = UIButton()
+    var btnCalendarInset = UIButton()
     
 //    add the collectionViews
     var cvEventInviteesCollectionView: UICollectionView!
@@ -126,6 +127,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     let respondBtnHeight = CGFloat(30)
     let respondBtnWidth = CGFloat(70)
     let calendarSize = CGFloat(25)
+    let calendarInsetSize = CGFloat(10)
     
     //   setup the view for holding the progress bar and title
     let containerView = UIView()
@@ -241,22 +243,26 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     lbleventTime.text = "12:00 - 13:00"
     
     
-////    add the button for the calendar
-//    topView.addSubview(btnCalendar)
-//    btnCalendar.topAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset + titleHeight*2 + pageTitleHeight).isActive = true
-//    btnCalendar.rightAnchor.constraint(equalTo: topView.rightAnchor,constant: -sideInset).isActive = true
-//    btnCalendar.widthAnchor.constraint(equalToConstant: calendarSize).isActive = true
-//    btnCalendar.heightAnchor.constraint(equalToConstant: calendarSize).isActive = true
-//    btnCalendar.setImage(UIImage(named:"CalendarCode"), for: .normal)
-//    btnCalendar.translatesAutoresizingMaskIntoConstraints = false
-//
-////    we only want to show this if the date has been chosen for the event
-//    if currentUserSelectedEvent.chosenDate == ""{
-//        btnCalendar.isHidden = true
-//    }
-//    else{
-//        btnCalendar.isHidden = false
-//    }
+//    add the button for the calendar
+    topView.addSubview(btnCalendar)
+    btnCalendar.topAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset + titleHeight*2 + pageTitleHeight).isActive = true
+    btnCalendar.rightAnchor.constraint(equalTo: topView.rightAnchor,constant: -sideInset).isActive = true
+    btnCalendar.widthAnchor.constraint(equalToConstant: calendarSize).isActive = true
+    btnCalendar.heightAnchor.constraint(equalToConstant: calendarSize).isActive = true
+    btnCalendar.setImage(UIImage(named:"CalendarCode"), for: .normal)
+    btnCalendar.translatesAutoresizingMaskIntoConstraints = false
+    btnCalendar.addTarget(self, action: #selector(btnCalendarTapped), for: .touchUpInside)
+    
+    
+    topView.addSubview(btnCalendarInset)
+    btnCalendarInset.bottomAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset + titleHeight*2 + pageTitleHeight + calendarSize).isActive = true
+    btnCalendarInset.rightAnchor.constraint(equalTo: topView.rightAnchor,constant: -sideInset).isActive = true
+    btnCalendarInset.widthAnchor.constraint(equalToConstant: calendarInsetSize).isActive = true
+    btnCalendarInset.heightAnchor.constraint(equalToConstant: calendarInsetSize).isActive = true
+    btnCalendarInset.setImage(UIImage(named:"greenTickCode"), for: .normal)
+    btnCalendarInset.translatesAutoresizingMaskIntoConstraints = false
+    btnCalendarInset.backgroundColor = .white
+    btnCalendarInset.addTarget(self, action: #selector(btnCalendarTapped), for: .touchUpInside)
     
 
     //        setup the collectionView
@@ -481,12 +487,17 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 //    function to show the instructions for a newly created event
     
     func showInstructions(){
-        let firstTimeUser = UserDefaults.standard.string(forKey: "firstCreatingOpeningv2.0001.8") ?? ""
+        var firstTimeUser = UserDefaults.standard.string(forKey: "firstEventOpeningvPROD") ?? ""
+        var firstTimeUserCreated = UserDefaults.standard.string(forKey: "firstCreatingOpeningvPROD") ?? ""
         
-//        let firstTimeUser = ""
+//        MARK: DO NOT inlcued in PROD
+//        firstTimeUserCreated = ""
+//        firstTimeUser = ""
 //        newEventCreated = true
-//        if the user hasnt seen the instructions  before and they have been sent to the event from the create event page
-        if firstTimeUser == "" && newEventCreated == true{
+        
+
+//        1. New user, creating new event: if the user hasnt seen the instructions before and they have been sent to the event from the create event page
+        if firstTimeUserCreated == "" && newEventCreated == true{
         coachmarkHelperText = "newEventCreated"
         coachMarksController.start(in: .window(over: self))
 //        if the user has invited non users, we show them the popup, we also check that this user is the user who created the event
@@ -498,12 +509,20 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 //            set this back to the false status
         newEventCreated = false
 //            set the user default so that it doesnt show again
-        UserDefaults.standard.setValue("shown", forKey: "firstCreatingOpeningv2.0001.8")
+        UserDefaults.standard.setValue("shown", forKey: "firstCreatingOpeningvPROD")
         }
+        
+//        2. New event with non user: The user just created an event but they are not being shown the instructions and there are non user in the event
         else if newEventCreated == true && currentUserSelectedEvent.nonUserNames.count != 0 && currentUserSelectedEvent.eventOwnerID == user!{
             self.inviteFriendsPopUp(notExistingUserArray: currentUserSelectedEvent.nonUserNames, nonExistingNameArray: currentUserSelectedEvent.nonUserNames)
 //                we reset the newCreated variable to ensure the pop doenst get shown each time we open the event
             newEventCreated = false
+        }
+//        3. old event first viewing: the user hasn't looked at an event previously
+        else if firstTimeUser == ""{
+            coachmarkHelperText = "newUserEvent"
+            coachMarksController.start(in: .window(over: self))
+            UserDefaults.standard.setValue("shown", forKey: "firstEventOpeningvPROD")
         }
     }
     
@@ -544,41 +563,6 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                         }
                     
                     self.setup()
-                    
-////                get the availability
-//                    let availability = AutoRespondHelper.serialiseAvailabilitywUserAuto(eventID: currentUserSelectedEvent.eventID, userID: user!)
-////                the user isnt a user, we could not fund them so we set to 0
-//                if availability.count == 0 {
-//                    print("updateTables - availability not returned")
-//
-//                    }
-//                    else{
-//
-//                    if availability[0].responded == "yes"{
-//                        print("updateTables - responded = yes")
-////                            if the user has responded we cahnge the button
-//                        self.lblRespond.text = "You are joining"
-//                        self.btnYesAttend.layer.borderWidth = 2
-//                        self.btnYesAttend.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
-////                            in case the user changed anything we also need to adjust the other button settings
-//                        self.btnNoAttend.layer.borderWidth = 1
-//                        self.btnNoAttend.layer.borderColor = MyVariables.colourSelected.cgColor
-//                    }
-//                    else if availability[0].responded == "no"{
-//                        print("updateTables - responded = no")
-//                        self.lblRespond.text = "You aren't joining"
-//                        self.btnNoAttend.layer.borderWidth = 2
-//                        self.btnNoAttend.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
-////                            in case the user changed anything we also need to adjust the other button settings
-//                        self.btnYesAttend.layer.borderWidth = 1
-//                        self.btnYesAttend.layer.borderColor = MyVariables.colourSelected.cgColor
-//                    }
-//                    else{
-//                        print("updateTables - responded = nr")
-//
-//                    }
-//                    }
-                    
                     }
                 }
         }
@@ -624,6 +608,67 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
             
         }
     
+    @objc func btnCalendarTapped(){
+        print("user tapped the calendar button")
+        
+        var calendarName = String()
+        let availability = CoreDataCode().serialiseAvailabilitywUser(eventID: currentUserSelectedEvent.eventID, userID: user!)
+        let chosenDatePosition = currentUserSelectedEvent.chosenDatePosition
+        let defaultCalendarToSave = UserDefaults.standard.string(forKey: "saveToCalendar") ?? ""
+//            we want to get the name of the calendar we are about to add the event into:
+        if defaultCalendarToSave == ""{
+                let saveCalendar = eventStore.defaultCalendarForNewEvents!
+                calendarName = saveCalendar.title
+            }
+        else{
+                let saveCalendar = eventStore.calendar(withIdentifier: UserDefaults.standard.string(forKey: "saveToCalendar")!)!
+                calendarName = saveCalendar.title
+            }
+        
+        if availability.count != 0{
+//            check if the user has the event in their calendar
+            if availability[0].calendarEventID == ""{
+//                show a pop-up asking if the user wants to add the event to their calendar
+                let utils = Utils()
+                let button1 = AlertButton(title: "Accept", action: {
+                    print("OK clicked")
+                    
+                    self.addEventToCalendarSimple(title: currentUserSelectedEvent.eventDescription, description: currentUserSelectedEvent.eventDescription, startDate: currentUserSelectedEvent.startDateArray[chosenDatePosition], endDate: currentUserSelectedEvent.endDateArray[chosenDatePosition], location: currentUserSelectedEvent.eventLocation, eventOwner: currentUserSelectedEvent.eventOwnerName, startDateDisplay: currentUserSelectedEvent.startDatesDisplay[chosenDatePosition], eventOwnerID: currentUserSelectedEvent.eventOwnerID, locationLongitude: currentUserSelectedEvent.locationLongitude, locationLatitude: currentUserSelectedEvent.locationLatitue, userEventStoreID: availability[0].documentID, calendarEventIDInput: availability[0].calendarEventID){_,_ in
+                    }
+                })
+                let button2 = AlertButton(title: "Reject", action: {
+                    print("the user chose not too add the event to their calendar")
+                })
+                
+                let alertPayload = AlertPayload(title: "Add to Calendar?", titleColor: UIColor.red, message: "Would you like to add \(currentUserSelectedEvent.eventDescription), on \(currentUserSelectedEvent.startDatesDisplay[chosenDatePosition]), to your calendar named: \(calendarName)? You can change the calendar the event is saved to in the App settings", messageColor: MyVariables.colourPlanrGreen, buttons: [button1,button2], backgroundColor: UIColor.clear, inputTextHidden: true)
+                
+                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
+                
+                
+            }
+            else{
+//                the user did have the event in thier calendar
+                let utils = Utils()
+                let button1 = AlertButton(title: "Accept", action: {
+                    print("OK clicked")
+                    
+                    self.addEventToCalendarSimple(title: currentUserSelectedEvent.eventDescription, description: currentUserSelectedEvent.eventDescription, startDate: currentUserSelectedEvent.startDateArray[chosenDatePosition], endDate: currentUserSelectedEvent.endDateArray[chosenDatePosition], location: currentUserSelectedEvent.eventLocation, eventOwner: currentUserSelectedEvent.eventOwnerName, startDateDisplay: currentUserSelectedEvent.startDatesDisplay[chosenDatePosition], eventOwnerID: currentUserSelectedEvent.eventOwnerID, locationLongitude: currentUserSelectedEvent.locationLongitude, locationLatitude: currentUserSelectedEvent.locationLatitue, userEventStoreID: availability[0].documentID, calendarEventIDInput: availability[0].calendarEventID){_,_ in
+                    }
+   
+                })
+                let button2 = AlertButton(title: "Reject", action: {
+                    print("the user chose not too add the event to their calendar")
+                })
+                
+                let alertPayload = AlertPayload(title: "Add to Calendar?", titleColor: UIColor.red, message:  "The event, \(currentUserSelectedEvent.eventDescription), is already in your calendar named: \(calendarName)? Would you like to update it? You can change the calendar the event is saved to in the App settings", messageColor: MyVariables.colourPlanrGreen, buttons: [button1,button2], backgroundColor: UIColor.clear, inputTextHidden: true)
+                
+                utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
+                
+                
+            }
+        }
+    }
+    
     @objc func btnNoAttendTapped(){
         print("btnNoAttendTapped")
         
@@ -649,7 +694,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                                print("OK clicked")
         })
         
-        let alertPayload = AlertPayload(title: "Not Attending", titleColor: UIColor.red, message: "The organiser has been notified you won't be attending. You will continue to receive updates or you can delete the event", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
+        let alertPayload = AlertPayload(title: "Not Going?", titleColor: UIColor.red, message: "The organizer has been notified you won't be going. You will continue to receive updates or you can delete the event", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
         
         utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
         
@@ -658,21 +703,30 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     @objc func btnYesAttendTapped(){
         print("btnYesAttendTapped")
         
-        //        get the current event availability
-                let availabilityResults = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
-        //        get this users availability
-                let filter = availabilityResults.filter {$0.uid == user!}
-        if filter.count == 0{
-          print("user doesnt have an availability")
-            AutoRespondHelper.nonRespondedEventsAuto()
-        }
-        else{
-          let availability = filter[0]
+        let utils = Utils()
         
+        let button = AlertButton(title: "OK", action: {
+                               print("OK clicked")
+            print("The user acknowedged the fact")
+            
+//        get the current event availability
+            let availabilityResults = self.serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
+//        get this users availability
+        let filter = availabilityResults.filter {$0.uid == user!}
+            if filter.count == 0{
+              print("user doesnt have an availability")
+                AutoRespondHelper.nonRespondedEventsAuto()
+            }
+            else{
+              let availability = filter[0]
             AutoRespondHelper.userAttendanceResponse(eventID: currentUserSelectedEvent.eventID, userEventStoreID: availability.documentID, response: "yes", userIDs: currentUserSelectedEvent.users)
-        }
+            }
+            
+        }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
         
-        
+        let alertPayload = AlertPayload(title: "You're going!", titleColor: UIColor.red, message: "We'll notify the event organizer that you want to attend. The double tick next to your name indicates you're going", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
+                       
+            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
     }
     
 //    function to dismiss the event view on pressing the close button
@@ -777,7 +831,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     
     
     @objc func btnEditAvailabilityPressed(){
-        Analytics.logEvent(firebaseEvents.eventEditAvailability, parameters: ["user": user])
+        Analytics.logEvent(firebaseEvents.eventEditAvailability, parameters: ["user": user!])
         
         print("user selected to edit thier availability")
         
@@ -836,6 +890,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     
     
     func setup(){
+        print("event setup running")
         
 //        setup some of the event details
         lbleventDescription.text = currentUserSelectedEvent.eventDescription
@@ -850,92 +905,133 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 //            lblDelete.isHidden = true
             lblEdit.isHidden = true
         }
-        
-//        set the text and color for the status label
-        if currentUserSelectedEvent.chosenDate != ""{
-          lblstatus.text = "Date Confirmed"
-            lblstatus.textColor = MyVariables.colourPlanrGreen
-            lblstatus.backgroundColor = MyVariables.colourSelected
+        setupTheCalendarButton()
+        setupTheResponButton()
+        setupTheStatus()
+    }
+    
+    
+//    fucntion to setup the calendar button
+    func setupTheCalendarButton(){
+//        if there is not a date confirmed the calendar button is hidden
+        if currentUserSelectedEvent.chosenDate == ""{
+            print("btnCalendar - currentUserSelectedEvent.chosenDate \(currentUserSelectedEvent.chosenDate)")
+            btnCalendar.isHidden = true
+            btnCalendarInset.isHidden = true
         }
         else{
-//            we need to check if every user has responded, this can be done, 1. there should be no non user names, 2.we need to loop through each user in the event and check if no every one has responded
-            
-//            tracking bool for a user not having responded
-            var notResponded = false
-            var declined = false
-            
-            for uid in currentUserSelectedEvent.users{
-                print("eventController looping through availability")
-//                get the availability
-                let availability = CoreDataCode().serialiseAvailabilitywUser(eventID: currentUserSelectedEvent.eventID, userID: uid)
-//                the user isnt a user, we could not find them so we set to 0
-                if availability.count == 0 {
-                    notResponded = true
-                }
-                else{
-//                    we check what was retruned
-                    let userAvailabilityArray = availability[0].userAvailability
-                    print("eventController userAvailabilityArray \(userAvailabilityArray)")
-                    
-//                    check if this is the current user, so we can set the event buttons
-                    if uid == user{
-                        if availability[0].responded == "yes"{
-                            print("setup - responded = yes")
+            let availability = CoreDataCode().serialiseAvailabilitywUser(eventID: currentUserSelectedEvent.eventID, userID: user!)
+            if availability.count != 0{
+            print("btnCalendar - event date has been chosen")
+                btnCalendar.isHidden = false
+                btnCalendarInset.isHidden = false
+//        if the event is in the users calendar then we want to show a green calendar
+            if  availability[0].calendarEventID != ""{
+                print("btnCalendar - event date has been chosen availability[0].calendarEventID \(availability[0].calendarEventID)")
+                btnCalendar.setImage(UIImage(named:"CalendarSelectedCode"), for: .normal)
+                btnCalendarInset.setImage(UIImage(named: "greenTickCode"), for: .normal)
+                    }
+            else{
+//        if the event isn't in the users calendar then we want to show a green calendar
+                print("btnCalendar - event date has not been chosen availability[0].calendarEventID \(availability[0].calendarEventID)")
+                btnCalendar.setImage(UIImage(named:"CalendarCode"), for: .normal)
+                btnCalendarInset.setImage(UIImage(named: "tabCreateEventCode"), for: .normal)
+                    }
+        }
+        }
+    }
+    
+    
+//    function to setup the respond buttons based on the users respons
+    func setupTheResponButton(){
+        print("running func setupTheResponButton")
+//        get the availabiltiy for the current user
+        let availability = CoreDataCode().serialiseAvailabilitywUser(eventID: currentUserSelectedEvent.eventID, userID: user!)
+        
+        if availability.count == 0 {
+            print("something went wrong")
+        }
+        else{
+            if availability[0].responded == "yes"{
+                print("setup - responded = yes")
 //                            if the user has responded we cahnge the button
-                            lblRespond.text = "You are joining"
-                            btnYesAttend.layer.borderWidth = 2
-                            btnYesAttend.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
+                lblRespond.text = "You are joining"
+                btnYesAttend.layer.borderWidth = 2
+                btnYesAttend.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
 //                            in case the user changed anything we also need to adjust the other button settings
-                            btnNoAttend.layer.borderWidth = 1
-                            btnNoAttend.layer.borderColor = MyVariables.colourSelected.cgColor
-                        }
-                        else if availability[0].responded == "no"{
-                            print("setup - responded = no")
-                            lblRespond.text = "You aren't joining"
-                            btnNoAttend.layer.borderWidth = 2
-                            btnNoAttend.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
+                btnNoAttend.layer.borderWidth = 1
+                btnNoAttend.layer.borderColor = MyVariables.colourSelected.cgColor
+            }
+            else if availability[0].responded == "no"{
+                print("setup - responded = no")
+                lblRespond.text = "You aren't joining"
+                btnNoAttend.layer.borderWidth = 2
+                btnNoAttend.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
 //                            in case the user changed anything we also need to adjust the other button settings
-                            btnYesAttend.layer.borderWidth = 1
-                            btnYesAttend.layer.borderColor = MyVariables.colourSelected.cgColor
-                            
-                            declined = true
-                        }
-                        else{
-                            
-                        }
-                    }
-                    if currentUserSelectedEvent.nonUserNames.count != 0{
-                        notResponded = true
-                    }
-                    
-    //                       2.1 the user has not responded and they have a picture
-                    if userAvailabilityArray[0] == 11 ||  userAvailabilityArray[0] == 99{
-                        notResponded = true
-                    }
-                }
-            }
-
-//            if the not responded is now set to true we are awaiting responses
-            if declined == true{
-                lblstatus.text = "Declined"
-                lblstatus.textColor = MyVariables.darkRed
-                lblstatus.backgroundColor = MyVariables.lightRed
-                lbleventDate.isHidden = true
-            }
-            else if notResponded == true{
-                lblstatus.text = "Awaiting Responses"
-                lblstatus.textColor = MyVariables.colourPendingText
-                lblstatus.backgroundColor = MyVariables.colourPendingBackground
-                lbleventDate.isHidden = true
+                btnYesAttend.layer.borderWidth = 1
+                btnYesAttend.layer.borderColor = MyVariables.colourSelected.cgColor
             }
             else{
-                lblstatus.text = "Host to Pick Date"
-                lblstatus.textColor = MyVariables.colourPendingText
-                lblstatus.backgroundColor = MyVariables.colourPendingBackground
-                lbleventDate.isHidden = true
+                print("the user hasnt responded, we make no changes to the buttons")
+                
             }
         }
     }
+    
+    
+//    to get the event status we need to know if everyone has responded, so we loop throught the inivtees and get their availability
+    func setupTheStatus(){
+        print("running func setupTheStatus")
+//        variable set to true if any user have not responded
+        var notResponded = false
+//        var set to true if this user has declined
+        var declined = false
+        
+//        start the loop
+        for uid in currentUserSelectedEvent.users{
+//            get uid availability
+            let availability = CoreDataCode().serialiseAvailabilitywUser(eventID: currentUserSelectedEvent.eventID, userID: uid)
+            
+            if availability.count == 0 {
+                notResponded = true
+            }
+            else{
+                let userAvailabilityArray = availability[0].userAvailability
+                
+                if uid == user && availability[0].responded == "no"{
+                    declined = true
+                }
+                else if userAvailabilityArray[0] == 11 ||  userAvailabilityArray[0] == 99{
+                    notResponded = true
+                }
+            }
+        }
+//            if the not responded is now set to true we are awaiting responses
+                    if currentUserSelectedEvent.chosenDate != ""{
+                        lblstatus.text = "Date Confirmed"
+                        lblstatus.textColor = MyVariables.colourPlanrGreen
+                        lblstatus.backgroundColor = MyVariables.colourSelected
+                    }
+                    else if declined == true{
+                        lblstatus.text = "Declined"
+                        lblstatus.textColor = MyVariables.darkRed
+                        lblstatus.backgroundColor = MyVariables.lightRed
+                        lbleventDate.isHidden = true
+                    }
+                    else if notResponded == true{
+                        lblstatus.text = "Awaiting Responses"
+                        lblstatus.textColor = MyVariables.colourPendingText
+                        lblstatus.backgroundColor = MyVariables.colourPendingBackground
+                        lbleventDate.isHidden = true
+                    }
+                    else{
+                        lblstatus.text = "Host to Pick Date"
+                        lblstatus.textColor = MyVariables.colourPendingText
+                        lblstatus.backgroundColor = MyVariables.colourPendingBackground
+                        lbleventDate.isHidden = true
+                    }
+    }
+    
     
 //    function to get the positions of the dates when users are available
         func getPositionOfAllAvailable(array: [Float]) -> (allAvailablePositionsArray: [Int], someAvailablePositionsArray: [Int]){
@@ -1021,15 +1117,18 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     //        we set the global variable coachmarkHelperText just before we launch the coachMarks, this tell it what we are running
                     if coachmarkHelperText == "newEventCreated"{
                         
-                        hintLabels = ["Your friends have been notified of the event, a tick means we've collected their availability, a double tick means they've confirmed they're coming","Once you've chosen the date for your event, select it and press save, Planr will notify your friends","If Planr has access to your calendar, your availability will be automatically calculated, you can also update or override it"]
+                        hintLabels = ["Your friends have been notified of the event, a tick means we've collected their availability, a double tick means they've confirmed they're coming","Once you've chosen the date for your event, select it and press save, Planr will notify your friends","If Planr has access to your calendar, your availability will be automatically calculated, you can also update or override it here"]
                         
                         coachViews.bodyView.hintLabel.text = hintLabels[index]
                     }
-                     
+                    else if coachmarkHelperText == "newUserEvent"{
+                        hintLabels = ["Welcome to your first event!","If Planr has access to your calendar, your availability will be automatically calculated, you can update or override it here","Let the event organizer know if you're going","A single tick indicates your availability has been calculated, a double tick indicates you're going","You can see when everyone is available here"]
+                        
+                        coachViews.bodyView.hintLabel.text = hintLabels[index]
+                    }
                      return (bodyView: coachViews.bodyView, arrowView: coachViews.arrowView)
                      
                  }
-                 
                  
                  func coachMarksController(_ coachMarksController: CoachMarksController, coachMarkAt index: Int) -> CoachMark {
                      //    Defines where the coachmark will appear
@@ -1041,7 +1140,12 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                         
                         pointOfInterest.frame = hintPositions[index]
                     }
-
+                    else if coachmarkHelperText == "newUserEvent"{
+    //                    we set where the coachmarks will appear
+                        let hintPositions = [CGRect(x: screenWidth/2, y: screenHeight/2, width: 1, height: 1),CGRect(x: screenWidth/2, y: screenHeight - 100, width: screenWidth/4, height: screenWidth/4),CGRect(x: 0, y: topDistance + 220, width: screenWidth, height: 75),CGRect(x: 0, y: topDistance + 170, width: screenWidth, height: 75),CGRect(x: 0, y: topDistance + 300, width: screenWidth, height: 250)]
+                        
+                        pointOfInterest.frame = hintPositions[index]
+                    }
                      return coachMarksController.helper.makeCoachMark(for: pointOfInterest)
                  }
                  
@@ -1054,7 +1158,11 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                     
                     if coachmarkHelperText == "newEventCreated"{
                         
-                       numberOfCoachMarks = 3
+                       numberOfCoachMarks = 4
+                    }
+                    else if coachmarkHelperText == "newUserEvent"{
+                        
+                       numberOfCoachMarks = 5
                     }
                     
                      return numberOfCoachMarks

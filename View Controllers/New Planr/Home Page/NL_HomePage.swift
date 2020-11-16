@@ -430,7 +430,7 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
     
     func showTutorial(){
         
-    let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningv2.0001.8") ?? ""
+    let firstTimeUser = UserDefaults.standard.string(forKey: "firstTimeOpeningvPROD") ?? ""
     var createEventCoachMarksPermenant = UserDefaults.standard.bool(forKey: "permenantToolTips")
         
 //        MARK: remove this when pushing to prod

@@ -483,7 +483,7 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
                                     loadingNotification.hide(animated: true)
                                                                 
 //                            the event was probably deleted by the user, we show a notification to let the user know
-                                                                let alertEventDeleted = UIAlertController(title: "Event Deleted", message: "The event has been deleted by the organiser", preferredStyle: UIAlertController.Style.alert)
+                                                                let alertEventDeleted = UIAlertController(title: "Event Deleted", message: "The event has been deleted by the organizer", preferredStyle: UIAlertController.Style.alert)
                                                                 alertEventDeleted.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: { action in
                                                                     print("user pressed ok")
 //          re-engage the listeners

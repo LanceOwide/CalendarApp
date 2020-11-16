@@ -48,11 +48,15 @@ class customAlertController: UIViewController{
             createButton(uiButton: button1, alertButton: payload.buttons[0])
             heading.text = payload.title
             message.text = payload.message
+            message.textAlignment = .center
+            message.adjustsFontSizeToFitWidth = true
             heading.font = UIFont.boldSystemFont(ofSize: 18)
             message.font = UIFont.systemFont(ofSize: 14)
         }
         if (payload.buttons.count == 1 && payload.inputTextHidden == false) {
             createButton(uiButton: button1, alertButton: payload.buttons[0])
+            message.textAlignment = .center
+            message.adjustsFontSizeToFitWidth = true
             heading.text = payload.title
             heading.font = UIFont.boldSystemFont(ofSize: 18)
         }
@@ -61,6 +65,8 @@ class customAlertController: UIViewController{
             createButton(uiButton: button2, alertButton: payload.buttons[1])
             heading.text = payload.title
             message.text = payload.message
+            message.textAlignment = .center
+            message.adjustsFontSizeToFitWidth = true
             heading.font = UIFont.boldSystemFont(ofSize: 18)
             message.font = UIFont.systemFont(ofSize: 14)
         }
@@ -81,13 +87,15 @@ class customAlertController: UIViewController{
         uiButton.layer.borderColor = MyVariables.colourPlanrGreen.cgColor
         uiButton.layer.cornerRadius = 6
         uiButton.translatesAutoresizingMaskIntoConstraints = false
+        uiButton.setTitleColor(MyVariables.colourPlanrGreen, for: .normal)
+        uiButton.backgroundColor = MyVariables.colourSelected
         
-        if (alertButton.titleColor != nil) {
-            uiButton.setTitleColor(alertButton.titleColor, for: .normal);
-        }
-        if (alertButton.backgroundColor != nil) {
-            uiButton.backgroundColor = alertButton.backgroundColor
-        }
+//        if (alertButton.titleColor != nil) {
+//            uiButton.setTitleColor(alertButton.titleColor, for: .normal);
+//        }
+//        if (alertButton.backgroundColor != nil) {
+//            uiButton.backgroundColor = alertButton.backgroundColor
+//        }
     }
     
     

@@ -1519,6 +1519,164 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
             
         }
         
+        //        adds the event to the calendar
+            func addEventToCalendarSimple(title: String, description: String?, startDate: String, endDate: String, location: String, eventOwner: String, startDateDisplay: String, eventOwnerID: String, locationLongitude: Double, locationLatitude: Double, userEventStoreID: String, calendarEventIDInput: String, completion: @escaping (_ success: Bool, _ error: NSError?) -> Void){
+                
+                
+                var calendarEventID = String()
+                
+            print("running func addEventToCalendar inputs - title: \(title), description: \(description!), startDate: \(startDate), endDate: \(endDate), location:\(location), userEventStoreID: \(userEventStoreID), calendarEventIDInput: \(calendarEventIDInput)")
+                
+    //        let dateFormatterForResultsCreateEvent = DateFormatter()
+    //        dateFormatterForResultsCreateEvent.dateFormat = "E d MMM HH:mm"
+    //        dateFormatterForResultsCreateEvent.locale = Locale(identifier: "en_US_POSIX")
+            
+            let eventStore = EKEventStore()
+                
+            let dateFormatterTZCreate = DateFormatter()
+            dateFormatterTZCreate.dateFormat = "yyyy-MM-dd HH:mm z"
+            dateFormatterTZCreate.locale = Locale(identifier: "en_US_POSIX")
+            let displayDate = startDateDisplay
+            var calendarName = String()
+            
+
+            
+            let chosenStartDateDate = dateFormatterTZCreate.date(from:startDate)
+            print("chosenStartDateDate: \(String(describing: chosenStartDateDate))")
+            let chosenEndDateDate = dateFormatterTZCreate.date(from:endDate)
+            print("chosenEndDateDate: \(String(describing: chosenEndDateDate))")
+                
+            let defaultCalendarToSave = UserDefaults.standard.string(forKey: "saveToCalendar") ?? ""
+                
+                
+    //            we want to get the name of the calendar we are about to add the event into:
+                if defaultCalendarToSave == ""{
+                    let saveCalendar = eventStore.defaultCalendarForNewEvents!
+                    calendarName = saveCalendar.title
+                }
+                else{
+                    let saveCalendar = eventStore.calendar(withIdentifier: UserDefaults.standard.string(forKey: "saveToCalendar")!)!
+                    calendarName = saveCalendar.title
+                }
+            
+                eventStore.requestAccess(to: .event, completion: { (granted, error) in
+                    if (granted) && (error == nil) {
+                        
+                        if calendarEventIDInput == "" || eventStore.event(withIdentifier: calendarEventIDInput) == nil{
+                      let event = EKEvent(eventStore: eventStore)
+                        //                    let event = EKEvent(eventStore: eventStore)
+                            event.title = title
+                            print("Event being saved: Title \(String(describing: event.title))")
+                            event.startDate = chosenStartDateDate
+                            print("Event being saved: startDate \(String(describing: event.startDate))")
+                            event.endDate = chosenEndDateDate
+                            print("Event being saved: endDate \(String(describing: event.endDate))")
+                            event.notes = description
+                            print("Event being saved: description \(String(describing: event.description))")
+                            
+                            if locationLongitude == 0.0{
+                                
+                                event.location = location
+                                print("Event being saved: Location \(String(describing: event.location))")
+                            }
+                            else{
+                                let geoLocation = CLLocation(latitude: locationLatitude, longitude: locationLongitude)
+                                let structuredLocation = EKStructuredLocation(title: location)
+                                
+                                structuredLocation.geoLocation = geoLocation
+                                event.structuredLocation = structuredLocation
+                                
+                            }
+                            
+                            if defaultCalendarToSave == ""{
+                                event.calendar = eventStore.defaultCalendarForNewEvents
+                            }
+                            else{
+                                event.calendar = eventStore.calendar(withIdentifier: UserDefaults.standard.string(forKey: "saveToCalendar")!)
+                                
+                            }
+                            print("Event being saved: calendar being saved to \(String(describing: event.calendar))")
+                            
+                            
+                            do {
+                                try eventStore.save(event, span: .thisEvent)
+                        
+                                print("Trying to save down event")
+                            } catch let e as NSError {
+                                completion(false, e)
+                                return
+                            }
+                        calendarEventID = event.eventIdentifier ?? ""
+    //                        write the calendarEventID to CoreData
+                            self.saveItemAvailabilty(userEventStoreID: userEventStoreID, key: "calendarEventID", value: calendarEventID)
+    //                        write the calendarEventID to the userEventStore
+                            dbStore.collection("userEventStore").document(userEventStoreID).setData(["calendarEventID" : calendarEventID, "chosenDateSeen" : true], merge: true)
+                            print("event saved for date \(startDate)")
+                            completion(true, nil)
+                    }
+                    else{
+    //                        there is already an event in the calendar
+                       let event = eventStore.event(withIdentifier: calendarEventIDInput)!
+                        //                    let event = EKEvent(eventStore: eventStore)
+                            event.title = title
+                            print("Event being saved: Title \(String(describing: event.title))")
+                            event.startDate = chosenStartDateDate
+                            print("Event being saved: startDate \(String(describing: event.startDate))")
+                            event.endDate = chosenEndDateDate
+                            print("Event being saved: endDate \(String(describing: event.endDate))")
+                            event.notes = description
+                            print("Event being saved: description \(String(describing: event.description))")
+                            
+                            if locationLongitude == 0.0{
+                                
+                                event.location = location
+                                print("Event being saved: Location \(String(describing: event.location))")
+                                
+                            }
+                            else{
+                                
+                                let geoLocation = CLLocation(latitude: locationLatitude, longitude: locationLongitude)
+                                let structuredLocation = EKStructuredLocation(title: location)
+                                
+                                structuredLocation.geoLocation = geoLocation
+                                event.structuredLocation = structuredLocation
+                                
+                            }
+                            
+                            if defaultCalendarToSave == ""{
+                                event.calendar = eventStore.defaultCalendarForNewEvents
+                            }
+                            else{
+                                event.calendar = eventStore.calendar(withIdentifier: UserDefaults.standard.string(forKey: "saveToCalendar")!)
+                                
+                            }
+                            print("Event being saved: calendar being saved to \(String(describing: event.calendar))")
+                            
+                            
+                            do {
+                                try eventStore.save(event, span: .thisEvent)
+                        
+                                print("Trying to save down event")
+                            } catch let e as NSError {
+                                completion(false, e)
+                                return
+                            }
+    //                        if error leave the ID blank, we have a protocal to ignore it if blank
+                            calendarEventID = event.eventIdentifier ?? ""
+                            dbStore.collection("userEventStore").document(userEventStoreID).setData(["chosenDateSeen" : true], merge: true)
+                        print("event saved for date \(startDate)")
+                            completion(true, nil)
+                    }
+                    }
+                    else {
+                        completion(false, error as NSError?)
+                        print(error ?? "no error message")
+                        print("error saving event")
+                    }
+                })
+        }
+        
+        
     //        adds the event to the calendar
         func addEventToCalendar(title: String, description: String?, startDate: String, endDate: String, location: String, eventOwner: String, startDateDisplay: String, eventOwnerID: String, locationLongitude: Double, locationLatitude: Double, userEventStoreID: String, calendarEventIDInput: String, completion: @escaping (_ success: Bool, _ error: NSError?) -> Void){
             
@@ -1534,11 +1692,13 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
         var eventOwnerName = String()
         var alertText = String()
         var alertTitle = String()
+        let eventStore = EKEventStore()
             
         let dateFormatterTZCreate = DateFormatter()
         dateFormatterTZCreate.dateFormat = "yyyy-MM-dd HH:mm z"
         dateFormatterTZCreate.locale = Locale(identifier: "en_US_POSIX")
         let displayDate = startDateDisplay
+        var calendarName = String()
         
 
         
@@ -1546,6 +1706,8 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
         print("chosenStartDateDate: \(String(describing: chosenStartDateDate))")
         let chosenEndDateDate = dateFormatterTZCreate.date(from:endDate)
         print("chosenEndDateDate: \(String(describing: chosenEndDateDate))")
+            
+        let defaultCalendarToSave = UserDefaults.standard.string(forKey: "saveToCalendar") ?? ""
             
             
             if eventOwnerID == user!{
@@ -1557,11 +1719,21 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                 eventOwnerName = ("\(eventOwner) has")
             }
             
+//            we want to get the name of the calendar we are about to add the event into:
+            if defaultCalendarToSave == ""{
+                let saveCalendar = eventStore.defaultCalendarForNewEvents!
+                calendarName = saveCalendar.title
+            }
+            else{
+                let saveCalendar = eventStore.calendar(withIdentifier: UserDefaults.standard.string(forKey: "saveToCalendar")!)!
+                calendarName = saveCalendar.title
+            }
+            
 //            checks to see if the event is already in the calendar, the alert message text is updated accordingly
             if calendarEventIDInput == ""{
                 
                 alertTitle = "Event Date Chosen"
-                alertText = ("\(eventOwnerName) chosen the date for event \( description!), on \(displayDate), would you like to add it to your phone calendar?")
+                alertText = ("\(eventOwnerName) chosen the date for event \( description!), on \(displayDate), would you like to add it to your calendar named: \(calendarName)? You can change the default calendar in the App settings")
             }
             else{
                 
@@ -1570,8 +1742,8 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
             }
     
         
-        let eventStore = EKEventStore()
-        let defaultCalendarToSave = UserDefaults.standard.string(forKey: "saveToCalendar") ?? ""
+        
+        
         
         let alert = UIAlertController(title: alertTitle, message: alertText, preferredStyle: .alert)
         
@@ -2960,10 +3132,15 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
             }
         
         
-        //    this function is used to get the events we will display on the different pages, it sets the gloabl variable, eventPageEvents
+//    this function is used to get the events we will display on the different pages, it sets the gloabl variable, eventPageEvents
+//        the events are organised by 
         func getTheEventsFunc(hosted: Bool, upcoming: Bool, past: Bool, completionHandler: @escaping (_ events: [eventSearch]) -> ()){
             
             var allEvents = [eventSearch]()
+            
+            let dateFormatterTz = DateFormatter()
+            dateFormatterTz.dateFormat = "yyyy-MM-dd HH:mm z"
+            dateFormatterTz.locale = Locale(identifier: "en_US_POSIX")
             
             //            get all of the events for the user
             let serialisedEvents = serialiseEvents(predicate: NSPredicate(format: "eventOwner = %@", user!), usePredicate: false)
@@ -2974,10 +3151,21 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                 //      filter the serilaised events for events hosted by the user and in the pending status
                         let events1 = filteringEventsForDisplay(pending: true, createdByUser: true, pastEvents: false, serialisedEvents: serialisedEvents)
                         
-                //      filter the serilaised events for events hosted by the user and in the pending status, but in the past
+                //      filter the serilaised events for events hosted by the user and confirmed
                         let events2 = filteringEventsForDisplay(pending: false, createdByUser: true, pastEvents: false, serialisedEvents: serialisedEvents)
                 
                  allEvents = events1 + events2
+                
+                //            order the events
+                            allEvents.sort(by: {
+                //                both the dates we are comparing have their date chosen
+                                if $0.chosenDate != "" &&  $1.chosenDate != ""{
+                                    return dateFormatterTz.date(from: $0.chosenDate)! < dateFormatterTz.date(from: $1.chosenDate)!
+                                }
+                                else{
+                                    return dateFormatterTz.date(from: $0.startDateArray[0])! < dateFormatterTz.date(from: $1.startDateArray[0])!
+                                }
+                                })
                 
             }
 //                get all the upcoming events not hosted by the user
@@ -2989,6 +3177,17 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                         let events2 = filteringEventsForDisplay(pending: false, createdByUser: false, pastEvents: false, serialisedEvents: serialisedEvents)
                 
                  allEvents = events1 + events2
+                
+                //            order the events
+                            allEvents.sort(by: {
+                //                both the dates we are comparing have their date chosen
+                                if $0.chosenDate != "" &&  $1.chosenDate != ""{
+                                    return dateFormatterTz.date(from: $0.chosenDate)! < dateFormatterTz.date(from: $1.chosenDate)!
+                                }
+                                else{
+                                    return dateFormatterTz.date(from: $0.startDateArray[0])! < dateFormatterTz.date(from: $1.startDateArray[0])!
+                                }
+                                })
                 
             }
             else if past == true{
@@ -3002,13 +3201,21 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                 let events4 = filteringEventsForDisplay(pending: false, createdByUser: false, pastEvents: true, serialisedEvents: serialisedEvents)
                 
                 allEvents = events1 + events2 + events3 + events4
+                
+                //            order the events
+                            allEvents.sort(by: {
+                //                both the dates we are comparing have their date chosen
+                                if $0.chosenDate != "" &&  $1.chosenDate != ""{
+                                    return dateFormatterTz.date(from: $0.chosenDate)! > dateFormatterTz.date(from: $1.chosenDate)!
+                                }
+                                else{
+                                    return dateFormatterTz.date(from: $0.startDateArray[0])! > dateFormatterTz.date(from: $1.startDateArray[0])!
+                                }
+                                })
    
             }
             
 //            once we have all the events we should loop through and check we have the user images if they exist
-            
-            
-            
             completionHandler(allEvents)
         }
         

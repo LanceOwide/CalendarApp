@@ -274,8 +274,6 @@ extension NL_SettingsPage: UITableViewDataSource, UITableViewDelegate {
                 navigator.pushViewController(viewController, animated: true)
             }
         }
-        
-   
     }
     
 

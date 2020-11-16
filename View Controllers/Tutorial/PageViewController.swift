@@ -77,7 +77,7 @@ class PageViewController: UIPageViewController, UIPageViewControllerDelegate {
     @objc func buttonAction(sender: UIButton!) {
       print("close tutorial tapped")
         
-        UserDefaults.standard.setValue("done", forKey: "firstTimeOpeningv2.0001.8")
+        UserDefaults.standard.setValue("done", forKey: "firstTimeOpeningvPROD")
         
         self.navigationController?.isNavigationBarHidden = false
         

@@ -78,7 +78,7 @@ class Tutorial3ViewController: UIViewController {
         lblTitle.text = "How it works"
         lblTitle.textAlignment = .center
         lblTitle.textColor = .white
-        lblTitle.font = UIFont.boldSystemFont(ofSize: 30)
+        lblTitle.font = UIFont.boldSystemFont(ofSize: 35)
         lblTitle.translatesAutoresizingMaskIntoConstraints = false
         lblTitle.topAnchor.constraint(equalTo: uiView.topAnchor).isActive = true
         lblTitle.centerXAnchor.constraint(equalTo: uiView.centerXAnchor).isActive = true
@@ -89,7 +89,7 @@ class Tutorial3ViewController: UIViewController {
         lblTitle1.text = "Step 1"
         lblTitle1.textAlignment = .center
         lblTitle1.textColor = .white
-        lblTitle1.font = UIFont.boldSystemFont(ofSize: 22)
+        lblTitle1.font = UIFont.boldSystemFont(ofSize: 25)
         lblTitle1.translatesAutoresizingMaskIntoConstraints = false
         lblTitle1.topAnchor.constraint(equalTo: uiView.topAnchor, constant: titleHeight + gapHeight + titleGapHeight).isActive = true
         lblTitle1.centerXAnchor.constraint(equalTo: uiView.centerXAnchor).isActive = true
@@ -100,7 +100,7 @@ class Tutorial3ViewController: UIViewController {
         lblTitle2.text = "Step 2"
         lblTitle2.textColor = .white
         lblTitle2.textAlignment = .center
-        lblTitle2.font = UIFont.boldSystemFont(ofSize: 22)
+        lblTitle2.font = UIFont.boldSystemFont(ofSize: 25)
         lblTitle2.translatesAutoresizingMaskIntoConstraints = false
         lblTitle2.topAnchor.constraint(equalTo: uiView.topAnchor, constant: titleHeight*2 + gapHeight*2 + descHeight + titleGapHeight).isActive = true
         lblTitle2.centerXAnchor.constraint(equalTo: uiView.centerXAnchor).isActive = true
@@ -111,7 +111,7 @@ class Tutorial3ViewController: UIViewController {
         lblTitle3.text = "Step 3"
         lblTitle3.textColor = .white
         lblTitle3.textAlignment = .center
-        lblTitle3.font = UIFont.boldSystemFont(ofSize: 22)
+        lblTitle3.font = UIFont.boldSystemFont(ofSize: 25)
         lblTitle3.translatesAutoresizingMaskIntoConstraints = false
         lblTitle3.topAnchor.constraint(equalTo: uiView.topAnchor, constant: titleHeight*3 + gapHeight*3 + descHeight*2 + titleGapHeight).isActive = true
         lblTitle3.centerXAnchor.constraint(equalTo: uiView.centerXAnchor).isActive = true
@@ -175,7 +175,7 @@ class Tutorial3ViewController: UIViewController {
         imgView3.heightAnchor.constraint(equalToConstant: imgHeight).isActive = true
         
         uiView.addSubview(lblDesc3)
-        lblDesc3.text = "You choose from the available dates. Simple!"
+        lblDesc3.text = "The host chooses from the available dates. Simple!"
         lblDesc3.textColor = .white
         lblDesc3.textAlignment = .left
         lblDesc3.numberOfLines = 5

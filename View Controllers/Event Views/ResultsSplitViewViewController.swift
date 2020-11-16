@@ -826,7 +826,7 @@ extension ResultsSplitViewViewController: UITableViewDataSource, UITableViewDele
                 }, completion: nil)
                 
 //            show notification that the only the event organiser can edit
-                showProgressHUD(notificationMessage: "Only the event organiser can edit", imageName: "unavailable", delay: 2.0)
+                showProgressHUD(notificationMessage: "Only the event organizer can edit", imageName: "unavailable", delay: 2.0)
             }
         }
         
