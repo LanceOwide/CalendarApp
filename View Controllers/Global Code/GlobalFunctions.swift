@@ -3156,7 +3156,7 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                 
                  allEvents = events1 + events2
                 
-                //            order the events
+                //            order the events - chronological order
                             allEvents.sort(by: {
                 //                both the dates we are comparing have their date chosen
                                 if $0.chosenDate != "" &&  $1.chosenDate != ""{
@@ -3178,7 +3178,7 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                 
                  allEvents = events1 + events2
                 
-                //            order the events
+                //            order the events - chronological order
                             allEvents.sort(by: {
                 //                both the dates we are comparing have their date chosen
                                 if $0.chosenDate != "" &&  $1.chosenDate != ""{
@@ -3202,7 +3202,7 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                 
                 allEvents = events1 + events2 + events3 + events4
                 
-                //            order the events
+                //            order the events in reverse order
                             allEvents.sort(by: {
                 //                both the dates we are comparing have their date chosen
                                 if $0.chosenDate != "" &&  $1.chosenDate != ""{
