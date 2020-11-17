@@ -128,11 +128,15 @@ class NL_AccountSettings: UIViewController {
                 }
           
                 else{
+                    let button1 = AlertButton(title: "OK", action: {
+                    
+                    }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
+                    
                     
 //                    show a notification to let the user know we are updating the database
-                    let alertPayload = AlertPayload(title: "Updating!", titleColor: UIColor.red, message: "We are updating your information.", messageColor: MyVariables.colourPlanrGreen, buttons: [], backgroundColor: UIColor.clear, inputTextHidden: true)
+                    let alertPayload = AlertPayload(title: "Updating!", titleColor: UIColor.red, message: "We are updating your information.", messageColor: MyVariables.colourPlanrGreen, buttons: [button1], backgroundColor: UIColor.clear, inputTextHidden: true)
                     
-                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: true, timeLag: 2.0, hideInput: true)
+                    utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 2.0, hideInput: true)
                     
                     
                     dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments { (querySnapshot, error) in
@@ -196,7 +200,9 @@ class NL_AccountSettings: UIViewController {
                         let userImageRef = imagesRef.child(user!)
                             
                             let uploadTask = userImageRef.putData(resizeImagePNG!, metadata: nil) { (metadata, error) in
-                              guard let metadata = metadata else {
+                                if let metadata = metadata{
+                                    AutoRespondHelper.postProfilePicNotification(userID: user!)
+                                } else {
                                 // Uh-oh, an error occurred!
                                 return
                               }
@@ -210,7 +216,6 @@ class NL_AccountSettings: UIViewController {
                                 
 //                                post notification to reload user photo
                                 NotificationCenter.default.post(name: .userPhotoUploaded, object: nil)
-
                             }
                             
                         }

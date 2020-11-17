@@ -8,6 +8,8 @@
 
 import UIKit
 
+var newLogin = Bool()
+
 class PageViewController: UIPageViewController, UIPageViewControllerDelegate {
     
     
@@ -86,8 +88,7 @@ class PageViewController: UIPageViewController, UIPageViewControllerDelegate {
         
 //        post a notification so the viewController knows to show the instructions now
 NotificationCenter.default.post(name: .tutorialClosed, object: nil)
-        
-        
+  
     }
     
 }
@@ -176,6 +177,9 @@ extension PageViewController: UIPageViewControllerDataSource {
                     AutoRespondHelper.registerForPushNotificationsAuto()
                     
         //            we run the setup of the app, so that when we dismiss the tutorial the app is ready
+                    
+                    newLogin = true
+                    
                     NL_HomePage().openingSetup()
                 }
                 

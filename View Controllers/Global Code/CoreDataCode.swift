@@ -484,6 +484,15 @@ extension UIViewController{
                     NotificationCenter.default.post(name: .newDataLoaded, object: nil)
                 }
             }
+            else if notification == "userProfilePic"{
+                print("CDRetrieveUpdatedEvents - profilePicUpdate userID \(i.key)")
+//                delete the users current image
+                DataBaseHelper.shareInstance.deleteImage(userID: i.key)
+                AutoRespondHelper.fetchUsersProfileImageAuto(uid: i.key){
+                    AutoRespondHelper.removeSignleEventNotificationsAuto(eventID: i.key){
+                    }
+                }
+            }
         }
     }
     
@@ -567,6 +576,16 @@ extension UIViewController{
        
                     }
         
+                }
+                else if notification == "userProfilePic"{
+                    print("CDRetrieveUpdatedEvents - profilePicUpdate userID \(i.key)")
+//                delete the users current image
+                    DataBaseHelper.shareInstance.deleteImage(userID: i.key)
+                    AutoRespondHelper.fetchUsersProfileImageAuto(uid: i.key){
+                        AutoRespondHelper.removeSignleEventNotificationsAuto(eventID: i.key){
+                        completion()
+                        }
+                    }
                 }
                 
             }
@@ -2027,7 +2046,7 @@ func removeTheAvailabilityNotifications(){
         if fetchingImage.count == 0{
             print("we didnt find the users image, we will try and get it from Firebase")
         //        we didnt find the image, so lets see if there is anything to pull from firebase
-                fetchUsersProfileImage(uid: uid){
+            AutoRespondHelper.fetchUsersProfileImageAuto(uid: uid){
         //            try to fetch the image again
                     let fetchRequest : NSFetchRequest<CoreDataUser> = CoreDataUser.fetchRequest()
                     fetchRequest.predicate = NSPredicate(format: "uid == %@", uid)

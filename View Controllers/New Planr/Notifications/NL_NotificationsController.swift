@@ -388,6 +388,12 @@ extension NL_NotificationsController: UICollectionViewDelegate, UICollectionView
 //            2.0 pull the data from defaults
             let userDefaults = UserDefaults.standard
             var currentAPNUI = userDefaults.object(forKey: "apnNotificationUserInfo") as? [[AnyHashable : Any]]
+            
+            if currentAPNUI?.count == 0{
+                NotificationCenter.default.post(name: .notificationTapped, object: nil)
+            }
+            else{
+            
 //            2.1 delete at index
             currentAPNUI?.remove(at: indexPath.row)
 //            2.2 push the new list back to the defaults
@@ -407,6 +413,7 @@ extension NL_NotificationsController: UICollectionViewDelegate, UICollectionView
 //              present the popover
                             self.present(popController, animated: true, completion: nil)
                         }
+        }
         }
     }
     }

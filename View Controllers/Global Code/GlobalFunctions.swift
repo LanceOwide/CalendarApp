@@ -1740,11 +1740,7 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                 alertTitle = "Event Updated"
                alertText = ("\(eventOwnerName) has changed the date of event \( description!), now on \(displayDate), would you like to update it in your calendar?")
             }
-    
-        
-        
-        
-        
+
         let alert = UIAlertController(title: alertTitle, message: alertText, preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { action in
@@ -1871,6 +1867,8 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
             print("user chose not to save the new event - chosenDateSeen set")
             
             dbStore.collection("userEventStore").document(userEventStoreID).setData(["chosenDateSeen" : true], merge: true)
+//            post a notification to ensure the table updates and the new chosen date is visible
+            NotificationCenter.default.post(name: .newDataLoaded,object: nil)
             
         }))
             

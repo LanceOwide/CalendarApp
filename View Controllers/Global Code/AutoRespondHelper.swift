@@ -488,6 +488,20 @@ class AutoRespondHelper {
                     }
 
                 }
+//                the user has a new profile pic to download
+                else if notification == "userProfilePic"{
+                    print("CDRetrieveUpdatedEvents - profilePicUpdate userID \(i.key)")
+                    
+//                    delete the users current photo
+                    DataBaseHelper.shareInstance.deleteImage(userID: i.key)
+                    
+                    AutoRespondHelper.fetchUsersProfileImageAuto(uid: i.key){
+                        self.removeSignleEventNotificationsAuto(eventID: i.key){
+                        myGroup.leave()
+                        }
+                    }
+                }
+                
                 else if notification == "DateChosen" || notification == "dateChosen"{
                  print("CDRetrieveUpdatedEvents - dateChosen event \(i.key)")
                     
@@ -2044,6 +2058,55 @@ class AutoRespondHelper {
                   docRefUserEventStore.document(documentID).delete()
         
             }
+            }
+        }
+    
+    
+    static func postProfilePicNotification(userID: String){
+        print("running func update")
+//      get all of the users the person is in an event with
+        var allUserIDs = [String]()
+        
+//        get all of the userIDs
+        for event in CDEevents{
+//            we combine our current list and the new events
+            allUserIDs =  allUserIDs + event.users!
+        }
+        let uniqueIDs = Array(Set(allUserIDs))
+        
+        
+        for id in uniqueIDs{
+        dbStore.collection("userEventUpdates").document(id).setData([userID: "userProfilePic"], merge: true)
+        }
+    }
+    
+    
+    //    function to retrieve the users image and save down the profile pictures
+       static func fetchUsersProfileImageAuto(uid: String, completion: @escaping () -> Void){
+            print("running func fetchUsersProfileImageAuto inputs- uid: \(uid)")
+            
+            // Create a reference to the file you want to download
+            // Get a reference to the storage service using the default Firebase App
+            let storage = Storage.storage()
+
+            // Create a storage reference from our storage service
+            let storageRef = storage.reference()
+            
+            // Create a child reference
+            // imagesRef now points to "images"
+            let imagesRef = storageRef.child("profileImages/\(uid)")
+            
+            // Download in memory with a maximum allowed size of 1MB (1 * 1024 * 1024 bytes)
+            imagesRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
+              if let error = error {
+                // Uh-oh, an error occurred!
+                completion()
+              } else {
+    //            save the image in coreData
+                let image = UIImage(data: data!)
+                DataBaseHelper.shareInstance.saveImage(image: image!, userID: uid)
+                completion()
+              }
             }
         }
 

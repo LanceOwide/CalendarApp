@@ -634,6 +634,17 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                     print("OK clicked")
                     
                     self.addEventToCalendarSimple(title: currentUserSelectedEvent.eventDescription, description: currentUserSelectedEvent.eventDescription, startDate: currentUserSelectedEvent.startDateArray[chosenDatePosition], endDate: currentUserSelectedEvent.endDateArray[chosenDatePosition], location: currentUserSelectedEvent.eventLocation, eventOwner: currentUserSelectedEvent.eventOwnerName, startDateDisplay: currentUserSelectedEvent.startDatesDisplay[chosenDatePosition], eventOwnerID: currentUserSelectedEvent.eventOwnerID, locationLongitude: currentUserSelectedEvent.locationLongitude, locationLatitude: currentUserSelectedEvent.locationLatitue, userEventStoreID: availability[0].documentID, calendarEventIDInput: availability[0].calendarEventID){_,_ in
+                        
+                        DispatchQueue.main.async {
+ 
+                        let button11 = AlertButton(title: "Ok", action: {
+                        })
+                        let alertPayload1 = AlertPayload(title: "Event Added!", titleColor: UIColor.red, message:  "The event has been added to your calendar", messageColor: MyVariables.colourPlanrGreen, buttons: [button11], backgroundColor: UIColor.clear, inputTextHidden: true)
+                        
+                        utils.showAlert(payload: alertPayload1, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
+                        }
+                        
+                        
                     }
                 })
                 let button2 = AlertButton(title: "Reject", action: {
@@ -649,22 +660,28 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
             else{
 //                the user did have the event in thier calendar
                 let utils = Utils()
-                let button1 = AlertButton(title: "Accept", action: {
+                let button1 = AlertButton(title: "Update", action: {
                     print("OK clicked")
                     
                     self.addEventToCalendarSimple(title: currentUserSelectedEvent.eventDescription, description: currentUserSelectedEvent.eventDescription, startDate: currentUserSelectedEvent.startDateArray[chosenDatePosition], endDate: currentUserSelectedEvent.endDateArray[chosenDatePosition], location: currentUserSelectedEvent.eventLocation, eventOwner: currentUserSelectedEvent.eventOwnerName, startDateDisplay: currentUserSelectedEvent.startDatesDisplay[chosenDatePosition], eventOwnerID: currentUserSelectedEvent.eventOwnerID, locationLongitude: currentUserSelectedEvent.locationLongitude, locationLatitude: currentUserSelectedEvent.locationLatitue, userEventStoreID: availability[0].documentID, calendarEventIDInput: availability[0].calendarEventID){_,_ in
+                        
+                        DispatchQueue.main.async {
+                        
+                        let button11 = AlertButton(title: "Ok", action: {
+                        })
+                        let alertPayload1 = AlertPayload(title: "Event Updated!", titleColor: UIColor.red, message:  "The event has been updated in your calendar", messageColor: MyVariables.colourPlanrGreen, buttons: [button11], backgroundColor: UIColor.clear, inputTextHidden: true)
+                        
+                        utils.showAlert(payload: alertPayload1, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
+                        }
                     }
-   
                 })
-                let button2 = AlertButton(title: "Reject", action: {
+                let button2 = AlertButton(title: "Ignore", action: {
                     print("the user chose not too add the event to their calendar")
                 })
                 
-                let alertPayload = AlertPayload(title: "Add to Calendar?", titleColor: UIColor.red, message:  "The event, \(currentUserSelectedEvent.eventDescription), is already in your calendar named: \(calendarName)? Would you like to update it? You can change the calendar the event is saved to in the App settings", messageColor: MyVariables.colourPlanrGreen, buttons: [button1,button2], backgroundColor: UIColor.clear, inputTextHidden: true)
+                let alertPayload = AlertPayload(title: "Add to Calendar?", titleColor: UIColor.red, message:  "The event, \(currentUserSelectedEvent.eventDescription), is already in your calendar. If you've changed the Save Calendar in the app settings, hit update to move the event to the new calendar.", messageColor: MyVariables.colourPlanrGreen, buttons: [button1,button2], backgroundColor: UIColor.clear, inputTextHidden: true)
                 
                 utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
-                
-                
             }
         }
     }
@@ -694,7 +711,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                                print("OK clicked")
         })
         
-        let alertPayload = AlertPayload(title: "Not Going?", titleColor: UIColor.red, message: "The organizer has been notified you won't be going. You will continue to receive updates or you can delete the event", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
+        let alertPayload = AlertPayload(title: "Not Going?", titleColor: UIColor.red, message: "The organizer has been notified that you won't be going. You will continue to receive event updates or you can delete the event to remove updates.", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
         
         utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
         
@@ -1158,7 +1175,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                     
                     if coachmarkHelperText == "newEventCreated"{
                         
-                       numberOfCoachMarks = 4
+                       numberOfCoachMarks = 3
                     }
                     else if coachmarkHelperText == "newUserEvent"{
                         

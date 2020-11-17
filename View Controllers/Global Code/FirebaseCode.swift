@@ -540,37 +540,6 @@ extension UIViewController{
                 }}}}
     
     
-//    function to retrieve the users image and save down the profile pictures
-    func fetchUsersProfileImage(uid: String, completion: @escaping () -> Void){
-        print("running func fetchUsersProfileImage inputs- uid: \(uid)")
-        
-        // Create a reference to the file you want to download
-        // Get a reference to the storage service using the default Firebase App
-        let storage = Storage.storage()
-
-        // Create a storage reference from our storage service
-        let storageRef = storage.reference()
-        
-        // Create a child reference
-        // imagesRef now points to "images"
-        let imagesRef = storageRef.child("profileImages/\(uid)")
-        
-        // Download in memory with a maximum allowed size of 1MB (1 * 1024 * 1024 bytes)
-        imagesRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
-          if let error = error {
-            // Uh-oh, an error occurred!
-            completion()
-          } else {
-//            save the image in coreData
-            let image = UIImage(data: data!)
-            DataBaseHelper.shareInstance.saveImage(image: image!, userID: uid)
-            completion()
-          }
-        }
-        
-        
-    }
-    
 //    this function creates a listener for each node of the realTime database the user has a chat at
 //    func createChatListeners(){
 //        print("createChatListeners running")

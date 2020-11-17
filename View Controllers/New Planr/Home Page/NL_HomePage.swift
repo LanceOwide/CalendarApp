@@ -76,6 +76,7 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
 //    add an observer to hold the observer so we can remove it at a later date
     var observer: NSObjectProtocol?
     var observer2: NSObjectProtocol?
+    var newDataObserver: NSObjectProtocol?
     let notificationCenter = NotificationCenter.default
     
 //    switch for the pending status
@@ -90,6 +91,9 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
 //        if the user is new, we do not want to go through this setup until they have seen the notifications
         if UserDefaults.standard.bool(forKey: "oldUser") == true{
         openingSetup()
+            
+//            we don't let the homepage update unless the user is an old one, otherwise the app will crash
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadHomePage), name: .newDataLoaded, object: nil)
         }
         
         setUpTheDateView()
@@ -125,9 +129,8 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
         
 //        add an observer to detect when the tutorial is closed and show the relevant coachmarks
         NotificationCenter.default.addObserver(self, selector: #selector(tutorialClosed), name: .tutorialClosed, object: nil)
-        
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadHomePage), name: .newDataLoaded, object: nil)
+    
+            
         
 //        AutoRespondHelper.registerForPushNotificationsAuto()
         
@@ -239,18 +242,18 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
     }
     
     @objc func tutorialClosed(){
-        print("tutorialClosed")
+        print("tutorialClosed - instructionsTriggered \(instructionsTriggered)")
+        
         
 //        there appears to be a bug where this is being triggered twice, to stop this we set a variable to say the instructions are showing
         if instructionsTriggered == false{
-            
+            instructionsTriggered = true
 //        check if the new user had an event invite already, if show show them the events page
         if CDEevents.count != 0{
-            instructionsTriggered = true
         coachmarkHelperText = "firstTimeUserHasBeenInvited"
         coachMarksController.start(in: .window(over: self))
         }
-        if CDEevents.count == 0{
+        else if CDEevents.count == 0{
             instructionsTriggered = true
         coachmarkHelperText = "firstTimeUserNoEvent"
         coachMarksController.start(in: .window(over: self))
@@ -268,8 +271,9 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
     
 // setup the app when the user opens the homepage, used for separation from the ViewDidload
     func openingSetup(){
+        print("opening setup running")
         
-        //        set the badge number to 0
+//        set the badge number to 0
                 UIApplication.shared.applicationIconBadgeNumber = 0
         
 //        setup the the title
