@@ -80,7 +80,5 @@ struct firebaseEvents{
     
     static var accessToNotificationsDenied = "accessToNotificationsDenied"
     static var accessToNotificationsGranted = "accessToNotificationsGranted"
-    
-    
-    
+  
 }
