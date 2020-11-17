@@ -202,7 +202,9 @@ class NL_SettingsPage: UIViewController {
             authStatusListener = false
             
 //            remove the notification listener
+            if notificationListenerRegistration != nil{
             notificationListenerRegistration.remove()
+            }
 
     //        when the user logs out we want to delete all their app data, otherwise logging in with another users credentials will not work
             self.deleteAllRecords(entityName:"CoreDataAvailability")

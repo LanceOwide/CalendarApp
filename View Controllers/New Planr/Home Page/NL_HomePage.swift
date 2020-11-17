@@ -85,7 +85,8 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("running viewDidLoad")
+        print("running viewDidLoad ")
+        
         
 //        opening setup func
 //        if the user is new, we do not want to go through this setup until they have seen the notifications
@@ -1344,11 +1345,11 @@ extension NL_HomePage{
                 summaryView = false
                 
     //            we turn off the listeners, this ensures the code below functions correctly, we then turn the listeners back on at the event page
-                if availabilityListenerEngaged == true{ availabilityListenerRegistration.remove()
+                if availabilityListenerRegistration != nil{ availabilityListenerRegistration.remove()
                      availabilityListenerEngaged = false
                     print("removing the event availability listener")
                 }
-                if eventListenerEngaged == true{ eventListenerRegistration.remove()
+                if eventListenerRegistration != nil{ eventListenerRegistration.remove()
                      eventListenerEngaged = false
                     print("removing the event event listener")
                 }

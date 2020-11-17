@@ -1206,7 +1206,7 @@ class AutoRespondHelper {
 //    fucntion to check for the availability
     static func availabilityChangeListenerAuto(){
         
-        if availabilityListenerEngaged == true{
+        if availabilityListenerRegistration != nil{
             print("availabilityChangeListener already engaged, not re-engaging")
                }
                else{

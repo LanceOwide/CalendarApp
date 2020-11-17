@@ -106,7 +106,7 @@ class NL_editAvailability: UIViewController {
 //            page title
             let pageTitle = UILabel()
             topView.addSubview(pageTitle)
-            pageTitle.text = "Choose Your Available Times"
+            pageTitle.text = "Choose Your Available Dates"
             pageTitle.textAlignment = .center
             pageTitle.font = UIFont.systemFont(ofSize: 18)
             pageTitle.translatesAutoresizingMaskIntoConstraints = false

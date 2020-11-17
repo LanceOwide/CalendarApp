@@ -63,6 +63,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("view did load availabilityListenerRegistration \(availabilityListenerRegistration) eventListenerRegistration \(eventListenerRegistration)")
         
         title = "Details"
         

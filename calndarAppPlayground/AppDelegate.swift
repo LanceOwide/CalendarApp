@@ -122,32 +122,21 @@ import FirebaseStorage
         
         print("running func - applicationDidEnterBackground")
 //        we remove the listeners so they don't interfere with background work
-        if availabilityListenerEngaged == true{availabilityListenerRegistration.remove()
+        if availabilityListenerRegistration != nil{availabilityListenerRegistration.remove()
             print("applicationDidEnterBackground - disabling availabilityListener")
             availabilityListenerEngaged = false
         }
-        if eventListenerEngaged == true{eventListenerRegistration.remove()
+        if eventListenerRegistration != nil{eventListenerRegistration.remove()
             print("applicationDidEnterBackground - disabling eventListenerRegistration")
             eventListenerEngaged = false
         }
-        
-        eventListenerEngaged = false
-        availabilityListenerEngaged = false
+
         
         //        save down the coredata if the app is going to terminate
         self.saveContext()
         
-//        we remove the listeners so they don't interfere when the app comes back  to the foreground
-        if availabilityListenerEngaged == true{availabilityListenerRegistration.remove()
-            print("applicationDidEnterBackground - disabling availabilityListener")
-            availabilityListenerEngaged = false
-        }
-        if eventListenerEngaged == true{eventListenerRegistration.remove()
-            print("applicationDidEnterBackground - disabling eventListenerRegistration")
-            eventListenerEngaged = false
-        }
         
-        if notificationListenerEnagaged == true{notificationListenerRegistration.remove()
+        if notificationListenerRegistration != nil{notificationListenerRegistration.remove()
             print("applicationDidEnterBackground - disabling notificationListenerRegistration")
             notificationListenerEnagaged = false
         }
@@ -169,9 +158,15 @@ import FirebaseStorage
         resetNotificationCount()
         
 //            engage the listeners to detect event and availability notifications, but check that they are not already engaged
-        if availabilityListenerEngaged == false{CoreDataCode().availabilityChangeListener()}
-        if eventListenerEngaged == false{CoreDataCode().eventChangeListener()}
-        if notificationListenerEnagaged == false{FirebaseCode().checkNotificationStatusListener()}
+        if availabilityListenerEngaged == false{CoreDataCode().availabilityChangeListener()
+            print("applicationWillEnterForeground - enabling availabilityListenerRegistration")
+        }
+        if eventListenerEngaged == false{CoreDataCode().eventChangeListener()
+            print("applicationWillEnterForeground - enabling eventListenerRegistration")
+        }
+        if notificationListenerEnagaged == false{FirebaseCode().checkNotificationStatusListener()
+            print("applicationWillEnterForeground - enabling notificationListenerRegistration")
+        }
         
 ////        we also need to remove any observers on the message nodes, we check if the listners were enagged to begin with befor removing it
 //        if chatListenerInt == true{userMessagesRef.removeAllObservers()
@@ -387,7 +382,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate{
 //  MARK: This function will be called right after user tap on the notification when the app is running the the background, it is not called if the app was not running
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
     
-    print("userNotificationCenter - didReceive was triggered in appDelegate")
+    print("userNotificationCenter - didReceive was triggered in appDelegate availabilityListenerEngaged \(availabilityListenerEngaged)")
     
     let notificationContent = response.notification.request.content.userInfo
     let userInfo = response.notification.request.content.userInfo
@@ -434,11 +429,11 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
         }
         else{
 //            Need to be sure that the listeners are removed before we load the event to ensure no issues with the calls overlapping, but once the event has been loaded we should re-engage the listeners to ensure we pull down the latest information
-            if availabilityListenerEngaged == true{availabilityListenerRegistration.remove()
+            if availabilityListenerRegistration != nil{availabilityListenerRegistration.remove()
              print("userNotificationCenter - disabling availabilityListenerRegistration")
                 availabilityListenerEngaged = false
             }
-            if eventListenerEngaged == true{eventListenerRegistration.remove()
+            if eventListenerRegistration != nil{eventListenerRegistration.remove()
                 print("userNotificationCenter - disabling eventListenerRegistration")
                 eventListenerEngaged = false
             }
@@ -490,7 +485,7 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
             if availabilityListenerEngaged == false{CoreDataCode().availabilityChangeListener()
              print("userNotificationCenter - enabling availabilityListenerRegistration")
             }
-                                                                    if eventListenerEngaged == false{CoreDataCode().eventChangeListener()
+            if availabilityListenerEngaged == false{CoreDataCode().eventChangeListener()
                 print("userNotificationCenter - enabling eventListenerRegistration")
             }
                                                                     completionHandler()
@@ -506,9 +501,9 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
                                     //                        load the required availability
                         currentUserSelectedAvailability = CoreDataCode().serialiseAvailability(eventID: newEventID)
                         CoreDataCode().prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
-                                // set the view controller as root
-                                navController.present(eventDetails, animated: true)
-                                                                
+                            
+                            print("userNotificationCenter - enabling availabilityListenerRegistration")
+                                
                                     //          set global variable to tell the homepage to engage the event listeners
                                                                 eventNotificationAppBackground = false
                                 //          re-engage the listeners
@@ -518,6 +513,9 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
                                 if eventListenerEngaged == false{CoreDataCode().eventChangeListener()
                                                                     print("userNotificationCenter - enabling eventListenerRegistration")
                                                                 }
+                            // set the view controller as root
+                            print("userNotificationCenter - segue to the event page")
+                            navController.present(eventDetails, animated: true)
                                                                                                
                                 completionHandler()
                                     }}
@@ -532,8 +530,7 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
 //                        load the required availability
                         currentUserSelectedAvailability = CoreDataCode().serialiseAvailability(eventID: newEventID)
                         CoreDataCode().prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
-                            // set the view controller as root
-                            navController.present(eventDetails, animated: true)
+                            
                             
 //          set global variable to tell the homepage to engage the event listeners
                             eventNotificationAppBackground = false
@@ -544,6 +541,9 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
                 if eventListenerEngaged == false{CoreDataCode().eventChangeListener()
                 print("userNotificationCenter - enabling eventListenerRegistration")
                                                                                            }
+                            // set the view controller as root
+                            navController.present(eventDetails, animated: true)
+                            print("userNotificationCenter - segue to the event page")
                completionHandler()
                             }}
                     }}
@@ -557,17 +557,19 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
                 //                load the required availability
                                 currentUserSelectedAvailability = CoreDataCode().serialiseAvailability(eventID: newEventID)
                                 CoreDataCode().prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: false){
-// set the view controller as root
-                                    navController.present(eventDetails, animated: true)
 //          set global variable to tell the homepage to engage the event listeners
                                     eventNotificationAppBackground = false
 //          re-engage the listeners
                                     if availabilityListenerEngaged == false{CoreDataCode().availabilityChangeListener()
-                                                                     print("userNotificationCenter - enabling availabilityListenerRegistration")
+                                        print("userNotificationCenter - enabling availabilityListenerRegistration")
                                                                     }
                                     if eventListenerEngaged == false{CoreDataCode().eventChangeListener()
                                                                         print("userNotificationCenter - enabling eventListenerRegistration")
                                                                     }
+                                    
+                                    // set the view controller as root
+                                    navController.present(eventDetails, animated: true)
+                                    print("userNotificationCenter - segue to the event page")
                                      completionHandler()
                 }
             }}}}

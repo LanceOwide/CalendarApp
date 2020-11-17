@@ -1558,6 +1558,7 @@ func removeTheAvailabilityNotifications(){
 //    MARK: snapshot listener section
 //    fuction for turning on and off the snapshot listener on the eventNotification table
     func eventChangeListener(){
+        print("running func eventChangeListener")
         if eventListenerEngaged == true{
             print("eventChangeListener already engaged, not re-engaging")
             
@@ -1599,6 +1600,7 @@ func removeTheAvailabilityNotifications(){
     
     //    check for availability with updated flags in the userEventsUpdate table
     func availabilityChangeListener(){
+        print("running func availabilityChangeListener")
         
         if availabilityListenerEngaged == true{
             print("availabilityChangeListener already engaged, not re-engaging")
