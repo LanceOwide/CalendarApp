@@ -1019,6 +1019,10 @@ class GlobalFunctions: UIViewController {
     //    pop-up used to ask if the user would like to invite their friends who are not users yet, inputs notExistingUserArray: phone numbers, nonExistingNameArray: names
     func inviteFriendsPopUp(notExistingUserArray: [String], nonExistingNameArray: [String]){
         print("inviteFriendsPopUp Initiated")
+        Analytics.logEvent(firebaseEvents.inviteFriendsPressed, parameters: ["Test": ""])
+        
+        
+        Analytics.logEvent(firebaseEvents.eventEdit, parameters: ["Test": ""])
         
         let displayArray = nonExistingNameArray.joined(separator:",")
         
@@ -1031,7 +1035,7 @@ class GlobalFunctions: UIViewController {
         }))
         alert.addAction(UIAlertAction(title: "YES", style: UIAlertAction.Style.default, handler: { action in
             
-            Analytics.logEvent(firebaseEvents.eventSendInvite, parameters: ["user": user])
+            Analytics.logEvent(firebaseEvents.eventSendInvite, parameters: ["Test": ""])
             print("User Selected to send texts to thier friends")
 //            self.sendInviteTextMessages(notExistingUserArray: notExistingUserArray)
             
@@ -1054,7 +1058,7 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
             let utils = Utils()
                         
             let button1 = AlertButton(title: "Yes", action: {
-                Analytics.logEvent(firebaseEvents.eventSendReminder, parameters: ["user": user])
+                Analytics.logEvent(firebaseEvents.eventSendReminder, parameters: ["Test": ""])
                     AutoRespondHelper.sendTheUserAReminder(eventID: eventID, userID: userID)
                 }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
                         
@@ -1350,12 +1354,14 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
             
             if accessGranted == true {
                 //                print("we got access")
+                Analytics.logEvent(firebaseEvents.accessToCalendarGranted, parameters: ["Test": ""])
                 self.loadCalendars2()
 //                since we were just granted access to the calendar we should respond to any events
                 AutoRespondHelper.nonRespondedEventsAuto()
 
             }
             else{
+                Analytics.logEvent(firebaseEvents.accessToCalendarDenied, parameters: ["Test": ""])
 //                we do not want to show the user this message more than once, so we track it
                 UserDefaults.standard.set(1, forKey: "calendarAccessReask")
                 print("no access to the calendar")
@@ -1750,6 +1756,9 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                     
                     if calendarEventIDInput == "" || eventStore.event(withIdentifier: calendarEventIDInput) == nil{
                   let event = EKEvent(eventStore: eventStore)
+                        
+                        Analytics.logEvent(firebaseEvents.eventAddedToCalendar, parameters: ["Test": ""])
+                        
                     //                    let event = EKEvent(eventStore: eventStore)
                         event.title = title
                         print("Event being saved: Title \(String(describing: event.title))")
@@ -1801,6 +1810,7 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                         completion(true, nil)
                 }
                 else{
+                    Analytics.logEvent(firebaseEvents.eventUpdatedInCalendar, parameters: ["Test": ""])
 //                        there is already an event in the calendar
                    let event = eventStore.event(withIdentifier: calendarEventIDInput)!
                     //                    let event = EKEvent(eventStore: eventStore)
@@ -1865,6 +1875,7 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
         
         alert.addAction(UIAlertAction(title: "Reject", style: .cancel, handler: { action in
             print("user chose not to save the new event - chosenDateSeen set")
+            Analytics.logEvent(firebaseEvents.eventAddRejectedCalendar, parameters: ["Test": ""])
             
             dbStore.collection("userEventStore").document(userEventStoreID).setData(["chosenDateSeen" : true], merge: true)
 //            post a notification to ensure the table updates and the new chosen date is visible

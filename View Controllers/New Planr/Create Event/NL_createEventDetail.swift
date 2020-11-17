@@ -267,7 +267,7 @@ class NL_createEventDetail: UIViewController, UIPopoverPresentationControllerDel
         let spacer = CGFloat(5)
         let buttonHeight = CGFloat(50)
         let timeLabelHeight = CGFloat(10)
-        let timeSpacer = CGFloat(10)
+        let timeSpacer = CGFloat(15)
     
       //   setup the view for holding the progress bar and title
       let containerView2 = UIView()
@@ -357,7 +357,7 @@ class NL_createEventDetail: UIViewController, UIPopoverPresentationControllerDel
         topView.addSubview(startTimeLbl)
         startTimeLbl.leftAnchor.constraint(equalTo: topView.leftAnchor, constant: CGFloat(sideInset)).isActive = true
         startTimeLbl.widthAnchor.constraint(equalToConstant: CGFloat(timeInputWidthFull)).isActive = true
-        startTimeLbl.topAnchor.constraint(equalTo: topView.topAnchor, constant: CGFloat(textBoxHeight)*2 + CGFloat(separatorHeight)*2 + spacer).isActive = true
+        startTimeLbl.topAnchor.constraint(equalTo: topView.topAnchor, constant: CGFloat(textBoxHeight)*2 + CGFloat(separatorHeight)*2 + timeSpacer).isActive = true
         startTimeLbl.heightAnchor.constraint(equalToConstant: CGFloat(timeLabelHeight)).isActive = true
         
         
@@ -383,7 +383,7 @@ class NL_createEventDetail: UIViewController, UIPopoverPresentationControllerDel
             topView.addSubview(endTimeLbl)
         endTimeLbl.rightAnchor.constraint(equalTo: topView.rightAnchor, constant: -CGFloat(sideInset)).isActive = true
         endTimeLbl.widthAnchor.constraint(equalToConstant: CGFloat(timeInputWidthFull)).isActive = true
-        endTimeLbl.topAnchor.constraint(equalTo: topView.topAnchor, constant: CGFloat(textBoxHeight)*2 + CGFloat(separatorHeight)*2 + spacer).isActive = true
+        endTimeLbl.topAnchor.constraint(equalTo: topView.topAnchor, constant: CGFloat(textBoxHeight)*2 + CGFloat(separatorHeight)*2 + timeSpacer).isActive = true
         endTimeLbl.heightAnchor.constraint(equalToConstant: CGFloat(timeLabelHeight)).isActive = true
         
 //        setup the end time input

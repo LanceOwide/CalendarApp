@@ -917,9 +917,12 @@ class AutoRespondHelper {
           granted, error in
           print("Permission granted: \(granted)") // 3
             guard granted else {
-                
+                Analytics.logEvent(firebaseEvents.accessToNotificationsDenied, parameters: ["Test": ""])
                 print("user didnt give us access to their notifications")
-                return }
+                return
+                
+            }
+            Analytics.logEvent(firebaseEvents.accessToNotificationsGranted, parameters: ["Test": ""])
             
             // 1 set the action we would like to perform
             let respondAction = UNNotificationAction(
@@ -1040,6 +1043,7 @@ class AutoRespondHelper {
             (accessGranted: Bool, error: Error?) in
             
             if accessGranted == true {
+                Analytics.logEvent(firebaseEvents.accessToCalendarGranted, parameters: ["Test": ""])
                 //                print("we got access")
                 self.loadCalendars2Auto()
 //                since we were just granted access to the calendar we should respond to any events
@@ -1050,6 +1054,7 @@ class AutoRespondHelper {
 //                we do not want to show the user this message more than once, so we track it
                 UserDefaults.standard.set(1, forKey: "calendarAccessReask")
                 print("no access to the calendar")
+                Analytics.logEvent(firebaseEvents.accessToCalendarDenied, parameters: ["Test": ""])
             }
             
         })}
@@ -1590,6 +1595,8 @@ class AutoRespondHelper {
              store.requestAccess(for: .contacts) { (granted, error) in
                  if let error = error {
                      print("Failed to get access",error)
+                    
+                    Analytics.logEvent(firebaseEvents.accessToContactsDeniedShown, parameters: ["Test": ""])
                      
                      print("Access Denied")
                      
@@ -1603,6 +1610,8 @@ class AutoRespondHelper {
                      }))
                      
                      alert.addAction(UIAlertAction(title: "Settings", style: UIAlertAction.Style.default, handler: { action in
+                        
+                        Analytics.logEvent(firebaseEvents.accessToContactsDeniedSettingURLClicked, parameters: ["Test": ""])
                          
 //                        MARK:  when the user changes the settings the app restarts, this is apple intended behaviour, we need to code around this
                          guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {

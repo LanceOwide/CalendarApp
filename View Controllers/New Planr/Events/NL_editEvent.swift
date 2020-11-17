@@ -176,6 +176,7 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
               let headerLabelText = "Edit Event"
               let instructionLabelText = "Edit event details"
               let sideInset = 16
+              
            
               //   setup the view for holding the progress bar and title
               let containerView = UIView()
@@ -239,6 +240,7 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
           let timeInputWidthFull = timeInputWidth - Int(screenWidth)/15
           let spacer = CGFloat(5)
           let buttonHeight = CGFloat(50)
+          let timeSpacer = CGFloat(5)
       
         //   setup the view for holding the progress bar and title
         let containerView2 = UIView()
@@ -345,14 +347,14 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
         
         let startTimeLbl = UILabel()
         startTimeLbl.translatesAutoresizingMaskIntoConstraints = false
-        startTimeLbl.text = "Start Time"
+        startTimeLbl.text = "Start Time:"
         startTimeLbl.textColor = MyVariables.colourLight
         startTimeLbl.adjustsFontSizeToFitWidth = true
         startTimeLbl.font = UIFont.systemFont(ofSize: 15)
         topView.addSubview(startTimeLbl)
         startTimeLbl.leftAnchor.constraint(equalTo: topView.leftAnchor, constant: CGFloat(sideInset)).isActive = true
         startTimeLbl.widthAnchor.constraint(equalToConstant: CGFloat(timeInputWidthFull)).isActive = true
-        startTimeLbl.topAnchor.constraint(equalTo: topView.topAnchor, constant: CGFloat(textBoxHeight)*2 + CGFloat(separatorHeight)*5).isActive = true
+        startTimeLbl.topAnchor.constraint(equalTo: topView.topAnchor, constant: CGFloat(textBoxHeight)*2 + CGFloat(separatorHeight)*5 + timeSpacer).isActive = true
         startTimeLbl.heightAnchor.constraint(equalToConstant: CGFloat(textLblHeight)).isActive = true
           
           
@@ -370,14 +372,14 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
         
         let endTimeLbl = UILabel()
         endTimeLbl.translatesAutoresizingMaskIntoConstraints = false
-        endTimeLbl.text = "End Time"
+        endTimeLbl.text = "End Time:"
         endTimeLbl.textColor = MyVariables.colourLight
         endTimeLbl.adjustsFontSizeToFitWidth = true
         endTimeLbl.font = UIFont.systemFont(ofSize: 15)
         topView.addSubview(endTimeLbl)
         endTimeLbl.rightAnchor.constraint(equalTo: topView.rightAnchor, constant: -CGFloat(sideInset)).isActive = true
         endTimeLbl.widthAnchor.constraint(equalToConstant: CGFloat(timeInputWidthFull)).isActive = true
-        endTimeLbl.topAnchor.constraint(equalTo: topView.topAnchor, constant: CGFloat(textBoxHeight)*2 + CGFloat(separatorHeight)*5).isActive = true
+        endTimeLbl.topAnchor.constraint(equalTo: topView.topAnchor, constant: CGFloat(textBoxHeight)*2 + CGFloat(separatorHeight)*5 + timeSpacer).isActive = true
         endTimeLbl.heightAnchor.constraint(equalToConstant: CGFloat(textLblHeight)).isActive = true
           
   //        setup the end time input

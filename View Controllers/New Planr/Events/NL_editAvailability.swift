@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 class NL_editAvailability: UIViewController {
 
@@ -169,6 +170,7 @@ class NL_editAvailability: UIViewController {
     
     @objc func saveSelected(){
         print("user selected save")
+        Analytics.logEvent(firebaseEvents.eventEditAvailability, parameters: ["Test": ""])
         
         let eventID = currentUserSelectedEvent.eventID
               

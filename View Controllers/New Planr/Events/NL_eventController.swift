@@ -609,6 +609,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
         }
     
     @objc func btnCalendarTapped(){
+        Analytics.logEvent(firebaseEvents.eventCalendarButtonPressed, parameters: ["Test": ""])
         print("user tapped the calendar button")
         
         var calendarName = String()
@@ -628,6 +629,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
         if availability.count != 0{
 //            check if the user has the event in their calendar
             if availability[0].calendarEventID == ""{
+                Analytics.logEvent(firebaseEvents.eventCalendarButtonPressedEventNotInCalendar, parameters: ["Test": ""])
 //                show a pop-up asking if the user wants to add the event to their calendar
                 let utils = Utils()
                 let button1 = AlertButton(title: "Accept", action: {
@@ -649,6 +651,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                 })
                 let button2 = AlertButton(title: "Reject", action: {
                     print("the user chose not too add the event to their calendar")
+                    Analytics.logEvent(firebaseEvents.eventAddRejectedCalendar, parameters: ["Test": ""])
                 })
                 
                 let alertPayload = AlertPayload(title: "Add to Calendar?", titleColor: UIColor.red, message: "Would you like to add \(currentUserSelectedEvent.eventDescription), on \(currentUserSelectedEvent.startDatesDisplay[chosenDatePosition]), to your calendar named: \(calendarName)? You can change the calendar the event is saved to in the App settings", messageColor: MyVariables.colourPlanrGreen, buttons: [button1,button2], backgroundColor: UIColor.clear, inputTextHidden: true)
@@ -662,12 +665,16 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
                 let utils = Utils()
                 let button1 = AlertButton(title: "Update", action: {
                     print("OK clicked")
+                    Analytics.logEvent(firebaseEvents.eventUpdatedInCalendar, parameters: ["Test": ""])
+                    
                     
                     self.addEventToCalendarSimple(title: currentUserSelectedEvent.eventDescription, description: currentUserSelectedEvent.eventDescription, startDate: currentUserSelectedEvent.startDateArray[chosenDatePosition], endDate: currentUserSelectedEvent.endDateArray[chosenDatePosition], location: currentUserSelectedEvent.eventLocation, eventOwner: currentUserSelectedEvent.eventOwnerName, startDateDisplay: currentUserSelectedEvent.startDatesDisplay[chosenDatePosition], eventOwnerID: currentUserSelectedEvent.eventOwnerID, locationLongitude: currentUserSelectedEvent.locationLongitude, locationLatitude: currentUserSelectedEvent.locationLatitue, userEventStoreID: availability[0].documentID, calendarEventIDInput: availability[0].calendarEventID){_,_ in
                         
                         DispatchQueue.main.async {
                         
-                        let button11 = AlertButton(title: "Ok", action: {
+                        let button11 = AlertButton(title: "Reject", action: {
+                            
+                            Analytics.logEvent(firebaseEvents.eventUpdateRejectedCalendar, parameters: ["Test": ""])
                         })
                         let alertPayload1 = AlertPayload(title: "Event Updated!", titleColor: UIColor.red, message:  "The event has been updated in your calendar", messageColor: MyVariables.colourPlanrGreen, buttons: [button11], backgroundColor: UIColor.clear, inputTextHidden: true)
                         
@@ -688,6 +695,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     
     @objc func btnNoAttendTapped(){
         print("btnNoAttendTapped")
+        Analytics.logEvent(firebaseEvents.eventNotGoingTapped, parameters: ["Test": ""])
         
         //        get the current event availability
                 let availabilityResults = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
@@ -719,6 +727,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     
     @objc func btnYesAttendTapped(){
         print("btnYesAttendTapped")
+        Analytics.logEvent(firebaseEvents.eventGoingTapped, parameters: ["Test": ""])
         
         let utils = Utils()
         
@@ -748,6 +757,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     
 //    function to dismiss the event view on pressing the close button
     @objc func closeSeclected(){
+        Analytics.logEvent(firebaseEvents.createEventClosed, parameters: ["Test": ""])
         
         self.dismiss(animated: true)
     }
@@ -758,6 +768,8 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     }
     @objc func btnDeletePressed(){
         print("button delete pressed")
+        Analytics.logEvent(firebaseEvents.eventDeletePressed, parameters: ["Test": ""])
+        
         
 //        there are two separate workflows, if the user owns the event, they can delete it, if not they are only removing themselves from the event
         
@@ -772,6 +784,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
         let button = AlertButton(title: "OK", action: {
                                print("OK clicked")
             print("User yes on the event delete the event")
+            Analytics.logEvent(firebaseEvents.eventDeleted, parameters: ["Test": ""])
             
             AutoRespondHelper.deleteEventStore(eventID: currentUserSelectedEvent.eventID)
             AutoRespondHelper.deleteEventRequest(eventID: currentUserSelectedEvent.eventID)
@@ -848,7 +861,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     
     
     @objc func btnEditAvailabilityPressed(){
-        Analytics.logEvent(firebaseEvents.eventEditAvailability, parameters: ["user": user!])
+        Analytics.logEvent(firebaseEvents.eventEditAvailabilityPressed, parameters: ["Test": ""])
         
         print("user selected to edit thier availability")
         
@@ -894,7 +907,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 //        send the user to the edit availability page
         if let popController = UIStoryboard(name: "NL_Events", bundle: nil).instantiateViewController(withIdentifier: "NL_editEvent") as? NL_editEvent{
             
-            Analytics.logEvent(firebaseEvents.eventEdit, parameters: ["user": user])
+            Analytics.logEvent(firebaseEvents.eventEdit, parameters: ["Test": ""])
                             
                 var nav = UINavigationController(rootViewController: popController)
                             // set the presentation style

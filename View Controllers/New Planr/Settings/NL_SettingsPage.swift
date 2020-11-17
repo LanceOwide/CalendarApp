@@ -194,7 +194,7 @@ class NL_SettingsPage: UIViewController {
         let button = AlertButton(title: "Yes", action: {
                 print("OK clicked")
             
-            Analytics.logEvent(firebaseEvents.settingsLogOff, parameters: ["user": user])
+            Analytics.logEvent(firebaseEvents.settingsLogOff, parameters: ["Test": ""])
             
             Auth.auth().removeStateDidChangeListener(authListener!)
             UserDefaults.standard.set("", forKey: "authVerificationID")

@@ -9,7 +9,7 @@
 import Foundation
 
 
-//Analytics.logEvent(firebaseEvents., parameters: ["user": user])
+//Analytics.logEvent(firebaseEvents., parameters: ["Test": ""])
 
 
 struct firebaseEvents{
@@ -27,6 +27,7 @@ struct firebaseEvents{
     static var createEventEndTimeMissing = "createEventEndTimeMissing"
     static var createEventEndBeforeStartTime = "createEventEndBeforeStartTime"
     static var createEventNoDatesSelected = "createEventNoDatesSelected"
+    static var createEventClosed = "createEventClosed"
     
     
     
@@ -36,15 +37,50 @@ struct firebaseEvents{
     
 //    events tracking
     static var eventEditAvailability = "eventEditAvailability"
+    static var eventEditAvailabilityPressed = "eventEditAvailabilityPressed"
     static var eventEdit = "eventEdit"
     static var eventSendReminder = "eventSendReminder"
-    static var eventSendInvite = "eventSendInvite"
     static var autoRespondwNotification = "autoRespondwNotification"
     static var remoteNotificationRecieved = "remoteNotificationRecieved"
+    static var closedEventPage = "closedEventPage"
+    static var eventNotGoingTapped = "eventNotAttendingTapped"
+    static var eventGoingTapped = "eventAttendingTapped"
+    static var eventDeleted = "eventDeleted"
+    static var eventDeletePressed = "eventDeleted"
     
     
 //    issue tracking
     static var errorUpdatingPhoneNumber = "errorUpdatingPhoneNumber"
+    
+//    added to the calendar
+    static var eventCalendarButtonPressed = "eventCalendarButtonPressed"
+    static var eventCalendarButtonPressedEventNotInCalendar = "eventCalendarButtonPressedEventNotInCalendar"
+    static var eventAddedToCalendar = "eventAddedToCalendar"
+    static var eventUpdatedInCalendar = "eventUpdatedInCalendar"
+    static var eventAddRejectedCalendar = "eventAddRejectedCalendar"
+    static var eventUpdateRejectedCalendar = "eventAddRejectedCalendar"
+    
+    
+// user invited new users to the app
+    static var inviteFriendsPressed = "inviteFriendsPressed"
+    static var eventSendInvite = "inviteFriendsSent"
+    
+    
+//    access to phone
+    static var accessToCalendarDenied = "accessToCalendarDenied"
+    static var accessToCalendarGranted = "accessToCalendarGranted"
+    
+    static var accessToContactsDenied = "accessToContactsDenied"
+    static var accessToContactsGranted = "accessToContactsGranted"
+    static var accessToContactsDeniedShown = "accessToContactsDeniedShown"
+    static var accessToContactsDeniedSettingURLClicked = "accessToContactsDeniedSettingURLClicked"
+    
+    static var accessToLocationDenied = "accessToLocationDenied"
+    static var accessToLocationGranted = "accessToLocationGranted"
+    
+    static var accessToNotificationsDenied = "accessToNotificationsDenied"
+    static var accessToNotificationsGranted = "accessToNotificationsGranted"
+    
     
     
 }

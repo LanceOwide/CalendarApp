@@ -294,7 +294,7 @@ import FirebaseStorage
 //    This code will run whenever the user receives a remote notification and the app is running in th background, we determine which notification they receieved and handle it
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         
-        Analytics.logEvent(firebaseEvents.remoteNotificationRecieved, parameters: ["user": user])
+        Analytics.logEvent(firebaseEvents.remoteNotificationRecieved, parameters: ["Test": ""])
         
         print("did receive a notification running - didReceiveRemoteNotification userInfo: \(userInfo)")
         
@@ -359,7 +359,7 @@ import FirebaseStorage
                         }
                     else{
                             AutoRespondHelper.CDRetrieveUpdatedEventsAuto(eventIDs: eventIDs){
-                                Analytics.logEvent(firebaseEvents.autoRespondwNotification, parameters: ["user": user])
+                                Analytics.logEvent(firebaseEvents.autoRespondwNotification, parameters: ["Test": ""])
                                 print("didReceiveRemoteNotification - completion with new data")
                                 completionHandler(.newData)
 
