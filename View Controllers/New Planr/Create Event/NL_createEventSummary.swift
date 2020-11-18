@@ -609,7 +609,7 @@ extension NL_createEventSummary: UICollectionViewDelegate, UICollectionViewDataS
 //           we need to convert the start dates into a format we can display
             let dateIndex = startDatesChosen[indexPath.row]
             let dateIndexDate = dateFormatterTZ.date(from: dateIndex)
-            let month = dateIndexDate!.get(.month)
+            let month = dateIndexDate!.get(.month) - 1
             let day = dateIndexDate!.get(.weekday)
             let dayInt = dateIndexDate!.get(.day)
             

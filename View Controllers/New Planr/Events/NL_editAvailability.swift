@@ -173,14 +173,21 @@ class NL_editAvailability: UIViewController {
         Analytics.logEvent(firebaseEvents.eventEditAvailability, parameters: ["Test": ""])
         
         let eventID = currentUserSelectedEvent.eventID
+        
+        let availability = AutoRespondHelper.serialiseAvailabilitywUserAuto(eventID: eventID, userID: user!)
+        
+        if availability.count == 0{
+//            we need add an error messsage
+            self.dismiss(animated: true)
+        }
+        else{
+            let documentID = availability[0].documentID
               
-              let currentUserAvailability = currentUserSelectedAvailability.filter {$0.uid == user! && $0.eventID == eventID}
-              
-              commitUserAvailbilityData(userEventStoreID: currentUserAvailability[0].documentID, finalAvailabilityArray2: temporaryCurrentUsersAvailability, eventID: eventID)
+              commitUserAvailbilityData(userEventStoreID: documentID, finalAvailabilityArray2: temporaryCurrentUsersAvailability, eventID: eventID)
               
               
               
-              updateUsersAvailability(documentID: currentUserAvailability[0].documentID, eventID: eventID, uid: user!, userAvailability: temporaryCurrentUsersAvailability)
+              updateUsersAvailability(documentID: documentID, eventID: eventID, uid: user!, userAvailability: temporaryCurrentUsersAvailability)
 
               currentUserSelectedAvailability = serialiseAvailability(eventID: currentUserSelectedEvent.eventID)
               prepareForEventDetailsPageCD(segueName: "", isSummaryView: false, performSegue: false, userAvailability: currentUserSelectedAvailability, triggerNotification: true){
@@ -189,8 +196,9 @@ class NL_editAvailability: UIViewController {
                   
                   self.dismiss(animated: true)
               }
+        }
         
-          }
+    }
     
     
     //    function to create an array of not responded users, for each
