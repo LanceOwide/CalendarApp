@@ -111,7 +111,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         
         let textAttributes = [NSAttributedString.Key.foregroundColor:MyVariables.colourLight]
         navigationController?.navigationBar.titleTextAttributes = textAttributes
-        self.title = "Event Chat"
+        self.title = ("\(currentUserSelectedEvent.eventDescription)")
         
         
         

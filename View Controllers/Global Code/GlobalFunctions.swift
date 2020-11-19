@@ -3171,6 +3171,13 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                                 if $0.chosenDate != "" &&  $1.chosenDate != ""{
                                     return dateFormatterTz.date(from: $0.chosenDate)! < dateFormatterTz.date(from: $1.chosenDate)!
                                 }
+                                else if $0.chosenDate == "" &&  $1.chosenDate != ""{
+                                    return dateFormatterTz.date(from: $0.startDateArray[0])! < dateFormatterTz.date(from: $1.chosenDate)!
+                                }
+                                else if $0.chosenDate != "" &&  $1.chosenDate == ""{
+                                    return dateFormatterTz.date(from: $0.chosenDate)! < dateFormatterTz.date(from: $1.startDateArray[0])!
+                                    
+                                }
                                 else{
                                     return dateFormatterTz.date(from: $0.startDateArray[0])! < dateFormatterTz.date(from: $1.startDateArray[0])!
                                 }
@@ -3188,15 +3195,22 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                  allEvents = events1 + events2
                 
                 //            order the events - chronological order
-                            allEvents.sort(by: {
-                //                both the dates we are comparing have their date chosen
-                                if $0.chosenDate != "" &&  $1.chosenDate != ""{
-                                    return dateFormatterTz.date(from: $0.chosenDate)! < dateFormatterTz.date(from: $1.chosenDate)!
-                                }
-                                else{
-                                    return dateFormatterTz.date(from: $0.startDateArray[0])! < dateFormatterTz.date(from: $1.startDateArray[0])!
-                                }
-                                })
+                allEvents.sort(by: {
+    //                both the dates we are comparing have their date chosen
+                    if $0.chosenDate != "" &&  $1.chosenDate != ""{
+                        return dateFormatterTz.date(from: $0.chosenDate)! < dateFormatterTz.date(from: $1.chosenDate)!
+                    }
+                    else if $0.chosenDate == "" &&  $1.chosenDate != ""{
+                        return dateFormatterTz.date(from: $0.startDateArray[0])! < dateFormatterTz.date(from: $1.chosenDate)!
+                    }
+                    else if $0.chosenDate != "" &&  $1.chosenDate == ""{
+                        return dateFormatterTz.date(from: $0.chosenDate)! < dateFormatterTz.date(from: $1.startDateArray[0])!
+                        
+                    }
+                    else{
+                        return dateFormatterTz.date(from: $0.startDateArray[0])! < dateFormatterTz.date(from: $1.startDateArray[0])!
+                    }
+                    })
                 
             }
             else if past == true{
@@ -3212,15 +3226,22 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
                 allEvents = events1 + events2 + events3 + events4
                 
                 //            order the events in reverse order
-                            allEvents.sort(by: {
-                //                both the dates we are comparing have their date chosen
-                                if $0.chosenDate != "" &&  $1.chosenDate != ""{
-                                    return dateFormatterTz.date(from: $0.chosenDate)! > dateFormatterTz.date(from: $1.chosenDate)!
-                                }
-                                else{
-                                    return dateFormatterTz.date(from: $0.startDateArray[0])! > dateFormatterTz.date(from: $1.startDateArray[0])!
-                                }
-                                })
+                allEvents.sort(by: {
+    //                both the dates we are comparing have their date chosen
+                    if $0.chosenDate != "" &&  $1.chosenDate != ""{
+                        return dateFormatterTz.date(from: $0.chosenDate)! > dateFormatterTz.date(from: $1.chosenDate)!
+                    }
+                    else if $0.chosenDate == "" &&  $1.chosenDate != ""{
+                        return dateFormatterTz.date(from: $0.startDateArray[0])! > dateFormatterTz.date(from: $1.chosenDate)!
+                    }
+                    else if $0.chosenDate != "" &&  $1.chosenDate == ""{
+                        return dateFormatterTz.date(from: $0.chosenDate)! > dateFormatterTz.date(from: $1.startDateArray[0])!
+                        
+                    }
+                    else{
+                        return dateFormatterTz.date(from: $0.startDateArray[0])! > dateFormatterTz.date(from: $1.startDateArray[0])!
+                    }
+                    })
    
             }
             

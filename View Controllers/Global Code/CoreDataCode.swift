@@ -493,6 +493,18 @@ extension UIViewController{
                     }
                 }
             }
+            else if notification == "eventPictureUpdate"{
+                print("CDRetrieveUpdatedEvents - eventPictureUpdate userID \(i.key)")
+                
+//                    delete the users current photo
+                eventImageHelper.shareInstance.deleteImage(eventID: i.key)
+                
+                AutoRespondHelper.fetchEventImageAuto(eventID: i.key){
+                    NotificationCenter.default.post(name: .newDataLoaded, object: nil)
+                    AutoRespondHelper.removeSignleEventNotificationsAuto(eventID: i.key){
+                    }
+                }
+            }
         }
     }
     
@@ -584,6 +596,18 @@ extension UIViewController{
                     AutoRespondHelper.fetchUsersProfileImageAuto(uid: i.key){
                         AutoRespondHelper.removeSignleEventNotificationsAuto(eventID: i.key){
                         completion()
+                        }
+                    }
+                }
+                else if notification == "eventPictureUpdate"{
+                    print("CDRetrieveUpdatedEvents - eventPictureUpdate userID \(i.key)")
+                    
+    //                    delete the users current photo
+                    eventImageHelper.shareInstance.deleteImage(eventID: i.key)
+                    
+                    AutoRespondHelper.fetchEventImageAuto(eventID: i.key){
+                        NotificationCenter.default.post(name: .newDataLoaded, object: nil)
+                        AutoRespondHelper.removeSignleEventNotificationsAuto(eventID: i.key){
                         }
                     }
                 }
@@ -2067,7 +2091,41 @@ func removeTheAvailabilityNotifications(){
     return fetchingImage
     }
     
-    
+    //    function to retrieve the image
+        func fetchEventImage(eventID: String) -> [CoreDataEventImage] {
+            print("running func fetchEventImage inputs: uid \(eventID)")
+        var fetchingImage = [CoreDataEventImage]()
+            
+            let fetchRequest : NSFetchRequest<CoreDataEventImage> = CoreDataEventImage.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "eventID == %@", eventID)
+        do {
+        fetchingImage = try context.fetch(fetchRequest)
+    //        print("funcfetchImage - fetchingImage \(fetchingImage)")
+    //cehck if we found an image
+            if fetchingImage.count == 0{
+                print("we didnt find the users image, we will try and get it from Firebase")
+            //        we didnt find the image, so lets see if there is anything to pull from firebase
+                AutoRespondHelper.fetchEventImageAuto(eventID: eventID){
+            //            try to fetch the image again
+                        let fetchRequest : NSFetchRequest<CoreDataEventImage> = CoreDataEventImage.fetchRequest()
+                        fetchRequest.predicate = NSPredicate(format: "eventID == %@", eventID)
+                    do {
+                    fetchingImage = try context.fetch(fetchRequest)
+                    } catch {
+                    print("Error while fetching the image")
+                    }
+               
+                    }}
+            
+        } catch {
+        print("Error while fetching the image")
+
+        }
+        return fetchingImage
+        }
+
+
+//    final closure
     }
 
 //set notification names
@@ -2077,6 +2135,7 @@ extension Notification.Name {
     static let chatNotificationTapped = Notification.Name("chatNotificationTapped")
     static let editEventUsersChosen = Notification.Name("editEventUsersChosen")
     static let userPhotoUploaded = Notification.Name("userPhotoUploaded")
+    static let eventPhotoUploaded = Notification.Name("eventPhotoUploaded")
 }
 
 

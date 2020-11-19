@@ -524,12 +524,29 @@ extension NL_eventsViewController: UICollectionViewDelegate, UICollectionViewDat
                 cell.lbleventLocation.text = event!.eventLocation
             
 //            set the event image, check that we have an eventType currently listed in our event and present in the array of images
-            if let index = eventTypeImages.userEventChoices.index(of: event!.eventType){
-                    let imageName = eventTypeImages.userEventChoicesImagesColored[index]
-                    cell.eventImage.image = UIImage(named: imageName)
-            }
-            else{
-                cell.eventImage.image = UIImage(named: "customColoredCode")
+        //        pull down the image from core data
+            let imageList = CoreDataCode().fetchEventImage(eventID: event!.eventID)
+                
+        //        check if we got an image back
+                var image = Data()
+                if imageList.count != 0{
+                    print("setupEventImage - imageList.count - image was returned")
+                    image = imageList[0].eventImage!
+                }
+        //        if we got an image then set it as the event image
+                if imageList.count != 0{
+                    print("setupEventImage - setting the event image")
+                    cell.eventImage.image = UIImage(data: image)
+                }
+                else{
+        //            there was no image, so we use the stock image
+                    if let index = eventTypeImages.userEventChoices.index(of: event!.eventType){
+                            let imageName = eventTypeImages.userEventChoicesImagesColored[index]
+                        cell.eventImage.image = UIImage(named: imageName)
+                    }
+                    else{
+                        cell.eventImage.image = UIImage(named: "customColoredCode")
+                        }
                 }
             
             cell.lbleventTime.text = ("\(convertToLocalTime(inputTime: event!.eventStartTime)) - \(convertToLocalTime(inputTime:(event!.eventEndTime)))")
@@ -548,15 +565,15 @@ extension NL_eventsViewController: UICollectionViewDelegate, UICollectionViewDat
                 print("day\(day)dayNum\(dayNum)month\(month)")
                 
 //                create attributed string for the date
-                let font = UIFont.systemFont(ofSize: 13)
+                let font = UIFont.systemFont(ofSize: 11)
                 let attributes = [NSAttributedString.Key.font: font]
                 let attributedQuote = NSMutableAttributedString(string: "\(String(day))\n", attributes: attributes)
                             
-                let font2 = UIFont.systemFont(ofSize: 15)
+                let font2 = UIFont.systemFont(ofSize: 13)
                 let attributes2 = [NSAttributedString.Key.font: font2]
                 let attributedQuote2 = NSMutableAttributedString(string: "\(String(dayNum))\n", attributes: attributes2)
                             
-                let font3 = UIFont.systemFont(ofSize: 13)
+                let font3 = UIFont.systemFont(ofSize: 11)
                 let attributes3 = [NSAttributedString.Key.font: font3]
                 let attributedQuote3 = NSMutableAttributedString(string: String(month), attributes: attributes3)
                             
