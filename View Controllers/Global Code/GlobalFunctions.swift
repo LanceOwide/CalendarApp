@@ -2702,7 +2702,7 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
     
     func shareLinkToTheEvent(){
         
-        let firstActivityItem = "Hey, I've invited you to an event on the Planr App, download the App to join https://testflight.apple.com/join/LUCwcAoC"
+        let firstActivityItem = "Hey, I've invited you to an event on the Planr App, download the App to join https://apps.apple.com/us/app/planr-event-scheduling/id1475562772"
         
         
         let subject = "Planr App - Event Invite"
