@@ -934,6 +934,10 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                 if deletedUsers == true{
 //                    remove the users from the event request
                 dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["users": inviteesUserIDs, "currentUserNames": inviteesNames], merge: true)
+                    
+//                    we also update the event users in the real time database
+                    let rRef = Database.database().reference()
+                    rRef.child("events/\(currentUserSelectedEvent.eventID)/invitedUsers").setValue(inviteesUserIDs)
                                             
                             }
             //                         did the user delete non users
@@ -942,6 +946,10 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                             }
                 if addedNewInvitees == true{
                 dbStore.collection("eventRequests").document(currentUserSelectedEvent.eventID).setData(["users": userIDs, "currentUserNames": userNames, "nonUserNames": nonUserNames], merge: true)
+                    
+//                    set the new list for the event invites
+                    let rRef = Database.database().reference()
+                    rRef.child("events/\(currentUserSelectedEvent.eventID)/invitedUsers").setValue(userIDs)
                                         }
             
 //            utilisities for the notifications

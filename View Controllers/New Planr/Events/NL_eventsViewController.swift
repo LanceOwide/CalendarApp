@@ -60,7 +60,8 @@ class NL_eventsViewController: UIViewController {
         setupTheNavigationbar()
         
 //        we load the events we need
-        reloadTheEvents()
+//        reloadTheEvents()
+//        firstLoad()
         
 //        add the tabBar
         view.addSubview(tabView)
@@ -289,9 +290,91 @@ class NL_eventsViewController: UIViewController {
             collectionViewEvents?.topAnchor.constraint(equalTo: topView.topAnchor, constant: btnHeight + 5).isActive = true
             collectionViewEvents?.bottomAnchor.constraint(equalTo: topView.bottomAnchor).isActive = true
             
+            firstLoad()
 
             return containerView
     }()
+    
+    
+    func firstLoad(){
+        //        we get the hosted events since this is the first page the user sees
+//        check for hosted events
+        getTheEventsFunc(hosted: true, upcoming: false, past: false){ [self]
+                (events) in
+                if events.count != 0{
+                    eventPageEvents = events
+                    if self.collectionViewEvents == nil{
+                    }
+                    else{
+                        self.currentView = "Hosted"
+                        //        change the separator color
+                        self.btnHostedView.backgroundColor = MyVariables.colourPlanrGreen
+                        self.btnUpcomingView.backgroundColor = MyVariables.colourLight
+                        self.btnPastview.backgroundColor = MyVariables.colourLight
+                        //        change the font of the button
+                        self.btnHosted.setTitleColor(MyVariables.colourPlanrGreen, for: .normal)
+                        self.btnUpcoming.setTitleColor(MyVariables.colourLight, for: .normal)
+                        self.btnPast.setTitleColor(MyVariables.colourLight, for: .normal)
+                        DispatchQueue.main.async {
+                        self.collectionViewEvents.reloadData()}
+                    }
+                }
+                else{
+//                    check for upcoming events events
+                    self.getTheEventsFunc(hosted: false, upcoming: true, past: false){
+                        (events) in
+                        if events.count != 0{
+                            eventPageEvents = events
+                            if self.collectionViewEvents == nil{
+                            }
+                            else{
+                                self.currentView = "Upcoming"
+                                //        change the separator color
+                                self.btnHostedView.backgroundColor = MyVariables.colourLight
+                                self.btnUpcomingView.backgroundColor = MyVariables.colourPlanrGreen
+                                self.btnPastview.backgroundColor = MyVariables.colourLight
+                                //        change the font of the button
+                                self.btnHosted.setTitleColor(MyVariables.colourLight, for: .normal)
+                                self.btnUpcoming.setTitleColor(MyVariables.colourPlanrGreen, for: .normal)
+                                self.btnPast.setTitleColor(MyVariables.colourLight, for: .normal)
+                                DispatchQueue.main.async {
+                                self.collectionViewEvents.reloadData()}
+                            }
+                        }
+                        else{
+//                            check past events
+                            self.getTheEventsFunc(hosted: false, upcoming: false, past: true){
+                                (events) in
+                                if events.count != 0{
+                                    eventPageEvents = events
+                                    if self.collectionViewEvents == nil{
+                                    }
+                                    else{
+                                        self.currentView = "Past"
+                                        //        change the separator color
+                                                btnHostedView.backgroundColor = MyVariables.colourLight
+                                                btnUpcomingView.backgroundColor = MyVariables.colourLight
+                                                btnPastview.backgroundColor = MyVariables.colourPlanrGreen
+                                        //        change the font of the button
+                                                btnHosted.setTitleColor(MyVariables.colourLight, for: .normal)
+                                                btnUpcoming.setTitleColor(MyVariables.colourLight, for: .normal)
+                                                btnPast.setTitleColor(MyVariables.colourPlanrGreen, for: .normal)
+                                        DispatchQueue.main.async {
+                                        self.collectionViewEvents.reloadData()}
+                                    }
+                                        
+                                    }
+                                else{
+                                    self.currentView = "Hosted"
+                                }
+                            }
+                            
+                        }
+                    }
+                    
+                }
+        }
+    }
     
     
     func reloadTheEvents(){
@@ -328,7 +411,8 @@ class NL_eventsViewController: UIViewController {
                 }
                 else{
                     DispatchQueue.main.async {
-                    self.collectionViewEvents.reloadData()}
+                    self.collectionViewEvents.reloadData()
+                    }
                 }
             }
         }

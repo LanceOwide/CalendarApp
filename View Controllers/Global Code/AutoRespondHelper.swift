@@ -1891,6 +1891,7 @@ class AutoRespondHelper {
         
 //        3. we push to the realtime database to trigger a APN for the user
         userRespondedAttendanceNotification(eventID: eventID)
+        
     }
     
     
@@ -1910,7 +1911,7 @@ class AutoRespondHelper {
             
         }
     
-    static func removeSingleUserFromEvent(eventID: String, user: String){
+    static func removeSingleUserFromEvent(eventID: String, userID: String){
         print("running func removeSingleUserFromEvent")
         
 //        1. update the eventStoreRequest
@@ -1923,15 +1924,20 @@ class AutoRespondHelper {
         getUserNameAuto{ (usersName) in
         
             currentUserNameList.removeAll(where: {$0 == usersName})
-            currentUserList.removeAll(where: {$0 == user})
+            currentUserList.removeAll(where: {$0 == userID})
             print("removeSingleUserFromEvent currentUserNameList \(currentUserNameList) currentUserList \(currentUserList)")
             
         let dbStoreInd = Firestore.firestore()
     
-        dbStoreInd.collection("eventRequests").document(eventID).setData(["currentUserNames" : currentUserNameList,"currentUserList": currentUserList], merge: true)
+        dbStoreInd.collection("eventRequests").document(eventID).setData(["currentUserNames" : currentUserNameList,"users": currentUserList], merge: true)
+            
+            //                    we also update the event users in the real time database
+        let rRef = Database.database().reference()
+        rRef.child("events/\(eventID)/invitedUsers").setValue(currentUserList)
+            
         }
 //        2. we run the delete to remove everything else
-        deletedUsersAuto(deletedUserIDs: [user], newUserIDList: currentUserList){
+        deletedUsersAuto(deletedUserIDs: [userID], newUserIDList: currentUserList){
 //            we tell the users there is a new udpate available
             eventAmendedNotificationAuto(userIDs: currentUserList, eventID: currentUserSelectedEvent.eventID)
         }

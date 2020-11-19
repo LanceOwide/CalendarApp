@@ -489,10 +489,6 @@ extension UIViewController{
                             if let index = nonUserNames.index(of: userCreatedName){
                                 nonUserNames.remove(at: index)
                             }
-                            
-//                            debug only
-//                            print("userIDs \(userIDs)")
-//                            print("currentUsersNames \(currentUsersNames)")
 
 //                            update the userIDs array
                             dbStore.collection("eventRequests").document(eventID).updateData(["users" : FieldValue.arrayUnion([uid!])])
@@ -500,6 +496,10 @@ extension UIViewController{
                             dbStore.collection("eventRequests").document(eventID).updateData(["currentUserNames" : FieldValue.arrayUnion(currentUsersNames)])
 //                            update the nonUsersName array names array
                             dbStore.collection("eventRequests").document(eventID).updateData(["nonUserNames" : nonUserNames])
+                            
+//                    we also update the event users in the real time database
+                            let rRef = Database.database().reference()
+                            rRef.child("events/\(eventID)/invitedUsers").setValue(userIDs)
                             
 //                          notify the users that the information has been updated
                             self.eventAmendedNotification(userIDs: userIDs, eventID: eventID, amendWithAvailability: false)

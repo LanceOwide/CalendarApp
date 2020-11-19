@@ -808,10 +808,8 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
         let utils = Utils()
         
 //        1. the user owns the event
-        
         if currentUserSelectedEvent.eventOwnerID == user{
     
-        
         let button = AlertButton(title: "OK", action: {
                                print("OK clicked")
             print("User yes on the event delete the event")
@@ -847,12 +845,11 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
         }
 //        the user doesnt own the event and they only remove themselves from the event
         else{
-            
             let button = AlertButton(title: "OK", action: {
                                    print("OK clicked")
                 print("User pressed yes on remove themselves from the event")
                 
-                AutoRespondHelper.removeSingleUserFromEvent(eventID: currentUserSelectedEvent.eventID, user: user!)
+                AutoRespondHelper.removeSingleUserFromEvent(eventID: currentUserSelectedEvent.eventID, userID: user!)
                 
     //            post a notification to say there is new data
                     NotificationCenter.default.post(name: .newDataLoaded, object: nil)
@@ -933,6 +930,8 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
 //        remove the lists being stored with the new invitees in them - we add this here to ensure each time the user selects the edit button these get reset
                 contactsSelected.removeAll()
                 inviteesNamesNew.removeAll()
+        
+        print("inviteesUserIDs \(inviteesUserIDs) inviteesNames \(inviteesNames)")
 
         
 //        send the user to the edit availability page
