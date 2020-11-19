@@ -502,6 +502,20 @@ class AutoRespondHelper {
                     }
                 }
                 
+                else if notification == "eventPictureUpdate"{
+                    print("CDRetrieveUpdatedEvents - eventPictureUpdate userID \(i.key)")
+                    
+//                    delete the users current photo
+                    eventImageHelper.shareInstance.deleteImage(eventID: i.key)
+                    
+                    AutoRespondHelper.fetchEventImageAuto(eventID: i.key){
+                        NotificationCenter.default.post(name: .newDataLoaded, object: nil)
+                        self.removeSignleEventNotificationsAuto(eventID: i.key){
+                        myGroup.leave()
+                        }
+                    }
+                }
+                
                 else if notification == "DateChosen" || notification == "dateChosen"{
                  print("CDRetrieveUpdatedEvents - dateChosen event \(i.key)")
                     
@@ -2089,6 +2103,30 @@ class AutoRespondHelper {
         }
     }
     
+    static func postEventPicNotification(eventID: String){
+        print("running func update")
+//      get all of the users the person is in an event with
+        var allUserIDs = [String]()
+        
+        //        1. retrieve the event data, eventSearch
+           let predicate = NSPredicate(format: "eventID = %@", eventID)
+           let predicateReturned = serialiseEventsAuto(predicate: predicate, usePredicate: true)
+           if predicateReturned.count == 0{
+               print("soemthing we wrong, we end the function")
+           }
+           else{
+            let event = predicateReturned[0]
+        
+            for id in event.users{
+//                we do not post a notification for the current user
+                if id != user{
+        dbStore.collection("userEventUpdates").document(id).setData([eventID: "eventPictureUpdate"], merge: true)
+                }
+        }
+            
+    }
+    }
+    
     
     //    function to retrieve the users image and save down the profile pictures
        static func fetchUsersProfileImageAuto(uid: String, completion: @escaping () -> Void){
@@ -2118,6 +2156,35 @@ class AutoRespondHelper {
               }
             }
         }
+    
+    
+    static func fetchEventImageAuto(eventID: String, completion: @escaping () -> Void){
+         print("running func fetchEventImageAuto inputs- uid: \(eventID)")
+         
+         // Create a reference to the file you want to download
+         // Get a reference to the storage service using the default Firebase App
+         let storage = Storage.storage()
+
+         // Create a storage reference from our storage service
+         let storageRef = storage.reference()
+         
+         // Create a child reference
+         // imagesRef now points to "images"
+         let imagesRef = storageRef.child("eventImage/\(eventID)")
+         
+         // Download in memory with a maximum allowed size of 1MB (1 * 1024 * 1024 bytes)
+         imagesRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
+           if let error = error {
+             // Uh-oh, an error occurred!
+             completion()
+           } else {
+ //            save the image in coreData
+             let image = UIImage(data: data!)
+            eventImageHelper.shareInstance.saveImage(image: image!, eventID: eventID)
+             completion()
+           }
+         }
+     }
 
     
 //    helper end

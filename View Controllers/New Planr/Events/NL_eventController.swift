@@ -45,6 +45,9 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     var cvEventInviteesCollectionView: UICollectionView!
     var cvEventResponses: UICollectionView!
     
+//    image picker
+    var imagePicker: ImagePicker!
+    
 //    buttons
     var btnEdit = UIButton()
     var btnDelete = UIButton()
@@ -56,6 +59,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     var btnYesAttend = UIButton()
     var btnNoAttend = UIButton()
     var lblRespond = UILabel()
+    var btnEditPhoto = UIButton()
     
     let cellId = "cellId"
     let cellId2 = "cellId2"
@@ -80,6 +84,9 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
         inputBottomView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         inputBottomView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         inputBottomView.isUserInteractionEnabled = true
+        
+//        image picker setup
+        self.imagePicker = ImagePicker(presentationController: self, delegate: self)
         
         setup()
         
@@ -113,7 +120,7 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     let timeHeight = CGFloat(25)
     let locationHeight = CGFloat(25)
     let sideInset = CGFloat(16)
-    let imgSize = CGFloat(50)
+    let imgSize = CGFloat(60)
     let closeSize = CGFloat(28)
     let cvInviteeHeight = CGFloat(70)
     let bottomButtonHeight = CGFloat(150)
@@ -194,7 +201,9 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     imgEventType.leftAnchor.constraint(equalTo: topView.leftAnchor,constant: sideInset).isActive = true
     imgEventType.widthAnchor.constraint(equalToConstant: imgSize).isActive = true
     imgEventType.heightAnchor.constraint(equalToConstant: imgSize).isActive = true
+//    imgEventType.layer.cornerRadius = imgSize / 2
     imgEventType.translatesAutoresizingMaskIntoConstraints = false
+//    imgEventType.layer.masksToBounds = true
 //    set the image to the user set image
     if let index = eventTypeImages.userEventChoices.index(of: currentUserSelectedEvent.eventType){
             let imageName = eventTypeImages.userEventChoicesImagesColored[index]
@@ -203,6 +212,19 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
     else{
         self.imgEventType.image = UIImage(named: "customColoredCode")
         }
+    
+    //    add the image for the event
+        topView.addSubview(btnEditPhoto)
+    btnEditPhoto.topAnchor.constraint(equalTo: topView.topAnchor,constant: sideInset
+            + pageTitleHeight + imgSize/2 + 7).isActive = true
+    btnEditPhoto.leftAnchor.constraint(equalTo: topView.leftAnchor,constant: sideInset).isActive = true
+    btnEditPhoto.widthAnchor.constraint(equalToConstant: imgSize).isActive = true
+    btnEditPhoto.heightAnchor.constraint(equalToConstant: imgSize).isActive = true
+    btnEditPhoto.translatesAutoresizingMaskIntoConstraints = false
+    btnEditPhoto.setTitle("Edit Pic", for: .normal)
+    btnEditPhoto.titleLabel?.font = UIFont.systemFont(ofSize: 10)
+    btnEditPhoto.setTitleColor(MyVariables.colourPlanrGreen, for: .normal)
+    btnEditPhoto.addTarget(self, action: #selector(editPhotoButtonPressed), for: .touchUpInside)
     
     
     
@@ -694,6 +716,14 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
         }
     }
     
+    @objc func editPhotoButtonPressed(){
+        print("editPhotoButtonPressed")
+        
+        self.imagePicker.present(from: imgEventType)
+        
+        
+    }
+    
     @objc func btnNoAttendTapped(){
         print("btnNoAttendTapped")
         Analytics.logEvent(firebaseEvents.eventNotGoingTapped, parameters: ["Test": ""])
@@ -939,6 +969,39 @@ class NL_eventController: UIViewController, CoachMarksControllerDataSource, Coac
         setupTheCalendarButton()
         setupTheResponButton()
         setupTheStatus()
+        setupEventImage()
+    }
+    
+    
+//    function to setup the eventImage
+    
+    func setupEventImage(){
+        print("running func setupEventImage")
+//        pull down the image from core data
+        let imageList = CoreDataCode().fetchEventImage(eventID: currentUserSelectedEvent.eventID)
+        
+//        check if we got an image back
+        var image = Data()
+        if imageList.count != 0{
+            print("setupEventImage - imageList.count - image was returned")
+            image = imageList[0].eventImage!
+        }
+//        if we got an image then set it as the event image
+        if imageList.count != 0{
+            print("setupEventImage - setting the event image")
+            imgEventType.image = UIImage(data: image)
+        }
+        else{
+//            there was no image, so we use the stock image
+            print("setupEventImage - there was no image")
+            if let index = eventTypeImages.userEventChoices.index(of: currentUserSelectedEvent.eventType){
+                    let imageName = eventTypeImages.userEventChoicesImagesColored[index]
+                self.imgEventType.image = UIImage(named: imageName)
+            }
+            else{
+                self.imgEventType.image = UIImage(named: "customColoredCode")
+                }
+        }
     }
     
     
@@ -1683,6 +1746,15 @@ class ResultsSectionHeader: UICollectionReusableView {
              fatalError("init(coder:) has not been implemented")
          }
      }
+
+extension NL_eventController: ImagePickerDelegate {
+
+    func didSelect(image: UIImage?) {
+        print("image selected")
+        self.imgEventType.image = image
+        eventImageHelper().pushEventImage(image: image!, eventID: currentUserSelectedEvent.eventID)
+    }
+}
 
 
 //class ButtonWithImage: UIButton {

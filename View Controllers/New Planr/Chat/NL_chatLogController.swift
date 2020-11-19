@@ -338,6 +338,30 @@ class NL_chatLogController: UIViewController {
                 self.navigationController?.navigationItem.setHidesBackButton(true, animated: false)
             }
         }
+        
+        func setupEventImage(eventID: String) -> UIImage{
+            print("running func setupEventImage")
+    //        pull down the image from core data
+            let imageList = CoreDataCode().fetchEventImage(eventID: eventID)
+            
+    //        check if we got an image back
+            var image = Data()
+            if imageList.count != 0{
+                print("setupEventImage - imageList.count - image was returned")
+                image = imageList[0].eventImage!
+            }
+    //        if we got an image then set it as the event image
+            if imageList.count != 0{
+                print("setupEventImage - setting the event image")
+                return UIImage(data: image)!
+            }
+            else{
+    //            there was no image, so we use the stock image
+            return UIImage(named: "conferenceColoredCode")!
+            
+            }
+        }
+        
     }
 
     //extention to manage the collectionView of dates
@@ -370,6 +394,10 @@ class NL_chatLogController: UIViewController {
 //                we set the last available chat to the cell location
                 let text = lastChatDict[event.eventID]
                 cell.lbleventLocation.attributedText = text
+                
+//                set the image for the chat
+                
+                cell.eventImage.image = setupEventImage(eventID: event.eventID)
 
 //                if the chat hasnt been read we want to highlight it
                     if chatNotificationiDs.contains(event.eventID){
@@ -445,7 +473,7 @@ class NL_chatLogController: UIViewController {
                                sizeForItemAt indexPath: IndexPath) -> CGSize {
             var size = CGSize()
             
-             size = CGSize(width: screenWidth - 32, height: 85)
+             size = CGSize(width: screenWidth - 32, height: 100)
             
                return size
            }

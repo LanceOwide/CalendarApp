@@ -148,8 +148,8 @@ class NL_eventCollectionViewCell: UICollectionViewCell {
         eventImage.image = UIImage(named: "conferenceColoredCode")
         eventImage.leftAnchor.constraint(equalTo: cellView.leftAnchor,constant: sideInset).isActive = true
         eventImage.topAnchor.constraint(equalTo: cellView.topAnchor,constant: sideInset).isActive = true
-        eventImage.heightAnchor.constraint(equalToConstant: segments*1.25).isActive = true
-        eventImage.widthAnchor.constraint(equalToConstant: segments*1.25).isActive = true
+        eventImage.heightAnchor.constraint(equalToConstant: segments*1.75).isActive = true
+        eventImage.widthAnchor.constraint(equalToConstant: segments*1.75).isActive = true
         eventImage.translatesAutoresizingMaskIntoConstraints = false
         
         
@@ -220,9 +220,9 @@ class NL_eventCollectionViewCell: UICollectionViewCell {
         lbleventDate.layer.cornerRadius = 3
         lbleventDate.layer.masksToBounds = true
         lbleventDate.leftAnchor.constraint(equalTo: cellView.leftAnchor,constant: sideInset).isActive = true
-        lbleventDate.topAnchor.constraint(equalTo: cellView.topAnchor,constant: segments*1.25 + 10 + sideInset).isActive = true
+        lbleventDate.topAnchor.constraint(equalTo: cellView.topAnchor,constant: segments*1.75 + 10 + sideInset).isActive = true
         lbleventDate.bottomAnchor.constraint(equalTo: cellView.bottomAnchor, constant: -sideInset).isActive = true
-        lbleventDate.widthAnchor.constraint(equalToConstant: segments*1.25 ).isActive = true
+        lbleventDate.widthAnchor.constraint(equalToConstant: segments*1.75).isActive = true
         lbleventDate.translatesAutoresizingMaskIntoConstraints = false
         lbleventDate.isHidden = true
         

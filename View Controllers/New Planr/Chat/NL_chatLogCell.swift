@@ -127,8 +127,8 @@ class NL_chatLogCell: UICollectionViewCell {
             eventImage.image = UIImage(named: "conferenceColoredCode")
             eventImage.leftAnchor.constraint(equalTo: cellView.leftAnchor,constant: sideInset).isActive = true
             eventImage.topAnchor.constraint(equalTo: cellView.topAnchor,constant: sideInset).isActive = true
-            eventImage.heightAnchor.constraint(equalToConstant: segments*1.25).isActive = true
-            eventImage.widthAnchor.constraint(equalToConstant: segments*1.25).isActive = true
+            eventImage.heightAnchor.constraint(equalToConstant: segments*1.5).isActive = true
+            eventImage.widthAnchor.constraint(equalToConstant: segments*1.5).isActive = true
             eventImage.translatesAutoresizingMaskIntoConstraints = false
             
             
