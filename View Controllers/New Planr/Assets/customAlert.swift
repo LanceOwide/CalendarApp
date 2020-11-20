@@ -55,8 +55,6 @@ class customAlertController: UIViewController{
         }
         if (payload.buttons.count == 1 && payload.inputTextHidden == false) {
             createButton(uiButton: button1, alertButton: payload.buttons[0])
-            message.textAlignment = .center
-            message.adjustsFontSizeToFitWidth = true
             heading.text = payload.title
             heading.font = UIFont.boldSystemFont(ofSize: 18)
         }
