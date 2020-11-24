@@ -14,7 +14,8 @@ import EventKit
 import AMPopTip
 import Alamofire
 import BackgroundTasks
-
+import FlagPhoneNumber
+import PhoneNumberKit
 
 
 var messageNotificationDateChosen = Bool()
@@ -26,7 +27,7 @@ class GlobalFunctions: UIViewController {
 }
     
     
-    extension UIViewController{
+extension UIViewController{
         
 
     //    Function: converts the input string into a date and converts to local timezone. Input: String, Output: String
@@ -705,108 +706,43 @@ class GlobalFunctions: UIViewController {
         func cleanPhoneNumbers(phoneNumbers: String, completion: @escaping (_ returnedPhoneNumber: String) -> ()){
 //    now that we have corrected the phone number we get it again
     
-    getUsersPhoneCode{ (numberReturned) in
-//    we need to get the dial code with the + i.e +44. a phone number is 10 characters without the country code
-    
-//    get the number of characters in the users number
-    let charNumber = numberReturned.count
-        print("charNumber \(charNumber)")
-
-//    the end of the users country code will be the count - 11 +15127714295 (char 12)
-    let endChar = charNumber - 11
-    let countryCode = numberReturned[1...endChar]
-    let countryPrefix = countryCode
-    
-    print("countryPrefix \(countryPrefix)")
-        
-        
-        var returnedPhoneNumber = String()
-        
-//            used to remove all the non digit characters within the phone numbers
-        let phoneNumberClean = phoneNumbers.components(separatedBy:CharacterSet.decimalDigits.inverted).joined(separator: "")
-        print("phoneNumberClean \(phoneNumberClean)")
-//        we get the number of digits in the clean phone number
-        let phoneNumberLen = phoneNumberClean.count
-        
-        if phoneNumberLen < 10{
-            print("something is wrong, this number is not correct")
-        }
-            
-//        If the phone number starts with a + we assume it is in the correct format
-    
-    if phoneNumberLen > 11 && phoneNumbers[0] == "+" {
-        print("phoneNumberLen > 11 && phoneNumbers[0]")
-        let phoneNumberLenClean = phoneNumberClean.count
-        let phoneNumberZero = phoneNumberLenClean - 11
-        let numberZero = phoneNumberClean[phoneNumberZero]
-        
-        if numberZero == "0"{
-            print("numberZero == 0")
-            let phoneNumberZero = phoneNumberLenClean - 11
-            let phoneNumberZeroSecond = phoneNumberLenClean - 10
-            
-            let firstPart = phoneNumberClean[..<phoneNumberZero]
-            print("firstPart: \(firstPart)")
-            let secondPart = phoneNumberClean[phoneNumberZeroSecond...]
-            print("secondPart: \(secondPart)")
-            
-            print("combined: \(firstPart)\(secondPart)")
-            
-            returnedPhoneNumber = "+\(firstPart)\(secondPart)"
-        }
-        else{
-            returnedPhoneNumber = "+\(phoneNumberClean)"
-            
-        }
-  
-    }
-        else if phoneNumberClean.count == 10{
-            returnedPhoneNumber = "+\(countryPrefix)\(phoneNumberClean)"
-            
-        }
-            
-        else if phoneNumberClean.count == 11 && phoneNumberClean[0] == "0"{
-            
-            returnedPhoneNumber = "+\(countryPrefix)\(phoneNumberClean.dropFirst(1))"
-        }
-            
-        else if phoneNumberClean.count == 11 {
-            
-            //                remove the first character
-            returnedPhoneNumber = "+\(phoneNumberClean)"
-        }
-        else if phoneNumberClean.count == 12 && phoneNumberClean[0] == "0" && phoneNumberClean[1] == "0"{
-            
-            //                remove the first character
-            
-            returnedPhoneNumber = "+\(countryPrefix)\(phoneNumberClean.dropFirst(1))"
-        }
-        else if phoneNumberClean.count == 12 && phoneNumberClean[0] == "0"{
-            
-            returnedPhoneNumber = "+\(phoneNumberClean.dropFirst(1))"
-        }
-        else if phoneNumberClean.count == 13 && phoneNumberClean[0] == "0" && phoneNumberClean[1] == "0"{
-            
-            returnedPhoneNumber = "+\(phoneNumberClean.dropFirst(2))"
-        }
-        else if phoneNumberClean.count == 13 && phoneNumberClean[0] == "0"{
-            
-            returnedPhoneNumber = "+\(phoneNumberClean.dropFirst(1))"
-        }
-        else if phoneNumberClean.count == 14 && phoneNumberClean[0] == "0" && phoneNumberClean[1] == "0"{
-            
-            returnedPhoneNumber = "+\(phoneNumberClean.dropFirst(2))"
-        }
-        else if phoneNumberClean.count == 14 && phoneNumberClean[0] == "0"{
-            
-            returnedPhoneNumber = "+\(phoneNumberClean.dropFirst(1))"
-        }
-        else{
-            returnedPhoneNumber = phoneNumberClean
-        }
-        print("returnedPhoneNumber \(returnedPhoneNumber)")
-        completion(returnedPhoneNumber)
-        }
+            getUsersPhoneCode{ (numberReturned) in
+//                initiate the phonekit
+            let phoneNumberKit = PhoneNumberKit()
+            do{
+    //            1.first we try parsing the phone number of the person the user tried to add
+            let addedNumber = try phoneNumberKit.parse(phoneNumbers)
+            let addedNumberString = phoneNumberKit.format(addedNumber, toType: .e164)
+//                if this worked, we complete with the numbers
+                print("cleanPhoneNumbers: \(addedNumberString)")
+                completion(addedNumberString)
+                
+            }
+            catch{
+//                2. the parsing did not work, therefore the number must be missing something, we get the users locale and add this to the number
+                do{
+//            we parse the users phone number into the phoneNumberKit
+                let usersNumber = try phoneNumberKit.parse(numberReturned)
+//            we get the users country code, this is just the numbers
+//                let usersCountryCode = usersNumber.countryCode
+//                    we get the users country code, this is the region string
+                let n = usersNumber.regionID
+//                parse the phone number with the region added
+                let addedNumber = try phoneNumberKit.parse("07854937880", withRegion: n!)
+                let addedNumberString = phoneNumberKit.format(addedNumber, toType: .e164)
+                    print("cleanPhoneNumbers: \(addedNumberString)")
+//                    we complete with the newly added user
+                completion(addedNumberString)
+                }
+                catch{
+//                    there was still an issue with the number, we return the number the user originally used
+                    
+                    
+                    
+                    completion(phoneNumbers)
+                }
+            }
+            }
     }
     
     

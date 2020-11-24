@@ -229,9 +229,6 @@ extension PhoneNumberInput: FPNTextFieldDelegate {
     func fpnDidSelectCountry(name: String, dialCode: String, code: String) {
         print(name, dialCode, code)
     }
-    
-    
-
 }
 
 // Firebase error messsages handler

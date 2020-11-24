@@ -26,5 +26,6 @@ pod 'Instructions'
 pod 'Firebase/Crashlytics'
 pod 'IQKeyboardManagerSwift'
 pod 'Firebase/Performance'
+pod 'PhoneNumberKit'
 
 end

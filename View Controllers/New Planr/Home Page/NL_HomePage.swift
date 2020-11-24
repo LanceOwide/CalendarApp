@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 import Instructions
+import PhoneNumberKit
 
 //global variables to hold the confirmed and pending events
 var pendingEventList = [[eventSearch?]]()
@@ -87,7 +88,6 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
         super.viewDidLoad()
         print("running viewDidLoad ")
         
-        
 //        opening setup func
 //        if the user is new, we do not want to go through this setup until they have seen the notifications
         if UserDefaults.standard.bool(forKey: "oldUser") == true{
@@ -96,6 +96,7 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
 //            we don't let the homepage update unless the user is an old one, otherwise the app will crash
         NotificationCenter.default.addObserver(self, selector: #selector(reloadHomePage), name: .newDataLoaded, object: nil)
         }
+        
         
         setUpTheDateView()
         
