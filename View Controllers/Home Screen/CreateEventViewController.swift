@@ -137,6 +137,10 @@ class CreateEventViewController: UIViewController, UICollectionViewDelegate,UICo
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        
+        
+        
 //        set the badge number to 0
         UIApplication.shared.applicationIconBadgeNumber = 0
 

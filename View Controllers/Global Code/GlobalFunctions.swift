@@ -670,8 +670,6 @@ extension UIViewController{
         let phoneNumberDefault = UserDefaults.standard.string(forKey: "userPhoneNumber") ?? ""
         print("phoneNumberDefault \(phoneNumberDefault)")
         
-
-        
     //    check if the user name was available, if so we need to get the users number from the database
         if phoneNumberDefault == "" {
             print("user didn't have a phone number")
@@ -680,6 +678,7 @@ extension UIViewController{
              print("user == nil")
             }
             else{
+                print("user != nil")
             dbStore.collection("users").whereField("uid", isEqualTo: user!).getDocuments { (querySnapshot, error) in
             if error != nil {
                 print("Error getting documents: \(error!)")
@@ -705,17 +704,24 @@ extension UIViewController{
 //function returns a clean phone number fron the dirty phone number used as an input
         func cleanPhoneNumbers(phoneNumbers: String, completion: @escaping (_ returnedPhoneNumber: String) -> ()){
 //    now that we have corrected the phone number we get it again
-    
+    print("running func cleanPhoneNumbers phoneNumbers \(phoneNumbers)")
             getUsersPhoneCode{ (numberReturned) in
+                print("cleanPhoneNumbers numberReturned \(numberReturned)")
 //                initiate the phonekit
             let phoneNumberKit = PhoneNumberKit()
+                
             do{
     //            1.first we try parsing the phone number of the person the user tried to add
             let addedNumber = try phoneNumberKit.parse(phoneNumbers)
             let addedNumberString = phoneNumberKit.format(addedNumber, toType: .e164)
 //                if this worked, we complete with the numbers
-                print("cleanPhoneNumbers: \(addedNumberString)")
-                completion(addedNumberString)
+            print("cleanPhoneNumbers1: \(addedNumberString)")
+                
+            let usersNumber = try phoneNumberKit.parse(numberReturned)
+            let n = usersNumber.regionID
+            print("cleanPhoneNumbers - addedNumberString \(addedNumberString)")
+                
+            completion(addedNumberString)
                 
             }
             catch{
@@ -727,19 +733,27 @@ extension UIViewController{
 //                let usersCountryCode = usersNumber.countryCode
 //                    we get the users country code, this is the region string
                 let n = usersNumber.regionID
+                print("cleanPhoneNumbers2 - region: \(n!) usersNumber \(usersNumber)")
+                    
+//                    we need to remove any non numeric characters from the phone number
+                let phoneNumberClean = phoneNumbers.components(separatedBy:CharacterSet.decimalDigits.inverted).joined(separator: "")
+//                    print("cleanPhoneNumbers2 - phoneNumberClean \(phoneNumberClean)")
+                    
 //                parse the phone number with the region added
-                let addedNumber = try phoneNumberKit.parse("07854937880", withRegion: n!)
+                let addedNumber = try phoneNumberKit.parse(phoneNumberClean, withRegion: n!)
                 let addedNumberString = phoneNumberKit.format(addedNumber, toType: .e164)
-                    print("cleanPhoneNumbers: \(addedNumberString)")
+                print("cleanPhoneNumbers2 - addedNumber \(addedNumber) - addedNumberString \(addedNumberString) n \(n)")
+                    
 //                    we complete with the newly added user
                 completion(addedNumberString)
                 }
                 catch{
-//                    there was still an issue with the number, we return the number the user originally used
+//                   3. there was still an issue with the number, we return the number the user originally used
+                    let phoneNumberClean = phoneNumbers.components(separatedBy:CharacterSet.decimalDigits.inverted).joined(separator: "")
                     
+                    print("cleanPhoneNumbers3 - this number wasn't parsed in the first two numberReturned:  \(phoneNumberClean)")
                     
-                    
-                    completion(phoneNumbers)
+                    completion(phoneNumberClean)
                 }
             }
             }

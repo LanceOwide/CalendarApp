@@ -88,6 +88,7 @@ class NL_HomePage: UIViewController, NL_MonthViewDelegate, UIPopoverPresentation
         super.viewDidLoad()
         print("running viewDidLoad ")
         
+                
 //        opening setup func
 //        if the user is new, we do not want to go through this setup until they have seen the notifications
         if UserDefaults.standard.bool(forKey: "oldUser") == true{
