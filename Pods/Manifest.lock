@@ -404,6 +404,12 @@ PODS:
     - nanopb/encode (= 1.30906.0)
   - nanopb/decode (1.30906.0)
   - nanopb/encode (1.30906.0)
+  - PhoneNumberKit (3.3.1):
+    - PhoneNumberKit/PhoneNumberKitCore (= 3.3.1)
+    - PhoneNumberKit/UIKit (= 3.3.1)
+  - PhoneNumberKit/PhoneNumberKitCore (3.3.1)
+  - PhoneNumberKit/UIKit (3.3.1):
+    - PhoneNumberKit/PhoneNumberKitCore
   - PromisesObjC (1.2.11)
   - Protobuf (3.13.0)
   - SwiftyJSON (5.0.0)
@@ -425,6 +431,7 @@ DEPENDENCIES:
   - Instructions
   - IQKeyboardManagerSwift
   - MBProgressHUD
+  - PhoneNumberKit
   - SwiftyJSON
 
 SPEC REPOS:
@@ -462,6 +469,7 @@ SPEC REPOS:
     - leveldb-library
     - MBProgressHUD
     - nanopb
+    - PhoneNumberKit
     - PromisesObjC
     - Protobuf
     - SwiftyJSON
@@ -500,10 +508,11 @@ SPEC CHECKSUMS:
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   MBProgressHUD: 3ee5efcc380f6a79a7cc9b363dd669c5e1ae7406
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
+  PhoneNumberKit: ff153d5e299f6da566cb73c6aa71e354933b2932
   PromisesObjC: 8c196f5a328c2cba3e74624585467a557dcb482f
   Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
 
-PODFILE CHECKSUM: a8e899997772f6dc249c84cf2c45b8f3de5675a3
+PODFILE CHECKSUM: f07241c0ce9c9da809d01894712af367d380a34c
 
 COCOAPODS: 1.10.0.rc.1
