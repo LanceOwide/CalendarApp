@@ -7,10 +7,15 @@
 //
 
 import Foundation
+import ContactsUI
 
 
 struct contactList {
     var name: String = ""
     var phoneNumber: String = ""
     var selectedContact: Bool = false
+    var phoneNumberList = [CNLabeledValue<CNPhoneNumber>]()
+    var userID = String()
+    var planrName = String()
+    var validatedANumber = Bool()
 }

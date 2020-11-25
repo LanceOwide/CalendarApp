@@ -455,31 +455,54 @@ class NL_createEventSummary: UIViewController{
                     
                     eventIDChosen = eventID
                     
-                    self.getSelectedContactsPhoneNumbers2{ (selectedPhoneNumbers,selectedNames) in
-                        print("getSelectedContactsPhoneNumbers2 complete selectedPhoneNumbers \(selectedPhoneNumbers), selectedNames \(selectedNames)")
-                
-                
-                self.createUserIDArrays(phoneNumbers: selectedPhoneNumbers, names: selectedNames) { (nonExistentArray, existentArray, userNameArray, nonExistentNameArray) in
+                self.getSelectedContactsPhoneNumbers2{ (usersContactList) in
                     
-                    print("nonExistentArray \(nonExistentArray)")
-                    print("existentArray \(existentArray)")
+                    print("getSelectedContactsPhoneNumbers2 complete usersContactList \(usersContactList)")
+                    
+                    self.createUserIDArrays(contacts: usersContactList) { (nonExistentArray,existentArray) in
+                    
+                    print("createUserIDArrays - nonExistentArray \(nonExistentArray)")
+                    print("createUserIDArrays - existentArray \(existentArray)")
                     
                     Crashlytics.crashlytics().log("existentArray \(existentArray) nonExistentArray \(nonExistentArray)")
                     
                     //           adds the non users to the database
-                    self.addNonExistingUsers2(phoneNumbers: nonExistentArray, eventID: eventID, names: nonExistentNameArray)
+                    self.addNonExistingUsers2(contacts: nonExistentArray, eventID: eventID)
+                    
+                        
+//                    we need to add the current user to the event link
+                    var currentUserContact = contactList()
+                    var completeUserList = [contactList]()
+                        completeUserList = existentArray
+                        self.getUserName{ (eventOwnersName) in
+                        currentUserContact.name = eventOwnersName
+                        }
+                        currentUserContact.userID = currentUserID!
+//                        we add the current user to the list of people to add to the event
+                        completeUserList.append(currentUserContact)
                     
                     //            Adds the user event link to the userEventStore
+                        self.userEventLinkArray(eventID: eventID, contact: completeUserList){
                     
-                    self.userEventLinkArray(userID: existentArray + [currentUserID!], userName: userNameArray + [eventOwnerName ?? ""], eventID: eventID){
-                    
-                    self.addUserIDsToEventRequests(userIDs: existentArray, currentUserID: [currentUserID!], existingUserIDs: [], eventID: eventID, addCurrentUser: true, currentUserNames: [eventOwnerName ?? ""] + userNameArray, nonUserNames: nonExistentNameArray)
+                        self.addUserIDsToEventRequests(currentUserID: user!, eventID: eventID, addCurrentUser: true, existingUsers: existentArray, nonExistingUsers: nonExistentArray, thisUsersName: currentUserContact.name)
                     
     //                Add a notification to the notificaiton table for each user invited to the event
-                    self.eventCreatedNotification(userIDs: existentArray, eventID: eventID)
+                            self.eventCreatedNotification(contacts: existentArray, eventID: eventID)
+                            
+//                            we need to create an array of the current users and the non user names
+                            var existentNamesArray = [String]()
+                            var existentUidArray = [String]()
+                            for i in existentArray{
+                                existentNamesArray.append(i.planrName)
+                                existentUidArray.append(i.userID)
+                            }
+                            var nonExistentNamesArray = [String]()
+                            for i in nonExistentArray{
+                                nonExistentNamesArray.append(i.name)
+                            }
                     
     //                add event to this users CoreData, this allows us to show the results page immediately
-                        self.commitSingleEventDB(chosenDate: "", chosenDateDay: 999, chosenDateMonth: 999, chosenDatePosition: 999, chosenDateYear: 999, daysOfTheWeek: daysOfTheWeekNewEvent, endDates: endDates, endTimeInput: newEventEndTime, endDateInput: newEventEndDate, eventDescription: newEventDescription, eventID: eventID, eventOwner: user!, eventOwnerName: eventOwnerName ?? "", isAllDay: "0", location: newEventLocation, locationLatitue: newEventLatitude, locationLongitude: newEventLongitude, startDates: startDates, startDateInput: newEventStartDate, startTimeInput: newEventStartTime, currentUserNames: [eventOwnerName ?? ""] + userNameArray, nonUserNames: nonExistentNameArray, users: [user!] + existentArray, eventType: eventType)
+                        self.commitSingleEventDB(chosenDate: "", chosenDateDay: 999, chosenDateMonth: 999, chosenDatePosition: 999, chosenDateYear: 999, daysOfTheWeek: daysOfTheWeekNewEvent, endDates: endDates, endTimeInput: newEventEndTime, endDateInput: newEventEndDate, eventDescription: newEventDescription, eventID: eventID, eventOwner: user!, eventOwnerName: eventOwnerName ?? "", isAllDay: "0", location: newEventLocation, locationLatitue: newEventLatitude, locationLongitude: newEventLongitude, startDates: startDates, startDateInput: newEventStartDate, startTimeInput: newEventStartTime, currentUserNames: [eventOwnerName ?? ""] + existentNamesArray, nonUserNames: nonExistentNamesArray, users: [user!] + existentUidArray, eventType: eventType)
                     
     //                    we need to set the currentUserSelectedEvent
                         
@@ -497,8 +520,8 @@ class NL_createEventSummary: UIViewController{
                     if nonExistentArray.isEmpty == false{
                     print("there are some invitees that arent users")
                         Crashlytics.crashlytics().log("there are some invitees that arent users")
-                        nonExistingUsers = nonExistentNameArray
-                        nonExistingNumbers = nonExistentArray
+//                        nonExistingUsers = nonExistentNameArray
+//                        nonExistingNumbers = nonExistentArray
                         contactsSelected.removeAll()
                         inviteesNamesNew.removeAll()
                         contactsSorted.removeAll()

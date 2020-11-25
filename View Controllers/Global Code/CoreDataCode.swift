@@ -1450,13 +1450,13 @@ func removeTheAvailabilityNotifications(){
 //    MARK: Notification functions, creating notifications within the database
     
 //    notification function for newly created events
-    func eventCreatedNotification(userIDs: [String], eventID: String){
-      print("running func eventCreatedNotification- adding notificaitons to userEventUpdates - inputs - userIDs \(userIDs)")
+    func eventCreatedNotification(contacts: [contactList], eventID: String){
+      print("running func eventCreatedNotification- adding notificaitons to userEventUpdates - inputs - contacts \(contacts) eventID \(eventID)")
         
-        for i in userIDs{
+        for i in contacts{
        
 //            add the eventID and an updated notification to the userEventUpdates tbales
-            dbStore.collection("userEventUpdates").document(i).setData([eventID: "New"], merge: true)
+            dbStore.collection("userEventUpdates").document(i.userID).setData([eventID: "New"], merge: true)
             
         }
     

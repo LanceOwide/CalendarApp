@@ -518,8 +518,79 @@ extension UIViewController{
             
         }}
     
+    
+    func checkForPhoneNumberInvitedArray(phoneNumber: String, completion: @escaping () -> Void){
+        
+        var fireStoreRef: DocumentReference? = nil
+        
+        print("running func checkForPhoneNumberInvitedArray, inputs: phoneNumber: \(phoneNumber)")
+        dbStore.collection("temporaryUserEventStore").whereField("phoneNumberList", arrayContains: phoneNumber).getDocuments { (querySnapshot, error) in
+            if error != nil {
+                print("Error getting documents: \(error!)")
+            }
+            else {
+                for document in querySnapshot!.documents {
+                    let eventID = document.get("eventID") as! String
+//                    pull down the users name as it is shown in the temporaryUserEventStore, we need to remove this from the details list
+                    let userCreatedName = document.get("name") as! String
+                    let uid = Auth.auth().currentUser?.uid
+                    //                    add the required info to the userEventStore
+                    fireStoreRef = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": uid!, "userName": registeredName]){
+                        error in
+                        if let error = error {
+                            print("Error adding document: \(error)")
+                        } else {
+//                print("Document added with ID: \(ref!.documentID)")
+                    let availabilityID = fireStoreRef!.documentID
+
+//                    adds the uid to the eventRequests
+                    let docRef = dbStore.collection("eventRequests").document(eventID)
+                    
+//                    add the new users userID to the event,  add the notifiction for everyone invited to update their event
+                    docRef.getDocument { (document, error) in
+                        if let document = document, document.exists {
+//                            get the userIDs from the eventRequest table, post a new availability notification and event notification for the userIDs
+                            var userIDs = document.get("users") as! [String]
+                            userIDs.append(uid!)
+                            var currentUsersNames = document.get("currentUserNames") as! [String]
+                            currentUsersNames.append(registeredName)
+                            
+//                            get the nonUserNames and remove the current users name
+                            var nonUserNames = document.get("nonUserNames") as! [String]
+                            if let index = nonUserNames.index(of: userCreatedName){
+                                nonUserNames.remove(at: index)
+                            }
+
+//                            update the userIDs array
+                            dbStore.collection("eventRequests").document(eventID).updateData(["users" : FieldValue.arrayUnion([uid!])])
+//                            update the current user names array
+                            dbStore.collection("eventRequests").document(eventID).updateData(["currentUserNames" : FieldValue.arrayUnion(currentUsersNames)])
+//                            update the nonUsersName array names array
+                            dbStore.collection("eventRequests").document(eventID).updateData(["nonUserNames" : nonUserNames])
+                            
+//                    we also update the event users in the real time database
+                            let rRef = Database.database().reference()
+                            rRef.child("events/\(eventID)/invitedUsers").setValue(userIDs)
+                            
+//                          notify the users that the information has been updated
+                            self.eventAmendedNotification(userIDs: userIDs, eventID: eventID, amendWithAvailability: false)
+                            self.availabilityAmendedNotification(userIDs: userIDs, availabilityDocumentID: availabilityID)
+                        } else {
+                            print("Document does not exist")
+                        }
+                    }
+                    }
+                                
+                    }
+                  completion()
+                }
+                
+            }
+            
+        }}
+    
     //    deletes the entry for the phone number into the temporaryUserEventStore
-    func deletePhoneNumberInvited(phoneNumber: String){
+    func deletePhoneNumberInvited(phoneNumber: String, completion: @escaping () -> Void){
         
         print("running func deletePhoneNumberInvited, inputs: phoneNumber \(phoneNumber)")
         
@@ -537,7 +608,32 @@ extension UIViewController{
                     let documentID = document.documentID
                     
                     docRefUserEventStore.document(documentID).delete()
-                }}}}
+                }}}
+        completion()
+    }
+    
+    //    deletes the entry for the phone number into the temporaryUserEventStore
+    func deletePhoneNumberInvitedArray(phoneNumber: String, completion: @escaping () -> Void){
+        
+        print("running func deletePhoneNumberInvitedArray, inputs: phoneNumber \(phoneNumber)")
+        
+        let docRefUserEventStore = dbStore.collection("temporaryUserEventStore")
+        
+        docRefUserEventStore.whereField("phoneNumberList", arrayContains: phoneNumber).getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")}
+                
+            else{
+                for document in querySnapshot!.documents{
+                    
+                    print("deleted temporary document")
+                    
+                    let documentID = document.documentID
+                    
+                    docRefUserEventStore.document(documentID).delete()
+                }}}
+        completion()
+    }
     
     
 //    this function creates a listener for each node of the realTime database the user has a chat at

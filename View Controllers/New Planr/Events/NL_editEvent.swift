@@ -883,28 +883,43 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                                    print("the user has added new invitees")
                                         
 //                1. get the phone numbers and names of the new users added
-                            self.getSelectedContactsPhoneNumbers2{selectedPhoneNumbers,selectedNames in
+                            self.getSelectedContactsPhoneNumbers2{ (usersContactList) in
 
                                         
 //                2. confirm which of the new invitees are users or not and add them to the arrya
-                                self.createUserIDArrays(phoneNumbers: selectedPhoneNumbers, names: selectedNames) { (nonExistentArray, existentArray, userNameArray, nonExistentNameArray) in
+                                self.createUserIDArrays(contacts: usersContactList) { (nonExistentArray,existentArray) in
                                                         
                                         print("nonExistentArray \(nonExistentArray)")
                                         print("existentArray \(existentArray)")
                                                         
                         //           3. adds the non users to the database
-                                        self.addNonExistingUsers2(phoneNumbers: nonExistentArray, eventID: currentUserSelectedEvent.eventID, names: nonExistentNameArray)
+                                    self.addNonExistingUsers2(contacts: nonExistentArray, eventID: currentUserSelectedEvent.eventID)
+                                    
                                                         
-                        //            4. Adds the user event link to the userEventStore. this also adds the required availability notification
-                                    self.userEventLinkArray(userID: existentArray, userName: userNameArray, eventID: currentUserSelectedEvent.eventID){
+//            4. Adds the user event link to the userEventStore. this also adds the required availability notification
+                                    self.userEventLinkArray(eventID: currentUserSelectedEvent.eventID, contact: existentArray){
+//               4.1 Add a notification to the notificaiton table for each user invited to the event
+                                        self.eventCreatedNotification(contacts: existentArray, eventID: currentUserSelectedEvent.eventID)
                                                             
                                                         }
+                                    
+                                    var existentNamesArray = [String]()
+                                    var existentUidArray = [String]()
+                                    for i in existentArray{
+                                        existentNamesArray.append(i.planrName)
+                                        existentUidArray.append(i.userID)
+                                    }
+                                    var nonExistentNamesArray = [String]()
+                                    for i in nonExistentArray{
+                                        nonExistentNamesArray.append(i.name)
+                                    }
+                                    
 //           5. Add the new user names and IDs to the database
-                                    self.commitDataToDB(deletedUsers: false, deletedNonUser: false, addedNewInvitees: true, nonUserNames: nonUserInviteeNames + nonExistentNameArray, userNames: inviteesNames + userNameArray, userIDs: inviteesUserIDs + existentArray, deletedUserIDs: deletedUserIDs)
+                                    self.commitDataToDB(deletedUsers: false, deletedNonUser: false, addedNewInvitees: true, nonUserNames: nonUserInviteeNames + nonExistentNamesArray, userNames: inviteesNames + existentNamesArray, userIDs: inviteesUserIDs + existentUidArray, deletedUserIDs: deletedUserIDs)
                                     
 //                                    post a notification to tell the new users to download the userAvailability Arrays
                                     for avail in currentUserSelectedAvailability{
-                                        self.availabilityCreatedNotification(userIDs: existentArray, availabilityDocumentID: avail.documentID)
+                                        self.availabilityCreatedNotification(userIDs: existentUidArray, availabilityDocumentID: avail.documentID)
                                     }
 
                                                         print("new users added")
@@ -926,8 +941,6 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
             print("running func commitDataToDB - inputs: deletedUsers: \(deletedUsers) deletedNonUser: \(deletedNonUser) nonUserNames: \(nonUserNames) addedNewInvitees:\(addedNewInvitees) userNames:\(userNames) userIDs \(userIDs)")
             
 //            variable to hold the userIDs of the users we need to send notifications to
-            
-            
             
 //           1. we save down the new list of users, we have to do this first to avoid any issues with data being pulled before we have updated the database
             //                            did the user delete users
@@ -990,6 +1003,8 @@ class NL_editEvent: UIViewController, UIPopoverPresentationControllerDelegate {
                       
                       let endDateString = endDatesNewEvent.last![0...9]
                       let startDateString = startDatesNewEvent.first![0...9]
+        
+        print("commitDataToDB - endDatesNewEvent \(endDatesNewEvent)")
                       
           //            we commit the new data into the database
           //            commit the updated event information to the database, we merge the data, if there are changes to the user invitees we deal with this later in the code

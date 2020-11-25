@@ -120,19 +120,29 @@ class PhoneNumberCode: UIViewController {
 
                                         self.checkForPhoneNumberInvited(phoneNumber: registeredPhoneNumbers[0]) {
                                             print("Temporary invited added to database 1 number")
-                                            self.deletePhoneNumberInvited(phoneNumber: registeredPhoneNumbers[0])
+                                            self.deletePhoneNumberInvited(phoneNumber: registeredPhoneNumbers[0]){
+                                                self.checkForPhoneNumberInvitedArray(phoneNumber: registeredPhoneNumbers[0]){
+                                                    self.deletePhoneNumberInvitedArray(phoneNumber: registeredPhoneNumbers[0]){
+                                                        
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                     else{
 
                                         self.checkForPhoneNumberInvited(phoneNumber: registeredPhoneNumbers[0]) {
                                             print("Temporary invited added to database 2 numbers - number 1")
-                                            self.deletePhoneNumberInvited(phoneNumber: registeredPhoneNumbers[0])
+                                            self.deletePhoneNumberInvited(phoneNumber: registeredPhoneNumbers[0]){
+                                                
+                                            }
                                         }
 
                                         self.checkForPhoneNumberInvited(phoneNumber: registeredPhoneNumbers[1]) {
                                             print("Temporary invited added to database 2 numbers - number 2")
-                                            self.deletePhoneNumberInvited(phoneNumber: registeredPhoneNumbers[1])
+                                            self.deletePhoneNumberInvited(phoneNumber: registeredPhoneNumbers[1]){
+                                                
+                                            }
                                         }
 
                                     }

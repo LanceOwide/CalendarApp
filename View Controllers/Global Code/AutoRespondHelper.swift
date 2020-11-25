@@ -1658,8 +1658,9 @@ class AutoRespondHelper {
                          try store.enumerateContacts(with: request, usingBlock: { (contact, stopPointerIfYouWantToStopPointerEnumerating) in
                              //                        print(contact.givenName)
                              
-                             contacts.append(contactList(name: contact.givenName + " " + contact.familyName, phoneNumber: contact.phoneNumbers.first?.value.stringValue ?? "", selectedContact: false))
-
+//                            we add the original phone number and the list of phone numbers the user has for the particular user
+                            contacts.append(contactList(name: contact.givenName + " " + contact.familyName, phoneNumber: contact.phoneNumbers.first?.value.stringValue ?? "", selectedContact: false, phoneNumberList: contact.phoneNumbers))
+                            
                          })
                          
                          contactsSorted = contacts.sorted(by: { $0.name < $1.name })
@@ -1680,8 +1681,39 @@ class AutoRespondHelper {
                          contactsSorted.removeAll {$0.phoneNumber == "     "}
                          contactsSorted.removeAll {$0.phoneNumber == "      "}
                          contactsSorted.removeAll {$0.phoneNumber == "       "}
+                        
+//                        this is too compute intensize, we do this when the user selects a contact
+//                        adding a step to validate one number from each contact we have
+//                        var contactsSortedTemp = [contactList]()
+//                        var n = 0
+//                        for contact in contactsSorted{
+//
+//                            var contactTemp = contactList()
+//                            contactTemp = contact
+//                            contactsSortedTemp.append(contact)
+//                            let numberList = contact.phoneNumberList
+//                            var y = 0
+//                            for number in numberList{
+//
+//                                GlobalFunctions().cleanPhoneNumbers(phoneNumbers: number.value.stringValue, landLineAllowed: true){(cleanPhoneNumber) in
+//                                    if cleanPhoneNumber != "No"{
+//                                        contactTemp.validatedANumber = true
+//                                    }
+//                                    y = y + 1
+//                                    if n == contactsSorted.count - 1 && y == contact.phoneNumberList.count{
+//                                    contactsSortedTemp.append(contactTemp)
+//                                    contactsSorted = contactsSortedTemp
+//                                    print("contactsSortedTemp wValidation \(contactsSortedTemp)")
+//                                }
+//                                else if y == numberList.count{
+//                                    contactsSortedTemp.append(contactTemp)
+//                                    n = n + 1
+//                                }
+//                            }
+//                            }
+//                        }
+                        
                              
-                         
                          completion()
                          
                      } catch let error{

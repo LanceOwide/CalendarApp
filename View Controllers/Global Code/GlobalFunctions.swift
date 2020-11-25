@@ -16,6 +16,7 @@ import Alamofire
 import BackgroundTasks
 import FlagPhoneNumber
 import PhoneNumberKit
+import ContactsUI
 
 
 var messageNotificationDateChosen = Bool()
@@ -343,221 +344,230 @@ extension UIViewController{
     
     
 //    function to allow for the process of a string array into the phone number cleaning function
-    
-        func getSelectedContactsPhoneNumbers2( completion: @escaping (_ phoneNumbers: [String], _ names: [String]) -> ()){
-        
-        print("running func getSelectedContactsPhoneNumbers2")
+        func getSelectedContactsPhoneNumbers2( completion: @escaping (_ selectedContacts: [contactList]) -> ()){
+        print("running func getSelectedContactsPhoneNumbers2 contactsSelected \(contactsSelected)")
         
         selectedContacts.removeAll()
         selectedContactNames.removeAll()
         
-        print("contactsSelected: \(contactsSelected)")
 //            we need the fucntion to only complete once the for loop in complete, we track this using n
             
             var n = 0
+//            variable to hold the list of contactList
+            var newContactList = [contactList]()
 
+//            we loop through each contact the user has tried to add
             for contact in contactsSelected{
+                print("getSelectedContactsPhoneNumbers2 - contactsSelected.count \(contactsSelected.count)")
+                
+//                variable to hold the new contactList
+                var newContactListItem = contactList()
+//                add the users name to the newcontact list
+                newContactListItem.name = contact.name
 
-                self.cleanPhoneNumbers(phoneNumbers: contact.phoneNumber){ (cleanPhoneNumber) in
-                    let contactName = contact.name
+//                first we clean the sinlge number we found as the first number the user
+                self.cleanPhoneNumbers(phoneNumbers: contact.phoneNumber, landLineAllowed: true){ (cleanPhoneNumber) in
+                    print("getSelectedContactsPhoneNumbers2 - cleanPhoneNumbers returned result cleanPhoneNumber \(cleanPhoneNumber)")
                     
-                        selectedContacts.append(cleanPhoneNumber)
-                        selectedContactNames.append(contactName)
-//                    add one to the loop tracker
+//                    add the users cleaned number to the contactListItem
+                    newContactListItem.phoneNumber = cleanPhoneNumber
                     n = n + 1
-                    if n == contactsSelected.count{
-                        print("output: phoneNumbers: \(selectedContacts) names: \(selectedContactNames)")
-                        completion(selectedContacts, selectedContactNames)
                     }
+//                        array to hold the clean numbers from the number array
+                    var numberArray = [CNLabeledValue<CNPhoneNumber>]()
                     
+//                    now we loop through the number array
+                    var y = 0
+                for number in contact.phoneNumberList{
+                        
+                        
+                        self.cleanPhoneNumbers(phoneNumbers: number.value.stringValue, landLineAllowed: false){ (cleanPhoneNumber) in
+//                            we only want to add the phone numbers we are happy with to the array, i.e. we remove landlines from our check
+                            if cleanPhoneNumber != "No"{
+                                let newNumber = CNPhoneNumber.init(stringValue: cleanPhoneNumber)
+                                let newLabelledValue = CNLabeledValue.init(label: "cleanedNumber", value: newNumber)
+                            
+                            numberArray.append(newLabelledValue)
+                            }
+                            print("getSelectedContactsPhoneNumbers2 - contact.phoneNumberList.count \(contact.phoneNumberList.count) n\(n) y\(y)")
+                            
+//                            we only complete once the outside and inside loop are finsihed
+                            
+                            y = y + 1
+//                            if this is the final list of
+                            if y == contact.phoneNumberList.count && n == contactsSelected.count{
+//                                append the number array
+                                newContactListItem.phoneNumberList = numberArray
+//                          append the newContactListItem to the total list
+                                newContactList.append(newContactListItem)
+                            print("getSelectedContactsPhoneNumbers2 output - newContactList: \(newContactList)")
+                            completion(newContactList)
+                        }
+                            else if y == contact.phoneNumberList.count{
+//                                append the number array
+                                newContactListItem.phoneNumberList = numberArray
+//                                append the newContactListItem to the total list
+                                print("getSelectedContactsPhoneNumbers2 - new contact list item being appended \(newContactListItem)")
+                                newContactList.append(newContactListItem)
+                            }
+                    }
                 }
-  
+
             }
-        
+
         }
     
     
-    func createUserIDArrays(phoneNumbers: [String], names: [String], completionHandler: @escaping (_ nonExistentArray: [String], _ existentArray: [String], _ existentNameArray: [String], _ nonExistentNameArray: [String]) -> ()){
+//    a function to check if the users being added are users, we loop through each of the users numbers and check if it is in the database
+    func createUserIDArrays(contacts: [contactList], completionHandler: @escaping (_ nonExistentArray: [contactList], _ existentArray: [contactList]) -> ()){
+        print("running func createUserIDArrays contacts \(contacts)")
         
-        var nonExistentArray = [String]()
-        var existentArray = [String]()
-        var existentNameArray = [String]()
-        var nonExistentNameArray = [String]()
+        var nonExistentArray = [contactList]()
+        var existentArray = [contactList]()
         var n = 0
-        let phoneNumbersCount = phoneNumbers.count
+        let contactCount = contacts.count
         
-        print("running func createUserIDArrays, inputs - phoneNumbers: \(phoneNumbers) names: \(names)")
-
-        for numbers in phoneNumbers{
-        
-            getUserID(phoneNumber: numbers) { (userID, userExists, userName) in
+//        we loop through all of the contacts in the contactList
+        for contact in contacts{
+            print("createUserIDArrays contact \(contact)")
+//        we check if one of the users phone numbers is in the database
+            getUserID(contact: contact) { ( _ userExists, _ contact, _ myAddedUserID, _ myAddedUserName) in
   
+//                the user doesnt exist in our database
             if userExists == false{
                 n = n + 1
                 
-                let indexOfItem = phoneNumbers.index(of: numbers)
-                print("indexOfItem: \(String(describing: indexOfItem))")
-                
-              nonExistentArray.append(numbers)
-                nonExistentNameArray.append(names[indexOfItem!])
-                
-                if n == phoneNumbersCount{
-                    print("nonExistentArray: \(nonExistentArray), existentArray: \(existentArray), existentNameArray: \(existentNameArray), nonExistentNameArray: \(nonExistentNameArray)")
-                    completionHandler(nonExistentArray, existentArray, existentNameArray, nonExistentNameArray)
-                    
-                }
+//                we add the users contactList to the nonExistentArry
+                nonExistentArray.append(contact)
             
             }
             else{
                 n = n + 1
+//                the userID and the users name as it is on the Planr app are added to the existentArray
+                var newContact = contact
+                newContact.planrName = myAddedUserName
+                newContact.userID = myAddedUserID
+                existentArray.append(newContact)
                 
-                existentArray.append(userID)
-                existentNameArray.append(userName)
-                
-                if n == phoneNumbersCount{
-                    print("nonExistentArray: \(nonExistentArray), existentArray: \(existentArray), existentNameArray: \(existentNameArray), nonExistentNameArray: \(nonExistentNameArray)")
-                    completionHandler(nonExistentArray, existentArray, existentNameArray, nonExistentNameArray)
+                }
+                if n == contactCount{
+                    print("createUserIDArrays - nonExistentArray: \(nonExistentArray), existentArray: \(existentArray)")
+                    completionHandler(nonExistentArray, existentArray)
                     
                 }
-                
-            }
-                
-                
-            }
-            
-            }
-        
-        
+            }}
     }
     
 //    (_ userID: String,_ userExists: Bool,_ userName: String)
     
-    func getUserID(phoneNumber: String, completionHandler: @escaping (_ userID: String, _ userExists: Bool, _ userName: String) -> ()){
-    
-        var userExists = Bool()
-        var userID = String()
-        var userName = String()
+//    loop through the phoneNumbers and check if one exists
+//    if we fund the number, we complete the function immediatley
+//    if not, we loop through and only complete once we have looped through all the phone numbers
+    func getUserID(contact: contactList, completionHandler: @escaping (_ userExists: Bool, _ contact: contactList, _ userID: String, _ userName: String) -> ()){
         
-        print("running func - getUserID - inputs - phoneNumber: \(phoneNumber)")
+        print("running func getUserID inputs contact \(contact)")
         
+//        track the number of loops we have been through
+        var n = 0
+        let totalCount = contact.phoneNumberList.count
         
-        dbStore.collection("users").whereField("phoneNumbers", arrayContains: phoneNumber).getDocuments { (querySnapshot, error) in
+        for phoneNumber in contact.phoneNumberList{
+          n = n + 1
+            dbStore.collection("users").whereField("phoneNumbers", arrayContains: phoneNumber.value.stringValue).getDocuments { (querySnapshot, error) in
             
-//            print("querySnapshot \(String(describing: querySnapshot))")
-            
-            if error != nil {
-                print("there was an error")
-            }
-            else {
-                print("querySnapshot!.isEmpty: \(querySnapshot!.isEmpty)")
-                
-                if querySnapshot!.isEmpty{
-                    
-                    print("The phone number is not in the Circles DB")
-                    
-                    userExists = false
-                    userID = ""
-                    completionHandler(userID, userExists, userName)
-                    
+                if error != nil {
+                    print("there was an error")
+                    if n == totalCount{
+                        completionHandler(false, contact, "", contact.name)
+                    }
                 }
-                else{
-                    for document in querySnapshot!.documents {
-                        print("document information: \(document.documentID) => \(document.data())")
-                        
-                        userExists = true
-                        
+                else {
+                    print("querySnapshot!.isEmpty: \(querySnapshot!.isEmpty)")
+                    
+                    if querySnapshot!.isEmpty{
+                        if n == totalCount{
+                            completionHandler(false, contact, "", contact.name)
+                        }
+                    }
+                    else{
+//                        we foudn the user, we get their infromation and complete the function
+                        for document in querySnapshot!.documents {
                         let myAddedUserID = document.get("uid") as! String
                         let myAddedUserName = document.get("name") as! String
-                        print("Next user to be added to the userIDArray \(myAddedUserID)")
-                        userID = myAddedUserID
-                        userName = myAddedUserName
-                        
-                        print("func - getUserID - outputs - userID: \(userID) userExists: \(userExists) userName: \(userName)")
-                        
-                        completionHandler(userID, userExists, userName)
-                    }}
+                            completionHandler(true, contact, myAddedUserID, myAddedUserName)
+                        }
+                    }
+                }
+                
             }
             
         }
-   
     }
     
     
-    func addNonExistingUsers2(phoneNumbers: [String], eventID: String, names: [String]){
-        
-        var nameToUpload = String()
-        
-        print("running func addNonExistingUsers2, inputs - phoneNumbers: \(phoneNumbers) eventID: \(eventID) names: \(names)")
-        
-        for phoneNumber in phoneNumbers{
-            
-            let indexOfItem = phoneNumbers.index(of: phoneNumber)
-            
-            print("indexOfItem: \(String(describing: indexOfItem))")
-            print("current phone number: \(phoneNumber)")
-            print("current name: \(names[indexOfItem!])")
-            
-//            Check to esnure a users name is always uploaded
-            if names[indexOfItem!] == ""{
-              
-                nameToUpload = "Unknown Name"
-                
+    func addNonExistingUsers2(contacts: [contactList], eventID: String){
+        print("running func addNonExistingUsers2 contacts \(contacts)")
+    
+        for contact in contacts{
+            print("addNonExistingUsers2 adding contact \(contact)")
+            var phoneNumberArray = [String]()
+//            we create a string of the users phone numbers
+            for number in contact.phoneNumberList{
+                phoneNumberArray.append(number.value.stringValue)
             }
-            else{
-                nameToUpload = names[indexOfItem!]
-            }
-        
-            dbStore.collection("temporaryUserEventStore").addDocument(data: ["eventID": eventID, "phoneNumber": phoneNumber, "name": nameToUpload])
             
+            dbStore.collection("temporaryUserEventStore").addDocument(data: ["eventID": eventID, "phoneNumber": contact.phoneNumber, "name": contact.name, "phoneNumberList": phoneNumberArray])
         }
         
     }
     
     
 //    adds the user and eventID into the userEventStore
-        func userEventLinkArray( userID: [String], userName: [String], eventID: String, completionHandler: @escaping () -> ()){
+    func userEventLinkArray( eventID: String, contact: [contactList], completionHandler: @escaping () -> ()){
         
-        print("running func userEventLinkArray, inputs - userID: \(userID) userName: \(userName) eventID: \(eventID)")
+        print("running func userEventLinkArray, inputs - contact: \(contact) eventID \(eventID)")
         
         let ref = Database.database().reference()
-        let numberOfUsers = userID.count - 1
+        let numberOfUsers = contact.count - 1
         print("numberOfUsers: \(numberOfUsers)")
         let semaphore = DispatchSemaphore(value: 0)
         let queue = DispatchQueue.global()
         var n = 0
         var respondedString = String()
         
+        
 //        we use the semaphore signal wait process to ensure the while statement waits for the data to be written to the database before continuing
         queue.async {
         while n <= numberOfUsers{
             var refFireStore: DocumentReference? = nil
             
-            if userID[n] == user{
+//            we check if the current user is this user, then we set their responded flag to yes
+            if contact[n].userID == user{
                 respondedString = "yes"
             }
             else{
                 respondedString = "nr"
             }
         
-            refFireStore = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": userID[n], "userName": userName[n], "userResponded": false, "responded": respondedString]){ err in
+            refFireStore = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": contact[n].userID, "userName": contact[n].planrName, "userResponded": false, "responded": respondedString]){ err in
             if let err = err {
                 print("Error adding document: \(err)")
                 semaphore.signal()
             } else {
                 print("Document added with ID: \(refFireStore!.documentID)")
 //                add the userAvailability to CoreData
-                self.commitSinlgeAvailabilityToCD(documentID: refFireStore!.documentID, eventID: eventID, uid: userID[n], userName: userName[n], userAvailability: [99], responded: respondedString)
+                self.commitSinlgeAvailabilityToCD(documentID: refFireStore!.documentID, eventID: eventID, uid: contact[n].userID, userName: contact[n].planrName, userAvailability: [99], responded: respondedString)
                 
                 //            We don't want to send notifications to the user who added the event
-                            if userID[n] == user!{
+                if contact[n].userID == user!{
                             }
                             else{
                 //            adds the username to the real time database
-                            ref.child("userEventLink/\(userID[n])/newEvent/\(eventID)").setValue(eventID)
+                            ref.child("userEventLink/\(contact[n].userID)/newEvent/\(eventID)").setValue(eventID)
                                 
 //                                update the realtime DB with the new event notification information
-                            dbStore.collection("userNotification").document(userID[n]).setData(["eventNotificationPending" : true], merge: true)
-                            dbStore.collection("userNotification").document(userID[n]).setData(["eventNotificationiDs" : [eventID]], merge: true)
+                            dbStore.collection("userNotification").document(contact[n].userID).setData(["eventNotificationPending" : true], merge: true)
+                            dbStore.collection("userNotification").document(contact[n].userID).setData(["eventNotificationiDs" : [eventID]], merge: true)
                             }
                 semaphore.signal()
                 if n == numberOfUsers{
@@ -630,19 +640,29 @@ extension UIViewController{
     }
     
 //    add user IDs to the eventRequests table
-    
-        func addUserIDsToEventRequests(userIDs: [String], currentUserID: [String],existingUserIDs: [String], eventID: String, addCurrentUser: Bool, currentUserNames: [String], nonUserNames: [String]) {
+    func addUserIDsToEventRequests(currentUserID: String, eventID: String, addCurrentUser: Bool, existingUsers: [contactList], nonExistingUsers: [contactList], thisUsersName: String) {
         
-        var allUsers = [String]()
+        print("running func addUserIDsToEventRequests, inputs - currentUserID: \(currentUserID) eventID: \(eventID) addCurrentUser: \(addCurrentUser) existingUsers \(existingUsers) nonExistingUsers \(nonExistingUsers)")
         
         let ref = Database.database().reference().child("events").child(eventID)
         
-        
-        print("running func addUserIDsToEventRequests, inputs - userID: \(userIDs) currentUserID: \(currentUserID) existingUserIDs: \(existingUserIDs) eventID: \(eventID) addCurrentUser: \(addCurrentUser)")
+        var currentUserNames = [String]()
+        var allUsers = [String]()
+//        create a list of the current user names and IDs
+        for contact in existingUsers{
+            currentUserNames.append(contact.planrName)
+            allUsers.append(contact.userID)
+        }
+        var nonUserNames = [String]()
+//        create a list of the non user names
+        for contact in nonExistingUsers{
+            nonUserNames.append(contact.name)
+        }
         
         if addCurrentUser == true{
             
-            allUsers = currentUserID + userIDs + existingUserIDs
+            allUsers.insert(currentUserID, at: 0)
+            currentUserNames.insert(thisUsersName, at: 0)
             
             dbStore.collection("eventRequests").document(eventID).setData(["users" : allUsers, "currentUserNames" : currentUserNames, "nonUserNames": nonUserNames], merge: true)
             ref.child("invitedUsers").setValue(allUsers)
@@ -650,7 +670,6 @@ extension UIViewController{
         }
         else{
         
-        allUsers = userIDs + existingUserIDs
             dbStore.collection("eventRequests").document(eventID).setData(["users" : allUsers, "currentUserNames" : currentUserNames, "nonUserNames": nonUserNames], merge: true)
             ref.child("invitedUsers").setValue(allUsers)
             
@@ -663,7 +682,7 @@ extension UIViewController{
         var usersPhoneCode = String()
             
 ////    FOR TESTING ONLY!!
-    UserDefaults.standard.setValue("", forKey: "userPhoneNumber")
+//    UserDefaults.standard.setValue("", forKey: "userPhoneNumber")
         
     //    we need to get the user local country dial code prefix, we do this by pulling the users number and extracting it, we check if the users number isnt saved in their phone and pull it from Firebase
         
@@ -701,12 +720,13 @@ extension UIViewController{
         }
     }
     
-//function returns a clean phone number fron the dirty phone number used as an input
-        func cleanPhoneNumbers(phoneNumbers: String, completion: @escaping (_ returnedPhoneNumber: String) -> ()){
+//function returns a clean phone number fron the dirty phone number used as an input.
+//    1. if the number is a landline we complete with the text no
+    func cleanPhoneNumbers(phoneNumbers: String, landLineAllowed: Bool, completion: @escaping (_ returnedPhoneNumber: String) -> ()){
 //    now that we have corrected the phone number we get it again
-    print("running func cleanPhoneNumbers phoneNumbers \(phoneNumbers)")
+//    print("running func cleanPhoneNumbers phoneNumbers \(phoneNumbers) landLineAllowed \(landLineAllowed)")
             getUsersPhoneCode{ (numberReturned) in
-                print("cleanPhoneNumbers numberReturned \(numberReturned)")
+//                print("cleanPhoneNumbers numberReturned \(numberReturned)")
 //                initiate the phonekit
             let phoneNumberKit = PhoneNumberKit()
                 
@@ -715,14 +735,18 @@ extension UIViewController{
             let addedNumber = try phoneNumberKit.parse(phoneNumbers)
             let addedNumberString = phoneNumberKit.format(addedNumber, toType: .e164)
 //                if this worked, we complete with the numbers
-            print("cleanPhoneNumbers1: \(addedNumberString)")
+//            print("cleanPhoneNumbers1: \(addedNumberString) addedNumber.type \(addedNumber.type)")
                 
-            let usersNumber = try phoneNumberKit.parse(numberReturned)
-            let n = usersNumber.regionID
-            print("cleanPhoneNumbers - addedNumberString \(addedNumberString)")
-                
-            completion(addedNumberString)
-                
+//             we check if the number is a landline and remove it if it is
+                if addedNumber.type == PhoneNumberType(rawValue: "Fixed") && landLineAllowed == false{
+//                    print("cleanPhoneNumbers - addedNumberString \("no")")
+                        
+                    completion("No")
+                }
+                else{
+//                    print("cleanPhoneNumbers - addedNumberString \(addedNumberString)")
+                    completion(addedNumberString)
+                }
             }
             catch{
 //                2. the parsing did not work, therefore the number must be missing something, we get the users locale and add this to the number
@@ -733,7 +757,7 @@ extension UIViewController{
 //                let usersCountryCode = usersNumber.countryCode
 //                    we get the users country code, this is the region string
                 let n = usersNumber.regionID
-                print("cleanPhoneNumbers2 - region: \(n!) usersNumber \(usersNumber)")
+//                print("cleanPhoneNumbers2 - region: \(n!) usersNumber \(usersNumber)")
                     
 //                    we need to remove any non numeric characters from the phone number
                 let phoneNumberClean = phoneNumbers.components(separatedBy:CharacterSet.decimalDigits.inverted).joined(separator: "")
@@ -742,18 +766,26 @@ extension UIViewController{
 //                parse the phone number with the region added
                 let addedNumber = try phoneNumberKit.parse(phoneNumberClean, withRegion: n!)
                 let addedNumberString = phoneNumberKit.format(addedNumber, toType: .e164)
-                print("cleanPhoneNumbers2 - addedNumber \(addedNumber) - addedNumberString \(addedNumberString) n \(n)")
-                    
-//                    we complete with the newly added user
-                completion(addedNumberString)
+//                print("cleanPhoneNumbers2 - addedNumber \(addedNumber) - addedNumberString \(addedNumberString) n \(n) addedNumber.type \(addedNumber.type)")
+                        
+        //             we check if the number is a landline and remove it if it is
+                        if addedNumber.type == PhoneNumberType(rawValue: "Fixed") && landLineAllowed == false{
+//                            print("cleanPhoneNumbers - addedNumberString \("no")")
+                                
+                            completion("No")
+                        }
+                        else{
+//                            print("cleanPhoneNumbers - addedNumberString \(addedNumberString)")
+                            completion(addedNumberString)
+                        }
                 }
                 catch{
 //                   3. there was still an issue with the number, we return the number the user originally used
                     let phoneNumberClean = phoneNumbers.components(separatedBy:CharacterSet.decimalDigits.inverted).joined(separator: "")
                     
-                    print("cleanPhoneNumbers3 - this number wasn't parsed in the first two numberReturned:  \(phoneNumberClean)")
+//                    print("cleanPhoneNumbers3 - this number wasn't parsed in the first two numberReturned:  \(phoneNumberClean)")
                     
-                    completion(phoneNumberClean)
+                    completion("notRealNumber")
                 }
             }
             }
@@ -977,7 +1009,7 @@ extension UIViewController{
         let displayArray = nonExistingNameArray.joined(separator:",")
         
         // create the alert
-        let alert = UIAlertController(title: "Not all the friends you invited are Planr App users", message: "Would you like to invite \(displayArray) to Planr?", preferredStyle: UIAlertController.Style.alert)
+        let alert = UIAlertController(title: "Not all the friends you invited are Planr App users", message: "Would you like to invite \(displayArray) to Planr? (you will be able to amend the message and recipients before sending the message)", preferredStyle: UIAlertController.Style.alert)
         
         // add the actions (buttons)
         alert.addAction(UIAlertAction(title: "NO", style: UIAlertAction.Style.cancel, handler: { action in

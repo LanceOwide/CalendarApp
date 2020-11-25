@@ -370,8 +370,17 @@ extension NL_eventChooseDate: UICollectionViewDelegate, UICollectionViewDataSour
             else{
                 sections["Non User"] = 99
             }
-                       
+              print("indexPath.section \(indexPath.section) indexPath.row \(indexPath.row)")
+            
+            if arrayForEventResultsPageFinal.indices.contains([arrays[indexPath.section][indexPath.row]][0]){
+            
             cell.cellText.text = arrayForEventResultsPageFinal[arrays[indexPath.section][indexPath.row]][0] as? String
+            }
+            else{
+                print("something went wrong")
+                
+                self.dismiss(animated: true)
+            }
             
 //            if we assume the order of the user IDs and the user names are the same, we can use a search for the user name and its index as the index for the user ID, we only want to do this for the first two rows as the other two are not users
             
