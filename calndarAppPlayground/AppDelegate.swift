@@ -441,6 +441,11 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
             eventNotificationAppBackground = true
             print("user didnt select to auto respond")
             
+//            if the user is currently viewing a chat we need to remove the card
+            let currentViewController = topMostController()
+            if currentViewController?.isKind(of: ChatLogController.self) == true{
+                currentViewController?.dismiss(animated: false)
+            }
 
             let loadingNotification = MBProgressHUD.showAdded(to: (UIApplication.topViewController()?.view)!, animated: false)
             loadingNotification.label.text = "Loading event"
@@ -597,6 +602,10 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
         if currentViewController?.isKind(of: ChatLogController.self) == true{
             chatAlreadyOpen = true
         }
+//        if the event view controller is visible, we need to dismiss it before we pop the chat
+        if currentViewController?.isKind(of: NL_eventController.self) == true{
+            currentViewController?.dismiss(animated: false)
+        }
         
 //        set the new notification count for the event, pulling from the userdefaults and saving back to user defaults
         if let data = UserDefaults.standard.value(forKey:"notifications") as? Data {
@@ -640,12 +649,9 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
                         NotificationCenter.default.post(name: .chatNotificationTapped, object: nil)
                         
                         completionHandler()
-
                     }
-                     
                 }
         }
-        
         }}
 }
     

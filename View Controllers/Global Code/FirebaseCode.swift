@@ -448,26 +448,36 @@ extension UIViewController{
     
     //    MARK: section get any events the user has already been invited to, move them from temporary and adds them to permanant, it then deletes the temporary entries
     
+    
     func checkForPhoneNumberInvited(phoneNumber: String, completion: @escaping () -> Void){
         
         var fireStoreRef: DocumentReference? = nil
         
-        print("running func checkForPhoneNumberInvited, inputs: phoneNumber: \(phoneNumber)")
+        getUserName{ (usersName) in
+        
+        print("running func checkForPhoneNumberInvited, inputs: phoneNumber: \(phoneNumber) usersName \(usersName)")
         dbStore.collection("temporaryUserEventStore").whereField("phoneNumber", isEqualTo: phoneNumber).getDocuments { (querySnapshot, error) in
             if error != nil {
-                print("Error getting documents: \(error!)")
+                print("checkForPhoneNumberInvited Error getting documents: \(error!)")
+                completion()
             }
             else {
+                print("checkForPhoneNumberInvited there was data count\(querySnapshot!.documents.count)")
+//          if nothing has been returned we complete the check
+                if querySnapshot!.documents.count == 0{
+                  completion()
+                }
                 for document in querySnapshot!.documents {
                     let eventID = document.get("eventID") as! String
+                    print("checkForPhoneNumberInvited aanlysing event: eventID \(eventID)")
 //                    pull down the users name as it is shown in the temporaryUserEventStore, we need to remove this from the details list
                     let userCreatedName = document.get("name") as! String
                     let uid = Auth.auth().currentUser?.uid
                     //                    add the required info to the userEventStore
-                    fireStoreRef = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": uid!, "userName": registeredName]){
+                    fireStoreRef = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": uid!, "userName": usersName]){
                         error in
                         if let error = error {
-                            print("Error adding document: \(error)")
+                            print("checkForPhoneNumberInvited Error adding document: \(error) eventID \(eventID)")
                         } else {
 //                print("Document added with ID: \(ref!.documentID)")
                     let availabilityID = fireStoreRef!.documentID
@@ -482,16 +492,16 @@ extension UIViewController{
                             var userIDs = document.get("users") as! [String]
                             userIDs.append(uid!)
                             var currentUsersNames = document.get("currentUserNames") as! [String]
-                            currentUsersNames.append(registeredName)
+                            currentUsersNames.append(usersName)
                             
 //                            get the nonUserNames and remove the current users name
                             var nonUserNames = document.get("nonUserNames") as! [String]
                             if let index = nonUserNames.index(of: userCreatedName){
                                 nonUserNames.remove(at: index)
                             }
-
 //                            update the userIDs array
                             dbStore.collection("eventRequests").document(eventID).updateData(["users" : FieldValue.arrayUnion([uid!])])
+                            print("checkForPhoneNumberInvited adding data to the DB eventID \(eventID) uid! \(uid!) currentUsersNames \(currentUsersNames) newnonUserNames \(nonUserNames)")
 //                            update the current user names array
                             dbStore.collection("eventRequests").document(eventID).updateData(["currentUserNames" : FieldValue.arrayUnion(currentUsersNames)])
 //                            update the nonUsersName array names array
@@ -506,22 +516,21 @@ extension UIViewController{
                             self.availabilityAmendedNotification(userIDs: userIDs, availabilityDocumentID: availabilityID)
                         } else {
                             print("Document does not exist")
-                        }
-                    }
-                    }
-                                
-                    }
-                  completion()
+                        }}}}
                 }
-                
+                print("checkForPhoneNumberInvited completing")
+              completion()
             }
-            
         }}
+    }
     
     
     func checkForPhoneNumberInvitedArray(phoneNumber: String, completion: @escaping () -> Void){
         
         var fireStoreRef: DocumentReference? = nil
+        
+        
+        getUserName{ (usersName) in
         
         print("running func checkForPhoneNumberInvitedArray, inputs: phoneNumber: \(phoneNumber)")
         dbStore.collection("temporaryUserEventStore").whereField("phoneNumberList", arrayContains: phoneNumber).getDocuments { (querySnapshot, error) in
@@ -530,12 +539,15 @@ extension UIViewController{
             }
             else {
                 for document in querySnapshot!.documents {
+                    if querySnapshot!.documents.count == 0{
+                      completion()
+                    }
                     let eventID = document.get("eventID") as! String
 //                    pull down the users name as it is shown in the temporaryUserEventStore, we need to remove this from the details list
                     let userCreatedName = document.get("name") as! String
                     let uid = Auth.auth().currentUser?.uid
                     //                    add the required info to the userEventStore
-                    fireStoreRef = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": uid!, "userName": registeredName]){
+                    fireStoreRef = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": uid!, "userName": usersName]){
                         error in
                         if let error = error {
                             print("Error adding document: \(error)")
@@ -553,14 +565,13 @@ extension UIViewController{
                             var userIDs = document.get("users") as! [String]
                             userIDs.append(uid!)
                             var currentUsersNames = document.get("currentUserNames") as! [String]
-                            currentUsersNames.append(registeredName)
+                            currentUsersNames.append(usersName)
                             
 //                            get the nonUserNames and remove the current users name
                             var nonUserNames = document.get("nonUserNames") as! [String]
                             if let index = nonUserNames.index(of: userCreatedName){
                                 nonUserNames.remove(at: index)
                             }
-
 //                            update the userIDs array
                             dbStore.collection("eventRequests").document(eventID).updateData(["users" : FieldValue.arrayUnion([uid!])])
 //                            update the current user names array
@@ -582,12 +593,13 @@ extension UIViewController{
                     }
                                 
                     }
-                  completion()
                 }
-                
+                print("checkForPhoneNumberInvited completing")
+                completion()
             }
             
         }}
+    }
     
     //    deletes the entry for the phone number into the temporaryUserEventStore
     func deletePhoneNumberInvited(phoneNumber: String, completion: @escaping () -> Void){
@@ -629,6 +641,10 @@ extension UIViewController{
                     print("deleted temporary document")
                     
                     let documentID = document.documentID
+                    
+//                    FOR Testing REMOVE!!
+//                    docRefUserEventStore.document(documentID).updateData(["phoneNumber" : "", "phoneNumberList": ""])
+                    
                     
                     docRefUserEventStore.document(documentID).delete()
                 }}}

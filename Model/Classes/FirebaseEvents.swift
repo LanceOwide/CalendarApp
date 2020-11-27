@@ -80,5 +80,9 @@ struct firebaseEvents{
     
     static var accessToNotificationsDenied = "accessToNotificationsDenied"
     static var accessToNotificationsGranted = "accessToNotificationsGranted"
+    
+    
+//    something went wrong
+    static var somethingWentWrong = "somethingWentWrong"
   
 }

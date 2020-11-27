@@ -47,6 +47,7 @@ class NL_AddInvitees: UIViewController, UISearchResultsUpdating{
     var isFiltering = false
     var selectedContactPredicate: NSPredicate = NSPredicate.init()
     var searcchControllercontacts: UISearchController!
+    var keyboardFrame = CGRect()
     
 //    used to house only the contacts we want to show to the user
     var contactsSortedToShow = [contactList]()
@@ -65,6 +66,9 @@ class NL_AddInvitees: UIViewController, UISearchResultsUpdating{
 //        setup the page
         setupThePage()
         createNextButton()
+        
+//        function to setup the keyboard observers to move the content on the screen
+//        setupKeyboardObservers()
         
 //        access the users contacts
         AutoRespondHelper.getUserContacts(viewController: self){
@@ -252,7 +256,7 @@ class NL_AddInvitees: UIViewController, UISearchResultsUpdating{
         searcchControllercontacts.searchResultsUpdater = self
         searcchControllercontacts.obscuresBackgroundDuringPresentation = false
         searcchControllercontacts.searchBar.setValue("Done", forKey:"cancelButtonText")
-        definesPresentationContext = true
+//        definesPresentationContext = true
         topView.addSubview(searcchControllercontacts.searchBar)
         searcchControllercontacts.searchBar.leftAnchor.constraint(equalTo: topView.leftAnchor, constant: CGFloat(sideInset)).isActive = true
         searcchControllercontacts.searchBar.widthAnchor.constraint(equalToConstant: CGFloat(Int(screenWidth) - sideInset - sideInset)).isActive = true
@@ -265,8 +269,45 @@ class NL_AddInvitees: UIViewController, UISearchResultsUpdating{
         return containerView2
     }()
     
+//    func setupKeyboardObservers() {
+//        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow), name: UIResponder.keyboardDidShowNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+//    }
+//
+//    @objc func handleKeyboardWillShow(_ notification: Notification) {
+//
+////        we need to check if the keyboard is already the first responder, otherwise we will push the message of the screen again, this is being called when the viewload, we dont know how to stop this, so we check if there are no messages first
+//
+//        keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as AnyObject).cgRectValue
+////        set the global variable for the keyboard
+//        print("handleKeyboardWillShow is running keyboardFrame!.height \(keyboardFrame.height)")
+//
+//
+//
+//
+////        self.view.frame.origin.y = -keyboardFrame.height
+//
+////        }
+////        else{
+////            print("handleKeyboardWillShow - keyboardIsActive = true")
+////        }
+//    }
+//
+//
+//    @objc func handleKeyboardWillHide(_ notification: Notification) {
+//        let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
+//
+////        self.view.endEditing(true)
+//
+//        self.view.frame.origin.y = 0
+//
+//    }
+//
+    
+    
 //    what to do when the search results are updating
     func updateSearchResults(for searchController: UISearchController) {
+        print("running func updateSearchResults")
 //        check that the user has typed some text
                 guard let text = searcchControllercontacts.searchBar.text else { return }
                 if text == ""{

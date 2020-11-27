@@ -1642,8 +1642,11 @@ class AutoRespondHelper {
                          
                      }))
                      
+                    DispatchQueue.main.async {
+                        
                      // show the alert
                     viewController.present(alert, animated: true, completion: nil)
+                    }
 
                  }
                  if granted{
@@ -1981,7 +1984,7 @@ class AutoRespondHelper {
             print("running func getUserName")
                 
             let userName = UserDefaults.standard.string(forKey: "name") ?? ""
-    //        print("userName \(userName)")
+            print("getUserName userName \(userName)")
             
             if userName == "" {
                 
@@ -2004,6 +2007,7 @@ class AutoRespondHelper {
                                         
                                         UserDefaults.standard.set(name, forKey: "name")
                                         
+                                        print("getUserName from firebase name \(name)")
                                         completion(name)
                                     }
                     } }}
@@ -2101,6 +2105,9 @@ class AutoRespondHelper {
              for users in userID{
             
             let filteredAvailability = currentUserSelectedAvailability.filter { $0.uid == users}
+                if filteredAvailability.count == 0{
+                }
+                else{
                 let documentID = filteredAvailability[0].documentID
                 if documentID == ""{
                     print("something went wrong in deleteuserEventLinkArray documentID is blank for user \(users)")
@@ -2120,6 +2127,7 @@ class AutoRespondHelper {
         
             }
             }
+             }
         }
     
     

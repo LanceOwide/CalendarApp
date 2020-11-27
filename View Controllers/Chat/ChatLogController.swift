@@ -79,10 +79,8 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         textField.layer.masksToBounds = true
         textField.layer.borderColor = UIColor.lightGray.cgColor
         textField.layer.borderWidth = 3
+        textField.textContainerInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
         textField.layer.cornerRadius = 15
-        
- 
-//        textField.delegate = self
         
         return textField
     }()

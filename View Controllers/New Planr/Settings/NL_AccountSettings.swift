@@ -572,7 +572,7 @@ class NL_AccountSettings: UIViewController {
                     return
                 }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected);
             
-                let alertPayload = AlertPayload(title: "Update Issue!", titleColor: UIColor.red, message: "We are having an issue contacting our server, if this continues, please contact us", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
+                let alertPayload = AlertPayload(title: "Update Issue!", titleColor: UIColor.red, message: "There was an issue updating your phone number, if this continues, please contact us", messageColor: MyVariables.colourPlanrGreen, buttons: [button], backgroundColor: UIColor.clear, inputTextHidden: true)
             
                 utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
                 
@@ -797,6 +797,7 @@ class NL_AccountSettings: UIViewController {
                         
                         self.documentIDVar = document.documentID
                         self.phoneNumbersArray = phoneNumbers
+                        print("phoneNumbersArray \(self.phoneNumbersArray)")
                         
                         
                     }}}}}
@@ -804,7 +805,7 @@ class NL_AccountSettings: UIViewController {
     
 //    fucntion to update the users phone number once they the numbmer has been validated. only one number should be updated at a time
     func updateThePhoneNumbers(phoneNumber: String, first: Bool, secondary: Bool){
-        print("running func updateThePhoneNumbers phoneNumber \(phoneNumber) first \(first) secondary \(secondary) documentIDVar \(documentIDVar)")
+        print("running func updateThePhoneNumbers phoneNumber \(phoneNumber) first \(first) secondary \(secondary) documentIDVar \(documentIDVar) phoneNumbersArray \(phoneNumbersArray)")
      
 //        1. based on the phone number the user has updated we update the array number
         if first == true{
@@ -819,11 +820,13 @@ class NL_AccountSettings: UIViewController {
             
         }
         else if secondary == true{
-//            we remove the first array number
-            phoneNumbersArray.remove(at: 1)
+//            if the user already had a secondary number we remove it
+            if phoneNumbersArray.count == 2{
+                phoneNumbersArray.remove(at: 1)
+            }
             
 //            we add back the new number
-            phoneNumbersArray.insert(phoneNumber, at: 0)
+            phoneNumbersArray.insert(phoneNumber, at: 1)
         }
         
 //        2. now the array has been updated we push the array to the database

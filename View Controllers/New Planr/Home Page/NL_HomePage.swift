@@ -1856,8 +1856,7 @@ class InnerCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColle
                         let events = confirmedEventList[selectedDate! - 1]
         //        1.1 get the current event
                     guard let event = events[collectionView.tag] else{
-                        CoreDataCode().somethingWentWrong(eventID: "", eventInfo: false, availabilityInfo: false, loginfo: "The user tried to select an event that didnt exist", viewController: NL_HomePage.init())
-                        
+                        CoreDataCode().somethingWentWrong(eventID: "", eventInfo: true, availabilityInfo: false, loginfo: "The user tried to select an event that didnt exist on the home page", currentViewController: NL_HomePage.init(), message: "We are updating the event you were viewing, please try again shortly. If this continues, please contact us at support@planr.me", segueStoryBoardID: "NL_HomePage", segueViewControllerID: "NL_HomePage")
                         return
                             }
         //        1.2 we combine the current user and non user names

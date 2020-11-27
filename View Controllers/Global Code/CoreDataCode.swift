@@ -1836,41 +1836,34 @@ func removeTheAvailabilityNotifications(){
 
     }
     
-//    function to handle any errors with the data for an event.
-//    this function takes in an eventID and eventInfo or availabilityBool and deletes either all the event data or availability data, to then download it again from the sever
-    func somethingWentWrong(eventID: String, eventInfo: Bool, availabilityInfo: Bool, loginfo: String, viewController: UIViewController){
+//    this function takes posts that there was an issue, as an event, and give us as much data about the issue as possible, it then sends the user back to the specified viewcontroller
+    func somethingWentWrong(eventID: String, eventInfo: Bool, availabilityInfo: Bool, loginfo: String, currentViewController: UIViewController, message: String, segueStoryBoardID: String, segueViewControllerID: String){
         print("running func somethingWentWrong")
         Crashlytics.crashlytics().log("running func somethingWentWrong")
         Crashlytics.crashlytics().log("running func somethingWentWrong - logs sent to func - loginfo \(loginfo)")
+        Analytics.logEvent(firebaseEvents.somethingWentWrong, parameters: ["loginfo": loginfo])
         
 //        1. show the user a notification tell them there was an issue
         let utils = Utils()
         let button1 = AlertButton(title: "Ok", action: {
+            currentViewController.dismiss(animated: true)
 //            send the user back to the homepage
-            let sampleStoryBoard : UIStoryboard = UIStoryboard(name: "NL_HomePage", bundle:nil)
-            let homeView  = sampleStoryBoard.instantiateViewController(withIdentifier: "NL_HomePage") as! NL_HomePage
+            let sampleStoryBoard : UIStoryboard = UIStoryboard(name: segueStoryBoardID, bundle:nil)
+            let homeView  = sampleStoryBoard.instantiateViewController(withIdentifier: segueViewControllerID)
             self.navigationController?.pushViewController(homeView, animated: true)
             
             }, titleColor: MyVariables.colourPlanrGreen, backgroundColor: MyVariables.colourSelected)
         
-        let alertPayload = AlertPayload(title: "Something Went Wrong!", titleColor: UIColor.red, message: "Oops, something went wrong, please try again later, we are working to fix it!", messageColor: MyVariables.colourPlanrGreen, buttons: [button1], backgroundColor: UIColor.clear, inputTextHidden: true)
+        let alertPayload = AlertPayload(title: "Something Went Wrong!", titleColor: UIColor.red, message: message, messageColor: MyVariables.colourPlanrGreen, buttons: [button1], backgroundColor: UIColor.clear, inputTextHidden: true)
         
         if self.presentedViewController == nil {
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
+            utils.showAlert(payload: alertPayload, parentViewController: currentViewController, autoDismiss: false, timeLag: 0.0, hideInput: true)
         }
         else {
             self.dismiss(animated: false, completion: nil)
-            utils.showAlert(payload: alertPayload, parentViewController: self, autoDismiss: false, timeLag: 0.0, hideInput: true)
+            utils.showAlert(payload: alertPayload, parentViewController: currentViewController, autoDismiss: false, timeLag: 0.0, hideInput: true)
         }
         
-        
-//        trigger to set the funtion to delete any current data for the event and then download the new data
-        if eventInfo == true{
-            
-        }
-        if availabilityInfo == true{
-   
-        }
     }
     
 //    this function runs everytime the user opens the app, it checks that the data in our database appears consistent, if not corrective measures are preformed. This runs as part of the homepage opening and should be run last after all the data has been loaded into CoreData checks are as follows:

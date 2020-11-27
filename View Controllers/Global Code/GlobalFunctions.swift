@@ -464,45 +464,46 @@ extension UIViewController{
 //    if we fund the number, we complete the function immediatley
 //    if not, we loop through and only complete once we have looped through all the phone numbers
     func getUserID(contact: contactList, completionHandler: @escaping (_ userExists: Bool, _ contact: contactList, _ userID: String, _ userName: String) -> ()){
-        
         print("running func getUserID inputs contact \(contact)")
-        
 //        track the number of loops we have been through
         var n = 0
         let totalCount = contact.phoneNumberList.count
+        var isUser = false
+        var myAddedUserID = ""
+        var myAddedUserName = contact.name
         
         for phoneNumber in contact.phoneNumberList{
-          n = n + 1
+            print("getUserID - phoneNumber.value.stringValue \(phoneNumber.value.stringValue)")
             dbStore.collection("users").whereField("phoneNumbers", arrayContains: phoneNumber.value.stringValue).getDocuments { (querySnapshot, error) in
             
                 if error != nil {
-                    print("there was an error")
+                    n = n + 1
+                    print("getUserID - there was an error")
                     if n == totalCount{
-                        completionHandler(false, contact, "", contact.name)
+                        completionHandler(isUser, contact, myAddedUserID, myAddedUserName)
                     }
                 }
                 else {
-                    print("querySnapshot!.isEmpty: \(querySnapshot!.isEmpty)")
+                    print("getUserID - querySnapshot!.isEmpty: \(querySnapshot!.isEmpty)")
                     
                     if querySnapshot!.isEmpty{
+                        n = n + 1
                         if n == totalCount{
-                            completionHandler(false, contact, "", contact.name)
+                            completionHandler(isUser, contact, myAddedUserID, myAddedUserName)
                         }
                     }
                     else{
 //                        we foudn the user, we get their infromation and complete the function
                         for document in querySnapshot!.documents {
-                        let myAddedUserID = document.get("uid") as! String
-                        let myAddedUserName = document.get("name") as! String
-                            completionHandler(true, contact, myAddedUserID, myAddedUserName)
+                        myAddedUserID = document.get("uid") as! String
+                        myAddedUserName = document.get("name") as! String
+                            isUser = true
+                            n = n + 1
+                            if n == totalCount{
+                            completionHandler(isUser, contact, myAddedUserID, myAddedUserName)
+                            }
                         }
-                    }
-                }
-                
-            }
-            
-        }
-    }
+                    }}}}}
     
     
     func addNonExistingUsers2(contacts: [contactList], eventID: String){
@@ -548,8 +549,13 @@ extension UIViewController{
             else{
                 respondedString = "nr"
             }
+//            we need to decide which name to use for the upload
+            var name = contact[n].planrName
+            if name == ""{
+                name = contact[n].name
+            }
         
-            refFireStore = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": contact[n].userID, "userName": contact[n].planrName, "userResponded": false, "responded": respondedString]){ err in
+            refFireStore = dbStore.collection("userEventStore").addDocument(data: ["eventID": eventID, "uid": contact[n].userID, "userName": name, "userResponded": false, "responded": respondedString]){ err in
             if let err = err {
                 print("Error adding document: \(err)")
                 semaphore.signal()
@@ -593,6 +599,7 @@ extension UIViewController{
          for users in userID{
         
         let filteredAvailability = currentUserSelectedAvailability.filter { $0.uid == users}
+            if filteredAvailability.count != 0{
             let documentID = filteredAvailability[0].documentID
             if documentID == ""{
                 print("something went wrong in deleteuserEventLinkArray documentID is blank for user \(users)")
@@ -612,6 +619,10 @@ extension UIViewController{
     
         }
         }
+            else{
+//                do not do anything
+            }
+         }
     }
     
     
@@ -785,7 +796,7 @@ extension UIViewController{
                     
 //                    print("cleanPhoneNumbers3 - this number wasn't parsed in the first two numberReturned:  \(phoneNumberClean)")
                     
-                    completion("notRealNumber")
+                    completion("notRealNumber: \(phoneNumberClean)")
                 }
             }
             }
@@ -1165,6 +1176,8 @@ func reminderPopUp(eventID: String, userID: String, userName: String){
             completion(arrayForEventResultsPageAvailability, arrayOfUserDocumentIDs)
         }
     }
+    
+    
     
         func addNonExistentUsers( eventID: String, noResultArray: Array<Any>, completion: @escaping (_ arrayForEventResultsPage: [[Any]], _ nonExistentNames: Array<Any>, _ nonExistentPhoneNumbers: Array<Any>) -> Void){
         

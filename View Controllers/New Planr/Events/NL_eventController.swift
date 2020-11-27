@@ -1370,6 +1370,7 @@ extension NL_eventController: UICollectionViewDelegate, UICollectionViewDataSour
                     
 //                    we want to check if the user has responded and if not display the hourglass
                     let availability = serialiseAvailabilitywUser(eventID: currentUserSelectedEvent.eventID, userID: currentUserId)
+                    print("cellForItem: availability.count \(availability.count) availability \(availability)")
                     
 // get the users image
                         let imageList = CoreDataCode().fetchImage(uid: currentUserId)

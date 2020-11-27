@@ -212,7 +212,7 @@ class NL_editAvailability: UIViewController {
 //            check that the user has an availability for the event if not we run somehting went wrong
             if t.count == 0{
                 completionHandler()
-                somethingWentWrong(eventID: currentUserSelectedEvent.eventID, eventInfo: true, availabilityInfo: true, loginfo: "running func - createArrayIfUserHasntResponded - no availability returned for the user", viewController: self)
+                somethingWentWrong(eventID: currentUserSelectedEvent.eventID, eventInfo: true, availabilityInfo: true, loginfo: "running func - createArrayIfUserHasntResponded - no availability returned for the user \(user) eventID \(currentUserSelectedEvent.eventID)", currentViewController: self,message: "We are updating the event you were viewing, please try again shortly. If this continues, please contact us at support@planr.me", segueStoryBoardID: "NL_HomePage", segueViewControllerID: "NL_HomePage")
                 
             }
             else{
