@@ -1124,7 +1124,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 2.2004;
+				MARKETING_VERSION = 2.2005;
 				PRODUCT_BUNDLE_IDENTIFIER = "Lance-Owide.calndarAppPlayground";
 				PRODUCT_NAME = Planr;
 				SWIFT_VERSION = 4.2;
@@ -1148,7 +1148,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 2.2004;
+				MARKETING_VERSION = 2.2005;
 				PRODUCT_BUNDLE_IDENTIFIER = "Lance-Owide.calndarAppPlayground";
 				PRODUCT_NAME = Planr;
 				SWIFT_VERSION = 4.2;
