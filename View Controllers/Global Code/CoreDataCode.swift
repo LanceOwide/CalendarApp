@@ -423,7 +423,6 @@ extension UIViewController{
 //                    remove the event notification from the event notification table
                     AutoRespondHelper.nonRespondedEventsAuto()
                     
-                    
                     AutoRespondHelper.checkValidityOfCalendareevnt(eventID: i.key)
                     
                   NotificationCenter.default.post(name: .newDataLoaded, object: nil)

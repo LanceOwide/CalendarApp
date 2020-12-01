@@ -23,6 +23,7 @@ class AutoRespondHelper {
     
    static func sendUserAvailabilityAuto(eventID: String, completion: @escaping()-> Void){
     print("running func sendUserAvailabilityAuto")
+    Crashlytics.crashlytics().log("running func sendUserAvailabilityAuto inputs - eventIDs: \(eventID) user \(user ?? "")")
     
     if checkCalendarStatusAuto() == false{
         print("sendUserAvailabilityAuto - checkCalendarStatusAuto = false")
@@ -33,7 +34,8 @@ class AutoRespondHelper {
             
             let docRefUserEventStore = dbStore.collection("userEventStore")
             
-    docRefUserEventStore.whereField("eventID", isEqualTo: eventID).whereField("uid", isEqualTo: user).getDocuments() { (querySnapshot, err) in
+//        get the users availability
+        docRefUserEventStore.whereField("eventID", isEqualTo: eventID).whereField("uid", isEqualTo: user ?? "").getDocuments() { (querySnapshot, err) in
                 
                 print("querySnapshot: \(String(describing: querySnapshot))")
                 print("is querySnapshot empty \(String(describing: querySnapshot?.isEmpty))")
@@ -42,8 +44,10 @@ class AutoRespondHelper {
                     print("Error getting documents: \(err)")}
                     
                 else{
+                    Crashlytics.crashlytics().log("running func sendUserAvailabilityAuto document count \(querySnapshot!.documents.count)")
                     
                     for document in querySnapshot!.documents{
+                        
                         
                     let documentID = document.documentID
                         getEventInformation3Auto(eventID: eventID, userEventStoreID: documentID) { (userEventStoreID, eventSecondsFromGMT, startDates, endDates, users) in
@@ -86,6 +90,7 @@ class AutoRespondHelper {
     
     //    function used to pull down the information of the event stored in the Firebase database
    static func getEventInformation3Auto(  eventID:String, userEventStoreID: String, completion: @escaping (_ userEventStoreID: String, _ eventSecondsFromGMT: Int, _ startDates: [String], _ endDates: [String],_ userIDs: [String]) -> Void) {
+    Crashlytics.crashlytics().log("running func getEventInformation3Auto inputs - eventIDs: \(eventID) user \(user) userEventStoreID \(userEventStoreID)")
         
         print("running func getEventInformation3Auto inputs - eventID: \(eventID)")
         
@@ -113,6 +118,7 @@ class AutoRespondHelper {
                     let startDates = document!.get("startDates") as! [String]
                     let users = document!.get("users") as! [String]
                     daysOfTheWeek = document!.get("daysOfTheWeek") as! [Int]
+                    Crashlytics.crashlytics().log("running func getEventInformation3Auto completion - userEventStoreID \(userEventStoreID), eventSecondsFromGMT \(eventSecondsFromGMT), startDates \(startDates), endDates \(endDates), users \(users)")
        
                         completion( userEventStoreID, eventSecondsFromGMT, startDates, endDates, users)
                     }
@@ -189,6 +195,9 @@ class AutoRespondHelper {
    
     static func compareTheEventTimmings3Auto(datesBetweenChosenDatesStart: [String], datesBetweenChosenDatesEnd: [String], startDatesOfTheEvents: Array<Date>, endDatesOfTheEvents: Array<Date>, completion: @escaping (_ finalAvailabilityArray: Array<Int>)-> Void){
 //            print("running func compareTheEventTimmings3Auto inputs - datesBetweenChosenDatesStart:\(datesBetweenChosenDatesStart) datesBetweenChosenDatesEnd: \(datesBetweenChosenDatesEnd) startDatesOfTheEvents:\(startDatesOfTheEvents) endDatesOfTheEvents: \(endDatesOfTheEvents)")
+        
+        Crashlytics.crashlytics().log("running func compareTheEventTimmings3Auto inputs - datesBetweenChosenDatesStart: \(datesBetweenChosenDatesStart) datesBetweenChosenDatesEnd \(datesBetweenChosenDatesEnd) startDatesOfTheEvents \(startDatesOfTheEvents) endDatesOfTheEvents \(endDatesOfTheEvents)")
+        
             let numeberOfDatesToCheck = datesBetweenChosenDatesStart.count - 1
             print("numeberOfDatesToCheck: \(numeberOfDatesToCheck)")
             let numberOfEventDatesToCheck = startDatesOfTheEvents.count - 1
@@ -278,12 +287,15 @@ class AutoRespondHelper {
                     
                 }}
 //            print(finalAvailabilityArray)
+        Crashlytics.crashlytics().log("running func compareTheEventTimmings3Auto completion finalAvailabilityArray \(finalAvailabilityArray)")
              completion(finalAvailabilityArray)
         }
     
     //    commits the user availability data to the userEventStore and also adds the notifications to the availabilityNotificationStore
         static func commitUserAvailbilityDataAuto(userEventStoreID: String, finalAvailabilityArray2: [Int], eventID: String, completion: @escaping () -> Void){
         print("running func commitUserAvailbilityDataAuto inputs - userEventStoreID: \(userEventStoreID) finalAvailabilityArray2: \(finalAvailabilityArray2) eventID: \(eventID)")
+            
+            Crashlytics.crashlytics().log("running func commitUserAvailbilityDataAuto inputs - userEventStoreID: \(userEventStoreID) finalAvailabilityArray2: \(finalAvailabilityArray2) eventID: \(eventID)")
         let dbStoreInd = Firestore.firestore()
     
             dbStoreInd.collection("userEventStore").document(userEventStoreID).setData(["userAvailability" : finalAvailabilityArray2,"userResponded": true], merge: true)
@@ -296,6 +308,8 @@ class AutoRespondHelper {
     
 //    commits the user availability data to the users CD, this means they don't have to pull it down from the DB
     static func commitUserAvailabilityDataCD(userEventStoreID: String, finalAvailabilityArray2: [Int], eventID: String, calendarEventID: String, completion: @escaping () -> Void){
+        
+        Crashlytics.crashlytics().log("running func commitUserAvailabilityDataCD inputs - userEventStoreID: \(userEventStoreID) calendarEventID: \(calendarEventID) eventID: \(eventID) finalAvailabilityArray2 \(finalAvailabilityArray2)")
         
         //                            before we commit anything to the DB we should check if it alredy exists and remove it if it does
         if let index = CDAvailability.index(where: {$0.documentID == userEventStoreID}){
@@ -378,7 +392,7 @@ class AutoRespondHelper {
     //    adds, deletes and amends events based on the userEventNotifications table in FireStore
         static func CDRetrieveUpdatedEventsAuto(eventIDs: [String: Any], completion: @escaping () -> Void){
             print("running func CDRetrieveUpdatedEventsAuto inputs - eventIDs: \(eventIDs)")
-            Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - eventIDs: \(eventIDs)")
+            Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - eventIDs: \(eventIDs) user \(user)")
 //            testing using dispatch to ensure all actions are run asynchronously
             let myGroup = DispatchGroup()
             
@@ -393,7 +407,6 @@ class AutoRespondHelper {
                 myGroup.enter()
                 Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group enter \(n)")
                 let notification = i.value as! String
-                n = n + 1
                 print("CDRetrieveUpdatedEventsAuto - event number \(n)")
                 
                 if notification == "delete" || notification == "Delete"{
@@ -410,6 +423,7 @@ class AutoRespondHelper {
                         NotificationCenter.default.post(name: .newDataLoaded, object: nil)
 //                        once the notification has been removed, we tell the loop to go onto the next
                         Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                        n = n + 1
                         myGroup.leave()
   
                     }
@@ -434,6 +448,7 @@ class AutoRespondHelper {
                             
 //                        once the notification has been removed, we tell the loop to go onto the next
                             Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                            n = n + 1
                             myGroup.leave()
                             
                             }
@@ -457,6 +472,7 @@ class AutoRespondHelper {
                         NotificationCenter.default.post(name: .newDataLoaded, object: nil)
 //                        once the notification has been removed, we tell the loop to go onto the next
                         Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                            n = n + 1
                             myGroup.leave()
                                                         
                                                     }
@@ -480,6 +496,7 @@ class AutoRespondHelper {
                             NotificationCenter.default.post(name: .newDataLoaded, object: nil)
 //                        once the notification has been removed, we tell the loop to go onto the next
                         Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                                    n = n + 1
                                     myGroup.leave()
                                     
                                 }
@@ -497,6 +514,8 @@ class AutoRespondHelper {
                     
                     AutoRespondHelper.fetchUsersProfileImageAuto(uid: i.key){
                         self.removeSignleEventNotificationsAuto(eventID: i.key){
+                            Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                            n = n + 1
                         myGroup.leave()
                         }
                     }
@@ -511,6 +530,8 @@ class AutoRespondHelper {
                     AutoRespondHelper.fetchEventImageAuto(eventID: i.key){
                         NotificationCenter.default.post(name: .newDataLoaded, object: nil)
                         self.removeSignleEventNotificationsAuto(eventID: i.key){
+                            Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                            n = n + 1
                         myGroup.leave()
                         }
                     }
@@ -524,6 +545,7 @@ class AutoRespondHelper {
                     
 //                    we still need to leave the group, even if nothing happens
                     Crashlytics.crashlytics().log("running func CDRetrieveUpdatedEventsAuto inputs - my group leave \(n)")
+                    n = n + 1
                     myGroup.leave()
                     
                 }
@@ -543,8 +565,8 @@ class AutoRespondHelper {
         print("running func - removeSignleEventNotificationsAuto inputs eventID \(eventID)")
         Crashlytics.crashlytics().log("running func - removeSignleEventNotificationsAuto inputs eventID \(eventID)")
         if user == nil{
-            completion()
             Crashlytics.crashlytics().log("removeSignleEventNotificationsAuto - user = nil")
+            completion()
         }
         else{
             dbStore.collection("userEventUpdates").document(user!).updateData([eventID : FieldValue.delete()]) { err in
@@ -564,6 +586,7 @@ class AutoRespondHelper {
         //    function to retrieve single event from Firebase
         static func CDRetrieveSinglEventsFBAuto(eventID: String, completion: @escaping (_ numberOfDates: [Int]) -> Void){
 
+//            1. retrieve specific event from FB using the eventID
                 print("running func CDRetrieveSinglEventsFB input - eventID: \(eventID)")
             dbStore.collection("eventRequests").document(eventID).getDocument{ (documentEventData, error) in
                     if error != nil {
@@ -577,6 +600,7 @@ class AutoRespondHelper {
                         }
                         else{
                             
+//                            if the event already exists we want to remove it from CD to ensure we do not get duplication
                             if let index = CDEevents.index(where: {$0.eventID == documentEventData!.documentID}){
                                 context.delete(CDEevents[index])
                                 CDEevents.remove(at: index)
@@ -800,6 +824,7 @@ class AutoRespondHelper {
     //            generate not responded array
                 let notRespondedArray = noResultArrayCompletion2Auto(numberOfDatesInArray: currentAvailabilty).noResultsArray
                 
+//                retrieve the availabiltiy for each user
                dbStore.collection("userEventStore").whereField("eventID", isEqualTo: currentEventID).getDocuments { (querySnapshot, error) in
                        if error != nil {
                            print("Error getting documents: \(error!)")
@@ -813,7 +838,7 @@ class AutoRespondHelper {
                             completion()
                            }
                            else{
-                            
+//                            loop through each document of availability
                             for documentEventData in querySnapshot!.documents{
                                 
     //                            before we commit anything to the DB we should check if it alredy exists and remove it if it does
@@ -1370,6 +1395,7 @@ class AutoRespondHelper {
         }
     
    static func removeSingleAvailabilityNotificationsAuto(documentID: String){
+    Crashlytics.crashlytics().log("running func removeSingleAvailabilityNotificationsAuto documentID \(documentID)")
         
         print("running func - removeSingleAvailabilityNotifications")
         if user == nil{
@@ -1379,8 +1405,10 @@ class AutoRespondHelper {
         dbStore.collection("userAvailabilityUpdates").document(user!).updateData([documentID : FieldValue.delete()]) { err in
             if let err = err {
                 print("Error removing document: \(err)")
+                Crashlytics.crashlytics().log("running func removeSingleAvailabilityNotificationsAuto completed with error \(err)")
             } else {
                 print("Document successfully removed!")
+                Crashlytics.crashlytics().log("running func removeSingleAvailabilityNotificationsAuto completed")
             }}
         }
     }
@@ -1601,6 +1629,8 @@ class AutoRespondHelper {
 //    get access to the users contacts
     static func getUserContacts(viewController: UIViewController, completion: @escaping () -> Void){
              print("Attempting to fetch the contacts")
+        Crashlytics.crashlytics().log("running func getUserContacts inputs - viewController: \(viewController)")
+        
              
              contacts.removeAll()
 
@@ -1634,6 +1664,7 @@ class AutoRespondHelper {
                          
                          if UIApplication.shared.canOpenURL(settingsUrl) {
                          UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                            Crashlytics.crashlytics().log("running func getUserContacts user sent to the settings page")
                              print("Settings opened: \(success)") // Prints true
                          })}
                          
@@ -1643,6 +1674,7 @@ class AutoRespondHelper {
                      }))
                      
                     DispatchQueue.main.async {
+                        Crashlytics.crashlytics().log("running func getUserContacts access denied shown")
                         
                      // show the alert
                     viewController.present(alert, animated: true, completion: nil)
@@ -1743,6 +1775,7 @@ class AutoRespondHelper {
                         
                         if UIApplication.shared.canOpenURL(settingsUrl) {
                         UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                            Crashlytics.crashlytics().log("running func getUserContacts user sent to the settings page")
                             print("Settings opened: \(success)") // Prints true
                         })}
                         
@@ -1751,8 +1784,11 @@ class AutoRespondHelper {
                         
                     }))
                     
+                    DispatchQueue.main.async {
+                        Crashlytics.crashlytics().log("running func getUserContacts access denied shown")
                     // show the alert
                    viewController.present(alert, animated: true, completion: nil)
+                    }
         
                  }
              }
