@@ -256,14 +256,12 @@ class NL_editEventInvitees: UIViewController, UISearchResultsUpdating {
                 searcchControllercontacts = UISearchController(searchResultsController: nil)
                 searcchControllercontacts.searchResultsUpdater = self
                 searcchControllercontacts.obscuresBackgroundDuringPresentation = false
-                definesPresentationContext = true
+                searcchControllercontacts.searchBar.setValue("Done", forKey:"cancelButtonText")
                 topView.addSubview(searcchControllercontacts.searchBar)
                 searcchControllercontacts.searchBar.leftAnchor.constraint(equalTo: topView.leftAnchor, constant: CGFloat(sideInset)).isActive = true
                 searcchControllercontacts.searchBar.widthAnchor.constraint(equalToConstant: CGFloat(Int(screenWidth) - sideInset - sideInset)).isActive = true
                 searcchControllercontacts.searchBar.topAnchor.constraint(equalTo: topView.topAnchor, constant: CGFloat(separatorHeight*5)).isActive = true
                 searcchControllercontacts.searchBar.heightAnchor.constraint(equalToConstant: CGFloat(textBoxHeight)).isActive = true
-        //        tableViewContacts.tableHeaderView = searcchControllercontacts.searchBar
-        //        searcchControllercontacts.searchBar.barTintColor = UIColor.white
                 
                 
                 return containerView2
@@ -344,7 +342,6 @@ class NL_editEventInvitees: UIViewController, UISearchResultsUpdating {
                             contactsFiltered = contactsSorted
                         }
                         else{
-        //                    searchController.obscuresBackgroundDuringPresentation = false
                             isFiltering = true
                             
                             filterContentForSearchText(text)

@@ -42,6 +42,10 @@ import FirebaseStorage
         IQKeyboardManager.shared.enable = true
         
         IQKeyboardManager.shared.disabledDistanceHandlingClasses.append(ChatLogController.self)
+        IQKeyboardManager.shared.disabledDistanceHandlingClasses.append(NL_AddInvitees.self)
+        
+        IQKeyboardManager.shared.disabledToolbarClasses.append(NL_AddInvitees.self)
+
 
         
         resetNotificationCount()

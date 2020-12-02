@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 class NL_AddInvitees: UIViewController, UISearchResultsUpdating{
     
     
@@ -64,6 +63,7 @@ class NL_AddInvitees: UIViewController, UISearchResultsUpdating{
                 } else {
                     // Fallback on earlier versions
                 }
+        
         
 //        setup the page
         setupThePage()
@@ -200,7 +200,7 @@ class NL_AddInvitees: UIViewController, UISearchResultsUpdating{
     //    setup the inputs for the detials
     lazy var inputBottomView: UIView = {
         
-        let textBoxHeight = 50
+        let textBoxHeight = 56
         let sideInset = 16
         let sideInsetIcon = 24
         let separatorHeight = 1
@@ -257,16 +257,15 @@ class NL_AddInvitees: UIViewController, UISearchResultsUpdating{
         
         searcchControllercontacts = UISearchController(searchResultsController: nil)
         searcchControllercontacts.searchResultsUpdater = self
+        searcchControllercontacts.hidesNavigationBarDuringPresentation = false
         searcchControllercontacts.obscuresBackgroundDuringPresentation = false
         searcchControllercontacts.searchBar.setValue("Done", forKey:"cancelButtonText")
 //        definesPresentationContext = true
         topView.addSubview(searcchControllercontacts.searchBar)
         searcchControllercontacts.searchBar.leftAnchor.constraint(equalTo: topView.leftAnchor, constant: CGFloat(sideInset)).isActive = true
-        searcchControllercontacts.searchBar.widthAnchor.constraint(equalToConstant: CGFloat(Int(screenWidth) - sideInset - sideInset)).isActive = true
+        searcchControllercontacts.searchBar.rightAnchor.constraint(equalTo: topView.rightAnchor, constant: -CGFloat(sideInset)).isActive = true
         searcchControllercontacts.searchBar.topAnchor.constraint(equalTo: topView.topAnchor, constant: CGFloat(separatorHeight*5)).isActive = true
         searcchControllercontacts.searchBar.heightAnchor.constraint(equalToConstant: CGFloat(textBoxHeight)).isActive = true
-//        tableViewContacts.tableHeaderView = searcchControllercontacts.searchBar
-//        searcchControllercontacts.searchBar.barTintColor = UIColor.white
         
         
         return containerView2
@@ -309,7 +308,6 @@ class NL_AddInvitees: UIViewController, UISearchResultsUpdating{
                     contactsFiltered = contactsSorted
                 }
                 else{
-//                    searchController.obscuresBackgroundDuringPresentation = false
                     isFiltering = true
                     
                     filterContentForSearchText(text)

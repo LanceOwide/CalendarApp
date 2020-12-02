@@ -215,7 +215,7 @@ class NL_createEventSelectDates: UIViewController {
                 calendarTitleArray.append(loopMonthIndex - 1)
             
             completion()
-            print("calendarArray2 \(calendarArray2)")
+//            print("calendarArray2 \(calendarArray2)")
         }
         }
     }
